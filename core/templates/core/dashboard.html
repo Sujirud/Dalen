@@ -15,9 +15,19 @@
       </div>
       <div class="days-badge">{{ data.remaining_days }} days remaining</div>
     </div>
-    <a href="{% url 'goal_setup' %}" class="reset-link" title="Change Goal">
-      <i class="fas fa-edit"></i> Edit
-    </a>
+
+    <div class="flex-between">
+      <a href="{% url 'goal_setup' %}" class="reset-link font-size-lg" title="Update Goal">
+        <i class="fas fa-edit"></i>
+      </a>
+
+      <form action="{% url 'delete_goal' %}" method="post" onsubmit="return confirm('Are you sure you want to delete this goal?');">
+        {% csrf_token %}
+        <button type="submit" class="reset-link font-size-lg" title="Delete Goal">
+          <i class="fas fa-trash"></i>
+        </button>
+      </form>
+    </div>
   </div>
 
   <div class="card main-metric-card {% if data.remaining_today < 0 %}metric-danger{% endif %}">
@@ -213,7 +223,7 @@
     <p class="empty-state-desc">
       You don't have an active savings plan. Tell us your goal, and we'll calculate your daily safe-to-spend limit automatically.
     </p>
-    <a href="{% url 'goal_setup' %}" class="btn btn-primary btn-lg shadow-hover">
+    <a href="{% url 'goal_setup' %}" class="btn btn-primary btn-lg shadow-hover" title="Create New Goal">
       <i class="fas fa-plus-circle"></i> Create New Goal
     </a>
   </div>

@@ -82,25 +82,51 @@ def transaction_api(request):
     return JsonResponse({'transactions': data})
 
 @login_required
-def onboarding(request):
+def setup_goal(request):
     current_goal = Goal.objects.filter(user=request.user, is_active=True).first()
 
     if request.method == 'POST':
         user = request.user
-        Goal.objects.filter(user=user).update(is_active=False)
 
         try:
-            Goal.objects.create(
-                user=user,
-                name=request.POST.get('goal_name'),
-                target_amount=Decimal(request.POST.get('goal_amount', 0)),
-                deadline=date.today() + timedelta(days=int(request.POST.get('days', 30)))
-            )
+            goal_name = request.POST.get('goal_name')
+            target_amount = Decimal(request.POST.get('goal_amount', 0))
+
+            deadline_str = request.POST.get('deadline')
+            deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+
+            if current_goal:
+                # Update existing goal
+                current_goal.name = goal_name
+                current_goal.target_amount = target_amount
+                current_goal.deadline = deadline
+                current_goal.save()
+                messages.success(request, "Goal updated successfully.")
+            else:
+                # Create new goal
+                Goal.objects.filter(user=user).update(is_active=False)
+                Goal.objects.create(
+                    user=user,
+                    name=goal_name,
+                    target_amount=target_amount,
+                    deadline=deadline
+                )
+                messages.success(request, "New goal created!")
+
             return redirect('dashboard')
         except ValueError:
             messages.error(request, "Invalid input. Please check your numbers.")
 
-    return render(request, 'core/goal_setup.html', {'goal': current_goal})
+    # Calculate min_date for the date picker (Tomorrow)
+    min_date = date.today() + timedelta(days=1)
+
+    return render(request, 'core/goal_setup.html', {'current_goal': current_goal, 'min_date': min_date})
+
+@login_required
+def delete_goal(request):
+    if request.method == 'POST':
+        Goal.objects.filter(user=request.user, is_active=True).delete()
+    return redirect('dashboard')
 
 @login_required
 def recurring_management(request):

@@ -9,7 +9,8 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='landing'), name='logout'),
 
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('setup-goal/', views.onboarding, name='goal_setup'),
+    path('setup-goal/', views.setup_goal, name='goal_setup'),
+    path('delete-goal/', views.delete_goal, name='delete_goal'),
     path('fixed-flows/', views.recurring_management, name='fixed_flows'),
     path('add/', views.add_transaction, name='transaction'),
     path('settings/', views.settings, name='settings'),

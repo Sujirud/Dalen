@@ -14,7 +14,7 @@
         <label>Goal Name</label>
         <div class="input-wrapper">
           <i class="fas fa-pen input-icon"></i>
-          <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" required>
+          <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" required value="{{ current_goal.name|default:'' }}">
         </div>
       </div>
 
@@ -23,26 +23,34 @@
           <label>Target Amount</label>
           <div class="input-wrapper">
             <span class="currency-symbol">{{ user.userprofile.currency_symbol }}</span>
-            <input type="number" step="0.01" min="0.01" max="9999999999999" name="goal_amount" placeholder="0.00" required>
+            <input type="number" step="0.01" min="0.01" max="9999999999999" name="goal_amount" placeholder="0.00" required value="{{ current_goal.target_amount|default:'' }}">
           </div>
         </div>
-        
+
         <div class="form-field">
-          <label>Timeline (Days)</label>
+          <label>Deadline</label>
           <div class="input-wrapper">
             <i class="fas fa-calendar-alt input-icon"></i>
-            <input type="number" name="days" min="1" max="3650" placeholder="0" required>
+            <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required value="{{ current_goal.deadline|date:'Y-m-d'|default:'' }}">
           </div>
         </div>
       </div>
 
+      {% if current_goal %}
       <div class="alert alert-info mt-2">
-        <i class="fas fa-info-circle"></i> Creating a new plan will replace your current active goal.
+        <i class="fas fa-info-circle"></i> Updating a plan will recalculate your daily budget.
       </div>
+      {% endif %}
 
       <div class="form-actions">
         <a href="{% url 'dashboard' %}" class="btn btn-outline btn-full">Cancel</a>
-        <button type="submit" class="btn btn-primary btn-full shadow-hover">Calculate Plan</button>
+        <button type="submit" class="btn btn-primary btn-full shadow-hover">
+        {% if current_goal %}
+          Update Plan
+        {% else %}
+          Create Plan
+        {% endif %}
+        </button>
       </div>
     </form>
   </div>
