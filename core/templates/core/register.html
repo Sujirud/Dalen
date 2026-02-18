@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="center-stage">
+  <div class="card-small glass-panel">
+    <div class="header-block">
+      <h2>Create Account</h2>
+      <p>Set up your financial compass.</p>
+    </div>
+    <form method="post" class="styled-form">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-field">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+        <small class="help-text">{{ field.help_text }}</small>
+        {% endif %}
+      </div>
+      {% endfor %}
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-full shadow-hover">Sign Up</button>
+      </div>
+    </form>
+    <div class="card-footer">
+      Already have an account? <a href="{% url 'login' %}">Log in here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

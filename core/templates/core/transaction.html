@@ -1,0 +1,201 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="transaction-container glass-panel">
+
+  <div class="header-block">
+    <h2><i class="fas fa-receipt"></i> Add Transaction</h2>
+  </div>
+
+  <input type="radio" name="tab_control" id="tab_manual" checked hidden>
+  <input type="radio" name="tab_control" id="tab_scan" hidden>
+
+  <div class="tabs-header">
+    <label for="tab_manual" class="tab-label">
+      <i class="fas fa-keyboard"></i> Manual Entry
+    </label>
+    <label for="tab_scan" class="tab-label">
+      <i class="fas fa-camera"></i> Upload Receipt
+    </label>
+  </div>
+
+  <form method="post" class="styled-form tab-content content-manual">
+    {% csrf_token %}
+
+    <div class="form-field">
+      <label>Description</label>
+      <div class="input-wrapper">
+        <i class="fas fa-tag input-icon"></i>
+        <input type="text" name="description" placeholder="e.g. Coffee" maxlength="100" autocomplete="off">
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-field">
+        <label>Amount</label>
+        <div class="input-wrapper">
+          <span class="currency-symbol">{{ user.userprofile.currency_symbol }}</span>
+          <input type="number" step="0.01" min="0.01" max="9999999999999" name="amount" placeholder="0.00" required>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Type</label>
+        <div class="select-wrapper">
+          <select name="type">
+            <option value="expense" selected>Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label>Date</label>
+        <input type="date" name="txn_date" id="txn_date" required>
+      </div>
+      <div class="form-field">
+        <label>Time</label>
+        <input type="time" name="txn_time" id="txn_time">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary btn-full shadow-hover">Record Transaction</button>
+    </div>
+  </form>
+
+  <form method="post" enctype="multipart/form-data" class="tab-content content-scan" id="uploadForm">
+    {% csrf_token %}
+    
+    <div id="upload-zone">
+      <input type="file" name="receipt_images" id="fileInput" class="file-input" accept="image/*" required multiple>
+      
+      <div class="zone-content">
+        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+        <h3>Upload Receipt Images</h3>
+        <p>Tap to select or drag files here.</p>
+        <small class="text-muted">We'll extract the date and total automatically.</small>
+      </div>
+    </div>
+
+    <div id="previewContainer" class="preview-grid mt-2 hidden"></div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary btn-full shadow-hover">
+        <i class="fas fa-magic"></i> Analyze & Save
+      </button>
+    </div>
+  </form>
+
+  <div class="card-footer">
+    <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm btn-full">Cancel</a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 1. Set Date/Time Defaults
+    const dateInput = document.getElementById('txn_date');
+    const timeInput = document.getElementById('txn_time');
+    
+    if (dateInput) {
+        dateInput.valueAsDate = new Date();
+    }
+    if (timeInput) {
+        const now = new Date();
+        // Format to HH:MM for HTML time input
+        const timeString = now.toTimeString().split(' ')[0].substring(0,5);
+        timeInput.value = timeString;
+    }
+
+    // 2. Receipt Upload Logic
+    const fileInput = document.getElementById('fileInput');
+    const uploadZone = document.getElementById('upload-zone');
+    const previewContainer = document.getElementById('previewContainer');
+    const dt = new DataTransfer();
+
+    fileInput.addEventListener('change', function(e) {
+      for (let i = 0; i < this.files.length; i++) {
+        dt.items.add(this.files[i]);
+      }
+      this.files = dt.files; 
+      updateGallery();
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      uploadZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      uploadZone.addEventListener(eventName, () => uploadZone.classList.add('highlight'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      uploadZone.addEventListener(eventName, () => uploadZone.classList.remove('highlight'), false);
+    });
+
+    uploadZone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+      const droppedFiles = e.dataTransfer.files;
+      for (let i = 0; i < droppedFiles.length; i++) {
+        dt.items.add(droppedFiles[i]);
+      }
+      fileInput.files = dt.files;
+      updateGallery();
+    }
+
+    function updateGallery() {
+      previewContainer.innerHTML = '';
+      
+      if (dt.files.length > 0) {
+        previewContainer.classList.remove('hidden');
+      } else {
+        previewContainer.classList.add('hidden');
+      }
+
+      Array.from(dt.files).forEach((file, index) => {
+        const item = document.createElement('div');
+        item.className = 'preview-item';
+
+        const img = document.createElement('img');
+        img.file = file;
+        img.className = 'preview-img';
+
+        const info = document.createElement('div');
+        info.className = 'preview-info';
+        
+        const name = document.createElement('span');
+        name.textContent = file.name;
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'deleteimg-btn';
+        delBtn.innerHTML = '<i class="fas fa-times"></i>';
+        delBtn.type = 'button';
+        delBtn.onclick = () => removeFile(index);
+
+        info.appendChild(name);
+        item.appendChild(img);
+        item.appendChild(info);
+        item.appendChild(delBtn);
+        previewContainer.appendChild(item);
+
+        const reader = new FileReader();
+        reader.onload = (e) => { img.src = e.target.result; };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    window.removeFile = function(index) {
+      dt.items.remove(index);
+      fileInput.files = dt.files;
+      updateGallery();
+    }
+  });
+</script>
+{% endblock %}

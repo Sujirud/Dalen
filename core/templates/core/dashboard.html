@@ -1,0 +1,296 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="dashboard-grid">
+  
+{% if data %}
+
+  <div class="dashboard-header-card glass-panel span-full">
+    <div class="goal-info">
+      <div class="goal-icon-circle">
+        <i class="fas fa-flag"></i>
+      </div>
+      <div class="goal-text">
+        <span class="goal-label">Current Goal</span>
+        <span class="goal-title">{{ data.goal_name }}</span>
+      </div>
+      <div class="days-badge">{{ data.remaining_days }} days remaining</div>
+    </div>
+    <a href="{% url 'goal_setup' %}" class="reset-link" title="Change Goal">
+      <i class="fas fa-edit"></i> Edit
+    </a>
+  </div>
+
+  <div class="card main-metric-card {% if data.remaining_today < 0 %}metric-danger{% endif %}">
+    <div class="card-glow"></div>
+    <div class="metric-content">
+        <p class="metric-label">Safe to Spend Today</p>
+        <div class="metric-value">
+          <span class="currency">{{ user.userprofile.currency_symbol }}</span>{{ data.remaining_today }}
+        </div>
+        <div class="metric-footer">
+          <div class="spent-pill">
+            <i class="fas fa-receipt"></i> Spent Today: {{ data.spent_today }} {{ user.userprofile.currency_symbol }}
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="card glass-panel progress-card">
+    <div class="progress-header">
+      <span>Timeline Progress</span>
+      <span>{{ data.progress_percent }}%</span>
+    </div>
+    <div class="progress-track-container">
+      <div class="progress-track">
+        <div class="progress-fill" style="width: {{ data.progress_percent }}%;">
+          <div class="progress-glare"></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <small class="text-muted">Daily Allowance: <strong>{{ data.base_budget }} {{ user.userprofile.currency_symbol }}</strong></small>
+    </div>
+  </div>
+
+  <a href="{% url 'transaction' %}" class="fab-btn" title="Add Transaction">
+    <i class="fas fa-plus"></i>
+  </a>
+
+  {% if chart_dates %}
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <div class="card glass-panel span-full">
+    <div class="header-block flex-between">
+      <div>
+        <h3><i class="fas fa-chart-line"></i> Spending Velocity</h3>
+        <p class="text-muted" style="font-size: 1.2rem;">Budget Limit vs. Actual Spending</p>
+      </div>
+
+      <div>
+        <button class="btn btn-outline btn-sm time-filter" data-days="90">90 Days</button>
+        <button class="btn btn-outline btn-sm time-filter ml-2" data-days="30">30 Days</button>
+        <button class="btn btn-outline btn-sm time-filter ml-2 active" data-days="7">7 Days</button>
+      </div>
+    </div>
+    <div id="chart"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const currencySign = "{{ user.userprofile.currency_symbol }}";
+
+      // --- 1. Data Injection (Safe Django Pattern) ---
+      const rawDates = {{ chart_dates|safe }};
+      const safeData = {{ chart_safe|safe }};
+      const actualData = {{ chart_actual|safe }};
+
+      // --- 2. Color & Theme Configuration ---
+      function getThemeColors(isDark) {
+        return {
+          primary: isDark ? '#60a5fa' : '#3b82f6',
+          danger:  isDark ? '#f87171' : '#ef4444',
+          grid:    isDark ? '#334155' : '#e2e8f0',
+          text:    isDark ? '#94a3b8' : '#64748b'
+        };
+      }
+
+      const initialTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+      let currentColors = getThemeColors(initialTheme);
+
+      // --- 3. Chart Setup ---
+      const options = {
+        series: [{
+          name: 'Safe Budget',
+          type: 'area',
+          data: safeData
+        }, {
+          name: 'Actual Spend',
+          type: 'line',
+          data: actualData
+        }],
+        chart: {
+          height: 320,
+          type: 'line',
+          fontFamily: 'Plus Jakarta Sans, sans-serif',
+          background: 'transparent',
+          toolbar: { show: false },
+          zoom: { enabled: false },
+          animations: { enabled: true }
+        },
+        colors: [currentColors.primary, currentColors.danger],
+        stroke: {
+          width: [2, 3],
+          curve: 'smooth',
+          dashArray: [0, 0]
+        },
+        fill: {
+          type: ['gradient', 'solid'],
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.4,
+            opacityTo: 0.05,
+            stops: [0, 90, 100]
+          }
+        },
+        dataLabels: { enabled: false },
+        labels: rawDates,
+        xaxis: {
+          type: 'datetime',
+          tooltip: { enabled: false },
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          labels: { 
+            style: { colors: currentColors.text, fontSize: '12px' },
+            datetimeFormatter: { year: 'yyyy', month: 'MMM', day: 'dd MMM' }
+          }
+        },
+        yaxis: {
+          labels: {
+            style: { colors: currentColors.text },
+            formatter: (value) => { return value.toFixed(0); }
+          },
+        },
+        grid: {
+          borderColor: currentColors.grid,
+          strokeDashArray: 4,
+          yaxis: { lines: { show: true } },
+          xaxis: { lines: { show: false } },
+          padding: { top: 0, right: 0, bottom: 0, left: 10 }
+        },
+        theme: { mode: initialTheme ? 'dark' : 'light' },
+        tooltip: {
+          theme: initialTheme ? 'dark' : 'light',
+          y: { formatter: function (val) { return currencySign + " " + val } }
+        }
+      };
+
+      const chart = new ApexCharts(document.querySelector("#chart"), options);
+      chart.render();
+
+      // --- 4. Interactivity: Zoom ---
+      const buttons = document.querySelectorAll('.time-filter');
+      const getLastDateTimestamp = () => new Date(rawDates[rawDates.length - 1]).getTime();
+
+      function handleZoom(days) {
+        const endDate = getLastDateTimestamp();
+        const startDate = endDate - (days * 24 * 60 * 60 * 1000);
+            
+        chart.zoomX(startDate, endDate);
+
+        buttons.forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = 'var(--text-muted)';
+        });
+            
+        const activeBtn = document.querySelector('.time-filter[data-days="' + days + '"]');
+        if(activeBtn) {
+          activeBtn.classList.add('active');
+          activeBtn.style.background = 'var(--primary-light)';
+          activeBtn.style.color = 'var(--primary)';
+        }
+      }
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const days = parseInt(e.target.dataset.days);
+          handleZoom(days);
+        });
+      });
+
+      setTimeout(() => handleZoom(7), 100);
+    });
+  </script>
+
+  {% endif %}
+
+{% else %}
+  <div class="dashboard-header-card glass-panel empty-state">
+    <div class="logo-circle empty-state-logo">
+      <i class="fas fa-compass"></i>
+    </div>
+    <h2 class="empty-state-title">Let's set a course.</h2>
+    <p class="empty-state-desc">
+      You don't have an active savings plan. Tell us your goal, and we'll calculate your daily safe-to-spend limit automatically.
+    </p>
+    <a href="{% url 'goal_setup' %}" class="btn btn-primary btn-lg shadow-hover">
+      <i class="fas fa-plus-circle"></i> Create New Goal
+    </a>
+  </div>
+{% endif %}
+
+  <div class="card glass-panel span-full">
+    <div class="header-block flex-between">
+      <h3><i class="fas fa-list-ul"></i> Recent Transactions</h3>
+
+      <div>
+        <button class="btn btn-outline btn-sm txn-filter" onclick="loadTransactions(30)" data-days="30">30 Days</button>
+        <button class="btn btn-outline btn-sm txn-filter ml-2 active" onclick="loadTransactions(7)" data-days="7">7 Days</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th class="text-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="txn-list-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const currencySign = "{{ user.userprofile.currency_symbol }}";
+
+      window.loadTransactions = async function(days) {
+        // Update buttons UI
+        document.querySelectorAll('.txn-filter').forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = 'var(--text-muted)';
+        });
+        const activeBtn = document.querySelector('.txn-filter[data-days="' + days + '"]');
+        if(activeBtn) {
+          activeBtn.classList.add('active');
+          activeBtn.style.background = 'var(--primary-light)';
+          activeBtn.style.color = 'var(--primary)';
+        }
+
+        // Fetch Data
+        try {
+          const response = await fetch(`{% url 'transaction_api' %}?days=${days}`);
+          const data = await response.json();
+          const tbody = document.getElementById('txn-list-body');
+          tbody.innerHTML = ''; // Clear current
+
+          if (data.transactions.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" class="text-muted text-center" style="padding: 2rem;">No transactions found in this period.</td></tr>`;
+          } else {
+            data.transactions.forEach(t => {
+              const amountClass = t.is_expense ? 'text-danger' : 'text-success';
+              const sign = t.is_expense ? '' : '+';
+
+              const row = `
+              <tr>
+                <td class="text-muted">${t.date}</td>
+                <td class="font-bold cell-round-left">${t.description}</td>
+                <td class="text-right cell-round-right ${amountClass} font-bold">${sign}${t.amount.toFixed(2)} ${currencySign}</td>
+              </tr>`;
+              tbody.innerHTML += row;
+            });
+          }
+        } catch (error) { console.error("Error loading transactions:", error); }
+      };
+
+      // Load initial transactions
+      loadTransactions(7);
+    });
+  </script>
+
+</div>
+{% endblock %}

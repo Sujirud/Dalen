@@ -1,0 +1,32 @@
+# --- Python General ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Django Core ---
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# --- Environment & Config ---
+.env
+env_config.sh
+.venv/
+venv/
+env/
+
+# --- Static ---
+staticfiles/
+
+# --- IDE & Editors ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- OS Generated ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini

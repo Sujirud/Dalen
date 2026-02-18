@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<div class="center-stage">
+  <div class="landing-card glass-panel">
+    <div>
+      <div class="logo-circle">
+        <img src="{% static 'img/logo.svg' %}" alt="Logo">
+      </div>
+      <h1 class="app-title gradient-text">Dalen</h1>
+      <p class="app-tagline">Your Daily Spending Compass.</p>
+      <p class="app-desc">Simply set a savings goal, and we'll calculate exactly what is safe to spend today. No complex spreadsheets required.</p>
+    </div>
+
+    <div class="auth-buttons">
+      <a href="{% url 'login' %}" class="btn btn-primary btn-lg shadow-hover">Log In</a>
+      <a href="{% url 'register' %}" class="btn btn-outline btn-lg">Get Started</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

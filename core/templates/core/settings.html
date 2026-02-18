@@ -1,0 +1,127 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="header-block ml-2">
+  <h2><i class="fas fa-sliders-h"></i> Settings</h2>
+  <p>Manage your account preferences.</p>
+</div>
+
+<div class="settings-body">
+  <div class="card glass-panel">
+    <h3 class="section-title"><i class="fas fa-user-circle"></i> Account</h3>
+
+    <form method="post" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_username">
+      <h4>Username</h4>
+
+      <div class="form-field row">
+        <div class="input-wrapper">
+          <i class="fas fa-user input-icon"></i>
+          <input type="text" name="username" value="{{ user.username }}" required>
+        </div>
+
+        <button type="submit" class="btn btn-outline btn-sm">Change Username</button>
+      </div>
+    </form>
+
+    <div class="styled-form">
+      <div class="form-field row">
+        <div>
+          <h4>Password</h4>
+          <p>Change your account password</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="openModal('passwordModal')">Change Password</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card glass-panel">
+    <h3 class="section-title"><i class="fas fa-paint-brush"></i> Preferences</h3>
+
+    <form method="post" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_theme">
+
+      <div class="form-field">
+        <label>Color Theme</label>
+        <div class="select-wrapper">
+          <select name="theme" onchange="this.form.submit()">
+            <option value="light" {% if profile.theme == 'light' %}selected{% endif %}>Light Mode</option>
+            <option value="dark" {% if profile.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <form method="post" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_currency-symbol">
+
+      <div class="form-field">
+        <label>Currency Symbol</label>
+        <div class="input-wrapper">
+          <i class="fas fa-coins input-icon"></i>
+          <input type="text" name="currency_symbol" value="{{ profile.currency_symbol }}" maxlength="5" onchange="this.form.submit()">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<dialog id="passwordModal">
+  <div class="card panel">
+    <div class="modal-header">
+      <h3>Change Password</h3>
+      <button type="button" class="close-btn" onclick="closeModal('passwordModal')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form method="post" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="change_password">
+
+      {% for field in password_form %}
+      <div class="form-field">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+        <small class="help-text">{{ field.help_text }}</small>
+        {% endif %}
+        {% if field.errors %}
+        <small class="error-text">
+          <i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}
+        </small>
+        {% endif %}
+      </div>
+      {% endfor %}
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal('passwordModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary shadow-hover">Set New Password</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<script>
+  function openModal(modalId) {
+    document.getElementById(modalId)?.showModal();
+  }
+  function closeModal(modalId) {
+    document.getElementById(modalId)?.close();
+  }
+
+  const dialogs = document.querySelectorAll('dialog');
+  dialogs.forEach(dialog => {
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+  });
+
+  // Automatically re-open modal if there are backend errors
+  {% if password_form.errors %}
+  document.addEventListener('DOMContentLoaded', function() {
+    openModal('passwordModal');
+  });
+  {% endif %}
+</script>
+{% endblock %}

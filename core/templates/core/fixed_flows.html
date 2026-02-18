@@ -1,0 +1,180 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="dashboard-grid">
+
+  <div class="card glass-panel span-full">
+    <div class="header-block flex-between">
+      <div>
+        <h2><i class="fas fa-sync-alt"></i> Fixed Flows</h2>
+        <p>Manage recurring income (Salary) and expenses (Rent, Subs).</p>
+      </div>
+      <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+
+    {% if items %}
+    <div class="table-responsive">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Start Date</th>
+            <th>Frequency</th>
+            <th>End Date</th>
+            <th class="text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td class="font-bold cell-round-left">
+              {{ item.name }}
+            </td>
+            <td>
+              {% if item.amount < 0 %}
+                <span class="text-danger font-bold">{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
+              {% else %}
+                <span class="text-success font-bold">+{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
+              {% endif %}
+            </td>
+            
+            <td class="text-muted">
+              {{ item.start_date|date:"M d, Y" }}
+            </td>
+
+            <td>
+              {% if item.frequency_type == 'monthly' %}
+                <div class="days-badge">Monthly</div>
+              {% else %}
+                <div class="days-badge">Every {{ item.interval_days }} days</div>
+              {% endif %}
+            </td>
+
+            <td class="text-muted">
+              {{ item.end_date|date:"M d, Y"|default:"-" }}
+            </td>
+
+            <td class="text-right cell-round-right">
+              <form method="post" class="inline-form" onsubmit="return confirm('Delete {{ item.name }}? This will affect future budget calculations.');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <button type="submit" class="icon-btn logout-btn pull-right" title="Delete Item">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-list-state">
+      <i class="fas fa-clipboard-list empty-icon"></i>
+      <p>No fixed flows defined yet.</p>
+      <small>Adding your Rent and Salary here makes the daily budget strictly accurate.</small>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="card glass-panel span-full">
+    <h3 style="margin-bottom: -2rem;"><i class="fas fa-plus-circle"></i> Add Fixed Flow</h3>
+
+    <form method="post" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create">
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Name</label>
+          <input type="text" name="rec_name" placeholder="e.g. Monthly Salary or Netflix" maxlength="50" required>
+        </div>
+        <div class="form-field">
+          <label>Amount</label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">{{ user.userprofile.currency_symbol }}</span>
+            <input type="number" step="0.01" min="0" max="9999999999999" name="rec_amount" placeholder="0.00" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Type</label>
+          <div class="select-wrapper">
+            <select name="rec_type">
+              <option value="expense">Expense (-)</option>
+              <option value="income">Income (+)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Frequency</label>
+          <div class="select-wrapper">
+            <select name="frequency_type" id="freqSelector">
+              <option value="monthly">Monthly</option>
+              <option value="custom">Custom Interval</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Start Date</label>
+          <input type="date" name="start_date_custom" id="customDate" required>
+
+          <div id="monthlyOptions" class="hidden">
+            <small class="help-text">For monthly items, we'll repeat on this day every month.</small>
+          </div>
+        </div>
+
+        <div id="customOptions" class="form-field hidden">
+          <label>Repeat Every (Days)</label>
+          <input type="number" name="interval_days" placeholder="e.g. 14">
+        </div>
+
+        <div class="form-field">
+          <label>End Date (Optional)</label>
+          <input type="date" name="end_date_custom">
+         </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary shadow-hover">Save Item</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const freqSelector = document.getElementById('freqSelector');
+    const monthlyOptions = document.getElementById('monthlyOptions');
+    const customOptions = document.getElementById('customOptions');
+    const customDate = document.getElementById('customDate');
+
+    // Default date to today
+    const today = new Date().toISOString().split('T')[0];
+    if(!customDate.value) customDate.value = today;
+
+    function toggleOptions() {
+      if (freqSelector.value === 'monthly') {
+        monthlyOptions.classList.remove('hidden');
+        customOptions.classList.add('hidden');
+        customDate.required = false;
+      } else {
+        monthlyOptions.classList.add('hidden');
+        customOptions.classList.remove('hidden');
+        customDate.required = true;
+      }
+    }
+
+    freqSelector.addEventListener('change', toggleOptions);
+    toggleOptions();
+  });
+</script>
+{% endblock %}
