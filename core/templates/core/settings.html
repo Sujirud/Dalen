@@ -65,6 +65,36 @@
         </div>
       </div>
     </form>
+
+    <form method="post" class="styled-form" id="timezoneForm">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_timezone">
+
+      <div class="form-field row">
+        <div>
+          <label>
+            Time Zone
+            <small id="clockDisplay" class="ml-2" style="color: var(--primary);">
+              <i class="far fa-clock"></i> Local time: --:--
+            </small>
+          </label>
+          <div class="select-wrapper">
+            <select name="timezone" id="timezoneSelect">
+              {% for tz in timezones %}
+              <option value="{{ tz }}" {% if profile.timezone == tz %}selected{% endif %}>{{ tz }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <button type="button" class="btn btn-outline btn-sm btn-full" onclick="detectTimezone()" title="Detect my location">
+            <i class="fas fa-location-arrow"></i> Auto
+          </button>
+          <button type="submit" class="btn btn-outline btn-sm btn-full">Save</button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -112,16 +142,62 @@
     document.getElementById(modalId)?.close();
   }
 
-  const dialogs = document.querySelectorAll('dialog');
-  dialogs.forEach(dialog => {
+  document.querySelectorAll('dialog').forEach(dialog => {
     dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
   });
 
   // Automatically re-open modal if there are backend errors
   {% if password_form.errors %}
-  document.addEventListener('DOMContentLoaded', function() {
-    openModal('passwordModal');
-  });
+  document.addEventListener('DOMContentLoaded', openModal('passwordModal'));
   {% endif %}
+</script>
+
+<script>
+  const select = document.getElementById('timezoneSelect');
+  const display = document.getElementById('clockDisplay');
+
+  function detectTimezone() {
+    try {
+      const detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (select && detectedTz) {
+        // Check if option exists
+        let exists = false;
+        for (let i=0; i < select.options.length; i++){
+          if (select.options[i].value === detectedTz) {
+            exists = true; 
+            break;
+          }
+        }
+
+        if (exists) {
+          select.value = detectedTz;
+          updateClock(); // Visually update immediately
+        } else {
+          alert("Your system timezone (" + detectedTz + ") is not supported by the server.");
+        }
+      }
+    } catch (e) { console.error("Timezone detection failed", e); }
+  }
+
+  function updateClock() {
+    if (select && display) {
+      const tz = select.value;
+      try {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+          timeZone: tz, 
+          hour: '2-digit', 
+          minute: '2-digit',
+          weekday: 'short'
+        });
+        display.innerHTML = `<i class="far fa-clock"></i> ${timeString}`;
+      } catch (e) {
+        display.textContent = "";
+      }
+    }
+  }
+
+  setInterval(updateClock, 10000);
+  document.addEventListener('DOMContentLoaded', updateClock);
 </script>
 {% endblock %}

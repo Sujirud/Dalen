@@ -8,6 +8,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     theme = models.CharField(max_length=10, default='light', choices=[('light', 'Light'), ('dark', 'Dark')])
     currency_symbol = models.CharField(max_length=5, default='$')
+    timezone = models.CharField(max_length=63, default='UTC')
 
     def __str__(self):
         return f"{self.user.username}'s Profile"

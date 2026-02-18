@@ -1,13 +1,20 @@
-from datetime import date, timedelta
+from datetime import timedelta
 from decimal import Decimal
 from django.db.models import Sum
+from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from .models import Goal, Transaction, RecurringItem
+import zoneinfo
 
 class FinancialGPS:
     def __init__(self, user):
         self.user = user
         self.goal = Goal.objects.filter(user=user, is_active=True).first()
+        self.user_tz = zoneinfo.ZoneInfo(self.user.userprofile.timezone)
+
+    def get_today(self):
+        """Returns the current date in the user's local timezone."""
+        return timezone.now().astimezone(self.user_tz).date()
 
     def _calculate_future_recurring(self, start_date, end_date):
         """
@@ -53,7 +60,7 @@ class FinancialGPS:
         if not self.goal:
             return None
 
-        today = date.today()
+        today = self.get_today()
         deadline = self.goal.deadline
 
         # 1. Timeline
@@ -101,13 +108,11 @@ class FinancialGPS:
     def get_historical_data(self, days=30):
         """
         Reconstructs the 'Safe to Spend' vs 'Actual' for the past N days.
-        Solves the 'Time Travel' problem by recalculating the budget based on 
-        the context (days remaining, balance) of that specific past day.
         """
         if not self.goal:
             return None
 
-        today = date.today()
+        today = self.get_today()
 
         goal_start_date = self.goal.created_at.date()
         requested_start = today - timedelta(days=days)
@@ -151,12 +156,11 @@ class FinancialGPS:
             running_net_worth += net_change
 
             # RECONSTRUCTION: What was the budget at the START of this day?
-            # We use (running_net_worth - net_change) to simulate morning balance
             morning_balance = running_net_worth - net_change
-            
+
             # Calculate Future Recurring from THAT date
             future_cash = self._calculate_future_recurring(current_date, self.goal.deadline)
-            
+
             # Calculate Days Remaining from THAT date
             days_left = max((self.goal.deadline - current_date).days, 1)
 

@@ -4,11 +4,20 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib import messages
 from django.http import JsonResponse
+from django.utils import timezone as django_timezone
 from .models import UserProfile, Goal, Transaction, RecurringItem
 from .services import FinancialGPS
-from datetime import date, timedelta, datetime
+from datetime import timedelta, datetime
 from decimal import Decimal
 import json
+import zoneinfo
+
+# --- HELPERS ---
+
+def _get_today(user):
+    """Returns the current date in the user's configured timezone."""
+    user_tz = zoneinfo.ZoneInfo(user.userprofile.timezone)
+    return django_timezone.now().astimezone(user_tz).date()
 
 # --- PUBLIC VIEWS ---
 
@@ -61,8 +70,10 @@ def transaction_api(request):
     """
     API Endpoint to fetch transactions via AJAX
     """
+    today = _get_today(request.user)
+    
     days = int(request.GET.get('days', 30))
-    start_date = date.today() - timedelta(days=days)
+    start_date = today - timedelta(days=days)
 
     transactions = Transaction.objects.filter(
         user=request.user,
@@ -84,6 +95,7 @@ def transaction_api(request):
 @login_required
 def setup_goal(request):
     current_goal = Goal.objects.filter(user=request.user, is_active=True).first()
+    today = _get_today(request.user)
 
     if request.method == 'POST':
         user = request.user
@@ -118,7 +130,7 @@ def setup_goal(request):
             messages.error(request, "Invalid input. Please check your numbers.")
 
     # Calculate min_date for the date picker (Tomorrow)
-    min_date = date.today() + timedelta(days=1)
+    min_date = today + timedelta(days=1)
 
     return render(request, 'core/goal_setup.html', {'current_goal': current_goal, 'min_date': min_date})
 
@@ -185,6 +197,8 @@ def recurring_management(request):
 @login_required
 def add_transaction(request):
     if request.method == 'POST':
+        today = _get_today(request.user)
+
         # Handles receipt upload via 'receipt_images' input
         images = request.FILES.getlist('receipt_images')
         if images:
@@ -193,7 +207,8 @@ def add_transaction(request):
             Transaction.objects.create(
                 user=request.user,
                 amount=total_cost,
-                description=f"Scanned Receipt ({count} items)"
+                description=f"Scanned Receipt ({count} items)",
+                date=today
             )
             messages.success(request, f"Processed {count} receipts!")
             return redirect('dashboard')
@@ -208,12 +223,12 @@ def add_transaction(request):
             if amount_val:
                 amount = Decimal(amount_val)
                 final_amount = amount if trans_type == 'income' else -abs(amount)
-                
+
                 # Parse Date or Default to Today
                 if date_val:
                     txn_date = datetime.strptime(date_val, '%Y-%m-%d').date()
                 else:
-                    txn_date = date.today()
+                    txn_date = today
 
                 Transaction.objects.create(
                     user=request.user,
@@ -233,6 +248,7 @@ def settings(request):
     user = request.user
     profile = UserProfile.objects.get(user=user)
     password_form = PasswordChangeForm(user)
+    available_timezones = sorted(list(zoneinfo.available_timezones()))
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -260,8 +276,17 @@ def settings(request):
             profile.currency_symbol = request.POST.get('currency_symbol')
             profile.save()
             return redirect('settings')
+            
+        elif action == 'update_timezone':
+            tz = request.POST.get('timezone')
+            if tz in available_timezones:
+                profile.timezone = tz
+                profile.save()
+                messages.success(request, "Time zone updated.")
+            return redirect('settings')
 
     return render(request, 'core/settings.html', {
         'profile': profile,
-        'password_form': password_form
+        'password_form': password_form,
+        'timezones': available_timezones
     })
