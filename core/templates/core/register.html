@@ -8,10 +8,28 @@
     </div>
     <form method="post" class="styled-form">
       {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+          <div><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       {% for field in form %}
       <div class="form-field">
         <label>{{ field.label }}</label>
         {{ field }}
+
+        {% if field.errors %}
+          <div class="error-text">
+            {% for error in field.errors %}
+              <div><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
         {% if field.help_text %}
         <small class="help-text">{{ field.help_text }}</small>
         {% endif %}
