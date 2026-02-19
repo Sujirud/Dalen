@@ -10,6 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="{% static 'js/slimselect.min.js' %}"></script>
+
   <link rel="stylesheet" href="{% static 'fontawesomefree/css/all.min.css' %}" type="text/css">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
@@ -57,5 +60,20 @@
       {% block content %}{% endblock %}
     </main>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const selects = document.querySelectorAll('select');
+
+      selects.forEach(select => {
+        const enableSearch = select.dataset.search == 'true';
+
+        select.slim = new SlimSelect({
+          select: select,
+          settings: { showSearch: enableSearch }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

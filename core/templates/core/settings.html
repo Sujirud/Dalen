@@ -44,12 +44,10 @@
 
       <div class="form-field">
         <label>Color Theme</label>
-        <div class="select-wrapper">
-          <select name="theme" onchange="this.form.submit()">
-            <option value="light" {% if profile.theme == 'light' %}selected{% endif %}>Light Mode</option>
-            <option value="dark" {% if profile.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
-          </select>
-        </div>
+        <select name="theme" onchange="this.form.submit()">
+          <option value="light" {% if profile.theme == 'light' %}selected{% endif %}>Light Mode</option>
+          <option value="dark" {% if profile.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
+        </select>
       </div>
     </form>
 
@@ -78,13 +76,11 @@
               <i class="far fa-clock"></i> Local time: --:--
             </small>
           </label>
-          <div class="select-wrapper">
-            <select name="timezone" id="timezoneSelect">
-              {% for tz in timezones %}
-              <option value="{{ tz }}" {% if profile.timezone == tz %}selected{% endif %}>{{ tz }}</option>
-              {% endfor %}
-            </select>
-          </div>
+          <select name="timezone" id="timezoneSelect" data-search="true">
+            {% for tz in timezones %}
+            <option value="{{ tz }}" {% if profile.timezone == tz %}selected{% endif %}>{{ tz }}</option>
+            {% endfor %}
+          </select>
         </div>
 
         <div class="flex-column" style="gap: 0;">
@@ -160,17 +156,13 @@
     try {
       const detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
       if (select && detectedTz) {
-        // Check if option exists
-        let exists = false;
-        for (let i=0; i < select.options.length; i++){
-          if (select.options[i].value === detectedTz) {
-            exists = true; 
-            break;
-          }
-        }
+
+        const exists = Array.from(select.options).some(opt => opt.value === detectedTz);
 
         if (exists) {
-          select.value = detectedTz;
+          if (select.slim) select.slim.setSelected(detectedTz);
+          else select.value = detectedTz;
+
           updateClock(); // Visually update immediately
         } else {
           alert("Your system timezone (" + detectedTz + ") is not supported by the server.");
@@ -196,6 +188,8 @@
       }
     }
   }
+
+  if (select) select.addEventListener('change', updateClock);
 
   setInterval(updateClock, 10000);
   document.addEventListener('DOMContentLoaded', updateClock);
