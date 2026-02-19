@@ -75,6 +75,9 @@
 html { font-size: 62.5%; height: 100%; }
 ul { padding-left: 10px; }
 
+h2 { font-size: 2.6rem; }
+h4 { font-size: 1.8rem; }
+
 button {
   display: block;
   background: none;
@@ -94,7 +97,89 @@ body {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 3. LAYOUT & BACKGROUND                                                     */
+/* 3. UTILITIES & MISC                                                       */
+/* -------------------------------------------------------------------------- */
+.pd-4 { padding: 4rem !important; }
+.mt-2 { margin-top: 2rem !important; }
+.mr-2 { margin-right: 2rem !important; }
+.mb-2 { margin-bottom: 2rem !important; }
+.ml-2 { margin-left: 2rem !important; }
+
+.font-size-1-8 { font-size: 1.8rem !important; }
+.font-size-2 { font-size: 2rem !important; }
+
+.flex-column { display: flex; flex-direction: column; gap: 2rem; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+
+.pull-right { float: right !important; }
+.text-right { text-align: right !important; }
+.text-muted { color: var(--text-muted); }
+.text-danger { color: var(--danger); }
+.text-success { color: var(--success-dark); }
+.font-bold { font-weight: 700; }
+.hidden { display: none !important; }
+@media (max-width: 600px) { .hidden-mobile { display: none !important; } }
+
+h2 i, h3 i { margin-right: 0.8rem; }
+
+.help-text { display: block; margin: 1.4rem; color: var(--text-muted); }
+.error-text { display: block; margin: 1.4rem 0; color: var(--danger); font-weight: 600; }
+.error-text i { margin-right: 0.8rem; }
+
+/* Alerts */
+.alert { padding: 1rem 1.6rem; border-radius: var(--radius-md); margin: 0 1rem 1.6rem; font-weight: 600; display: flex; gap: 1rem; align-items: center; }
+.alert-success { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+.alert-error, .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+.alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+
+/* Dialogs/Modals */
+dialog {
+  display: none; justify-content: center; align-items: center;
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  max-width: 100%; max-height: 100%; background: none; border: none;
+  color: var(--text-main); transition: all 0.3s ease-out, overlay 0.3s allow-discrete, display 0.3s allow-discrete;
+  opacity: 0; transform: scale(96%);
+}
+dialog::backdrop {
+  background: #00000080; backdrop-filter: blur(2px);
+  transition: all 0.3s ease-out, overlay 0.3s allow-discrete, display 0.3s allow-discrete;
+  opacity: 0;
+}
+dialog[open] { display: flex; opacity: 1; transform: none; }
+dialog[open]::backdrop { opacity: 1; }
+@starting-style {
+  dialog[open] { opacity: 0; transform: scale(96%); }
+  dialog[open]::backdrop { opacity: 0; }
+}
+
+.modal-header { display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { font-size: 2.2rem; font-weight: 700; margin: 0; }
+.close-btn {
+  background: transparent; border: none; font-size: 2.4rem; color: var(--text-muted);
+  cursor: pointer; transition: all 0.2s; width: 3.2rem; height: 3.2rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.close-btn:hover { background: var(--input-bg); color: var(--text-main); }
+
+/* Landing Page Elements */
+.logo-circle {
+  background: linear-gradient(135deg, var(--primary-light), white);
+  width: 12rem; height: 12rem; padding: 1rem;
+  display: inline-flex; border-radius: 50%; margin-bottom: 2.4rem;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.15);
+}
+[data-theme="dark"] .logo-circle { background: linear-gradient(135deg, var(--primary-dark), #1e293b); }
+.app-title { font-size: 4.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
+.gradient-text {
+  background: linear-gradient(to right, var(--primary), var(--accent));
+  background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.app-tagline { font-size: 2rem; font-weight: 600; color: var(--text-main); margin-bottom: 1.6rem; }
+.app-desc { font-size: 1.8rem; color: var(--text-muted); margin-bottom: 4rem; max-width: 50rem; margin-left: auto; margin-right: auto; }
+.auth-buttons { display: flex; gap: 1.6rem; justify-content: center; max-width: 40rem; margin: 0 auto; }
+
+/* -------------------------------------------------------------------------- */
+/* 4. LAYOUT & BACKGROUND                                                     */
 /* -------------------------------------------------------------------------- */
 .app-background {
   position: fixed;
@@ -132,15 +217,15 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 80vh;
-  padding: 2rem;
 }
 .goal-setup-stage {
+  display: flex;
+  justify-content: center;
   align-items: flex-start;
-  padding-top: 4rem;
 }
 
 /* -------------------------------------------------------------------------- */
-/* 4. COMPONENTS: NAVIGATION                                                  */
+/* 5. COMPONENTS: NAVIGATION                                                  */
 /* -------------------------------------------------------------------------- */
 .top-nav {
   position: sticky;
@@ -194,7 +279,7 @@ body {
 .logout-btn:hover { background: rgba(var(--danger-rgb), 0.2); color: var(--danger); }
 
 /* -------------------------------------------------------------------------- */
-/* 5. COMPONENTS: CARDS & CONTAINERS                                          */
+/* 6. COMPONENTS: CARDS & CONTAINERS                                          */
 /* -------------------------------------------------------------------------- */
 .panel {
   background: var(--bg-surface);
@@ -210,21 +295,26 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.card { border-radius: var(--radius-md); padding: 2.4rem; overflow: hidden; }
-.card > :last-child { margin-bottom: 0; }
-
-.landing-card {
-  max-width: 80rem; width: 100%; padding: 6rem 4rem;
-  text-align: center; border-radius: 3.2rem;
+.card {
+  display: flex; flex-direction: column; gap: 2rem;
+  border-radius: var(--radius-md);
+  padding: 2.4rem;
+  overflow: hidden;
 }
 
 .card-small {
+  display: flex; flex-direction: column; gap: 2rem;
   width: 100%; max-width: 60rem; padding: 4rem; border-radius: 2.4rem;
 }
-.card-footer { margin-top: 2rem; }
+
+.landing-card {
+  max-width: 80rem; width: 100%; padding: 6rem 4rem;
+  border-radius: 3.2rem;
+  text-align: center;
+}
 
 /* -------------------------------------------------------------------------- */
-/* 6. COMPONENTS: DASHBOARD                                                   */
+/* 7. COMPONENTS: DASHBOARD                                                   */
 /* -------------------------------------------------------------------------- */
 .dashboard-grid {
   display: grid; grid-template-columns: 1fr; gap: 2.4rem;
@@ -302,9 +392,9 @@ body {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 7. COMPONENTS: TABLES & RECURRING ITEMS                                    */
+/* 8. COMPONENTS: TABLES & RECURRING ITEMS                                    */
 /* -------------------------------------------------------------------------- */
-.table-responsive { overflow-x: auto; margin-top: 1rem; }
+.table-responsive { overflow-x: auto; }
 
 .styled-table {
   width: 100%;
@@ -341,11 +431,9 @@ body {
 .empty-icon { font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3; }
 
 /* -------------------------------------------------------------------------- */
-/* 8. COMPONENTS: FORMS & INPUTS                                              */
+/* 9. COMPONENTS: FORMS & INPUTS                                              */
 /* -------------------------------------------------------------------------- */
-.styled-form { margin: 2rem 0; }
-.styled-form h4 { font-size: 1.8rem; margin-bottom: 1.6rem; }
-.settings-body { display: flex; flex-direction: column; gap: 2rem; }
+.styled-form { display: flex; flex-direction: column; gap: 2rem; }
 
 @media (min-width: 45rem) {
   .form-row { display: flex; gap: 3rem;}
@@ -353,13 +441,15 @@ body {
 
 .form-field { flex: 1; }
 .form-field label {
-  display: block; margin-top: 2.4rem; margin-bottom: 0.8rem;
+  display: block;
+  margin-bottom: 0.8rem;
   font-weight: 600; font-size: 1.3rem; color: var(--text-muted);
   text-transform: uppercase; letter-spacing: 0.05rem;
 }
 
 .form-field input, .form-field select {
   width: 100%;
+  height: 5.5rem;
   padding: 1.4rem 1.6rem;
   border: 1px solid var(--input-border);
   border-radius: 1.2rem;
@@ -397,19 +487,21 @@ body {
   position: absolute; top: 50%; transform: translateY(-50%); right: 1.6rem; pointer-events: none;
 }
 
-.form-actions { display: flex; justify-content: end; gap: 3rem; margin-top: 3rem; }
+.form-actions { display: flex; justify-content: end; gap: 3rem; }
 .inline-form { display: inline; }
 
 /* -------------------------------------------------------------------------- */
-/* 9. COMPONENTS: BUTTONS                                                     */
+/* 10. COMPONENTS: BUTTONS                                                     */
 /* -------------------------------------------------------------------------- */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center;
+  position: relative;
   padding: 1.2rem 2.4rem;
   border-radius: 1.2rem;
-  font-weight: 700; text-decoration: none;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1.6rem; gap: 0.8rem; position: relative;
 }
 
 .shadow-hover:hover {
@@ -457,13 +549,11 @@ body {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 10. COMPONENTS: TRANSACTION TABS & UPLOAD                                  */
+/* 11. COMPONENTS: TRANSACTION TABS & UPLOAD                                  */
 /* -------------------------------------------------------------------------- */
-.transaction-container { padding: 4rem; }
-
 .tabs-header {
   display: flex; background: var(--input-bg); padding: 0.5rem;
-  border-radius: 1.2rem; margin-bottom: 2.4rem; gap: 0.5rem;
+  border-radius: 1.2rem; gap: 0.5rem;
   box-shadow: var(--shadow-inner);
 }
 
@@ -481,8 +571,8 @@ body {
 }
 
 .tab-content { display: none; animation: slideUp 0.3s ease-out; }
-#tab_manual:checked ~ .content-manual { display: block; }
-#tab_scan:checked ~ .content-scan { display: block; }
+#tab_manual:checked ~ .content-manual { display: flex; }
+#tab_scan:checked ~ .content-scan { display: flex; }
 @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Upload Zone */
@@ -528,79 +618,3 @@ body {
   cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s;
 }
 .deleteimg-btn:hover { transform: scale(1.1); }
-
-/* -------------------------------------------------------------------------- */
-/* 11. UTILITIES & MISC                                                       */
-/* -------------------------------------------------------------------------- */
-.ml-2 { margin-left: 2rem !important; }
-.mt-2 { margin-top: 2rem !important; }
-.font-size-lg { font-size: 1.8rem !important; }
-.header-block { margin-bottom: 1.8rem; }
-.flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-.pull-right { float: right !important; }
-.text-right { text-align: right !important; }
-.text-muted { color: var(--text-muted); }
-.text-danger { color: var(--danger); }
-.text-success { color: var(--success-dark); }
-.font-bold { font-weight: 700; }
-.hidden { display: none !important; }
-@media (max-width: 600px) { .hidden-mobile { display: none !important; } }
-
-h2 i, h3 i { margin-right: 0.8rem; }
-
-.section-title { font-size: 2rem; margin-bottom: 3rem; }
-.help-text { display: block; margin: 1.4rem; color: var(--text-muted); }
-.error-text { display: block; margin: 1.4rem 0; color: var(--danger); font-weight: 600; }
-.error-text i { margin-right: 0.8rem; }
-
-/* Alerts */
-.alert { padding: 1.6rem; border-radius: var(--radius-md); margin-bottom: 1.6rem; font-weight: 600; display: flex; gap: 1rem; align-items: center; }
-.alert-success { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
-.alert-error, .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
-.alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
-
-/* Dialogs/Modals */
-dialog {
-  display: none; justify-content: center; align-items: center;
-  position: fixed; inset: 0; width: 100%; height: 100%;
-  max-width: 100%; max-height: 100%; background: none; border: none;
-  color: var(--text-main); transition: all 0.3s ease-out, overlay 0.3s allow-discrete, display 0.3s allow-discrete;
-  opacity: 0; transform: scale(96%);
-}
-dialog::backdrop {
-  background: #00000080; backdrop-filter: blur(2px);
-  transition: all 0.3s ease-out, overlay 0.3s allow-discrete, display 0.3s allow-discrete;
-  opacity: 0;
-}
-dialog[open] { display: flex; opacity: 1; transform: none; }
-dialog[open]::backdrop { opacity: 1; }
-@starting-style {
-  dialog[open] { opacity: 0; transform: scale(96%); }
-  dialog[open]::backdrop { opacity: 0; }
-}
-
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.4rem; }
-.modal-header h3 { font-size: 2.2rem; font-weight: 700; margin: 0; }
-.close-btn {
-  background: transparent; border: none; font-size: 2.4rem; color: var(--text-muted);
-  cursor: pointer; transition: all 0.2s; width: 3.2rem; height: 3.2rem; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-}
-.close-btn:hover { background: var(--input-bg); color: var(--text-main); }
-
-/* Landing Page Elements */
-.logo-circle {
-  background: linear-gradient(135deg, var(--primary-light), white);
-  width: 12rem; height: 12rem; padding: 1rem;
-  display: inline-flex; border-radius: 50%; margin-bottom: 2.4rem;
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.15);
-}
-[data-theme="dark"] .logo-circle { background: linear-gradient(135deg, var(--primary-dark), #1e293b); }
-.app-title { font-size: 4.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
-.gradient-text {
-  background: linear-gradient(to right, var(--primary), var(--accent));
-  background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.app-tagline { font-size: 2rem; font-weight: 600; color: var(--text-main); margin-bottom: 1.6rem; }
-.app-desc { font-size: 1.8rem; color: var(--text-muted); margin-bottom: 4rem; max-width: 50rem; margin-left: auto; margin-right: auto; }
-.auth-buttons { display: flex; gap: 1.6rem; justify-content: center; max-width: 40rem; margin: 0 auto; }

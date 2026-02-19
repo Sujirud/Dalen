@@ -17,13 +17,13 @@
     </div>
 
     <div class="flex-between">
-      <a href="{% url 'goal_setup' %}" class="reset-link font-size-lg" title="Update Goal">
+      <a href="{% url 'goal_setup' %}" class="reset-link font-size-1-8" title="Update Goal">
         <i class="fas fa-edit"></i>
       </a>
 
       <form action="{% url 'delete_goal' %}" method="post" onsubmit="return confirm('Are you sure you want to delete this goal?');">
         {% csrf_token %}
-        <button type="submit" class="reset-link font-size-lg" title="Delete Goal">
+        <button type="submit" class="reset-link font-size-1-8" title="Delete Goal">
           <i class="fas fa-trash"></i>
         </button>
       </form>
@@ -70,16 +70,16 @@
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
   <div class="card glass-panel span-full">
-    <div class="header-block flex-between">
+    <div class="flex-between">
       <div>
         <h3><i class="fas fa-chart-line"></i> Spending Velocity</h3>
         <p class="text-muted" style="font-size: 1.2rem;">Budget Limit vs. Actual Spending</p>
       </div>
 
-      <div>
+      <div class="flex-between">
         <button class="btn btn-outline btn-sm time-filter" data-days="90">90 Days</button>
-        <button class="btn btn-outline btn-sm time-filter ml-2" data-days="30">30 Days</button>
-        <button class="btn btn-outline btn-sm time-filter ml-2 active" data-days="7">7 Days</button>
+        <button class="btn btn-outline btn-sm time-filter" data-days="30">30 Days</button>
+        <button class="btn btn-outline btn-sm time-filter active" data-days="7">7 Days</button>
       </div>
     </div>
     <div id="chart"></div>
@@ -230,12 +230,12 @@
 {% endif %}
 
   <div class="card glass-panel span-full">
-    <div class="header-block flex-between">
+    <div class="flex-between">
       <h3><i class="fas fa-list-ul"></i> Recent Transactions</h3>
 
-      <div>
+      <div class="flex-between">
         <button class="btn btn-outline btn-sm txn-filter" onclick="loadTransactions(30)" data-days="30">30 Days</button>
-        <button class="btn btn-outline btn-sm txn-filter ml-2 active" onclick="loadTransactions(7)" data-days="7">7 Days</button>
+        <button class="btn btn-outline btn-sm txn-filter active" onclick="loadTransactions(7)" data-days="7">7 Days</button>
       </div>
     </div>
 

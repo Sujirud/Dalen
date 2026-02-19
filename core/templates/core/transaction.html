@@ -1,10 +1,7 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="transaction-container glass-panel">
-
-  <div class="header-block">
-    <h2><i class="fas fa-receipt"></i> Add Transaction</h2>
-  </div>
+<div class="glass-panel pd-4 flex-column">
+  <h2><i class="fas fa-receipt"></i> Add Transaction</h2>
 
   <input type="radio" name="tab_control" id="tab_manual" checked hidden>
   <input type="radio" name="tab_control" id="tab_scan" hidden>
@@ -18,7 +15,7 @@
     </label>
   </div>
 
-  <form method="post" class="styled-form tab-content content-manual">
+  <form method="post" class="styled-form tab-content flex-column content-manual">
     {% csrf_token %}
 
     <div class="form-field">
@@ -65,7 +62,7 @@
     </div>
   </form>
 
-  <form method="post" enctype="multipart/form-data" class="tab-content content-scan" id="uploadForm">
+  <form method="post" enctype="multipart/form-data" class="tab-content flex-column content-scan" id="uploadForm">
     {% csrf_token %}
     
     <div id="upload-zone">
@@ -88,9 +85,7 @@
     </div>
   </form>
 
-  <div class="card-footer">
-    <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm btn-full">Cancel</a>
-  </div>
+  <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm btn-full">Cancel</a>
 </div>
 
 <script>

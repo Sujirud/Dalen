@@ -1,13 +1,13 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="header-block ml-2">
-  <h2><i class="fas fa-sliders-h"></i> Settings</h2>
-  <p>Manage your account preferences.</p>
-</div>
+<div class="flex-column">
+  <div class="ml-2">
+    <h2><i class="fas fa-sliders-h"></i> Settings</h2>
+    <p>Manage your account preferences.</p>
+  </div>
 
-<div class="settings-body">
-  <div class="card glass-panel">
-    <h3 class="section-title"><i class="fas fa-user-circle"></i> Account</h3>
+  <div class="card glass-panel flex-column">
+    <h3 class="font-size-2"><i class="fas fa-user-circle"></i> Account</h3>
 
     <form method="post" class="styled-form">
       {% csrf_token %}
@@ -35,8 +35,8 @@
     </div>
   </div>
 
-  <div class="card glass-panel">
-    <h3 class="section-title"><i class="fas fa-paint-brush"></i> Preferences</h3>
+  <div class="card glass-panel flex-column">
+    <h3 class="font-size-2"><i class="fas fa-paint-brush"></i> Preferences</h3>
 
     <form method="post" class="styled-form">
       {% csrf_token %}
@@ -87,7 +87,7 @@
           </div>
         </div>
 
-        <div>
+        <div class="flex-column" style="gap: 0;">
           <button type="button" class="btn btn-outline btn-sm btn-full" onclick="detectTimezone()" title="Detect my location">
             <i class="fas fa-location-arrow"></i> Auto
           </button>
