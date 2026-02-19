@@ -12,6 +12,69 @@ from decimal import Decimal
 import json
 import zoneinfo
 
+CURRENCIES = {
+    'د.إ': ['AED'],
+    'AR$': ['ARS'],
+    '$': ['AUD', 'CAD', 'NZD', 'SGD', 'USD'],
+    'KM': ['BAM'],
+    '৳': ['BDT'],
+    'BGN': ['BGN'],
+    '.د.ب': ['BHD'],
+    'Bs.': ['BOB'],
+    'R$': ['BRL'],
+    'CHF': ['CHF'],
+    'CL$': ['CLP'],
+    '¥': ['CNY', 'JPY'],
+    'CO$': ['COP'],
+    'Kč': ['CZK'],
+    'kr': ['DKK', 'ISK', 'NOK', 'SEK'],
+    'E£': ['EGP'],
+    '€': ['EUR'],
+    '£': ['GBP'],
+    'GH₵': ['GHS'],
+    'HK$': ['HKD'],
+    'Ft': ['HUF'],
+    'Rp': ['IDR'],
+    '₪': ['ILS'],
+    '₹': ['INR'],
+    'ع.د': ['IQD'],
+    'د.ا': ['JOD'],
+    'KSh': ['KES'],
+    '៛': ['KHR'],
+    '₩': ['KRW'],
+    'د.ك': ['KWD'],
+    '₭': ['LAK'],
+    'ل.ل': ['LBP'],
+    'Rs': ['LKR', 'PKR'],
+    'MAD': ['MAD'],
+    'K': ['MMK'],
+    '₮': ['MNT'],
+    'MOP$': ['MOP'],
+    'MX$': ['MXN'],
+    'RM': ['MYR'],
+    '₦': ['NGN'],
+    'रू': ['NPR'],
+    'ر.ع.': ['OMR'],
+    'S/': ['PEN'],
+    '₱': ['PHP'],
+    'zł': ['PLN'],
+    '₲': ['PYG'],
+    'ر.ق': ['QAR'],
+    'lei': ['RON'],
+    'дин.': ['RSD'],
+    '₽': ['RUB'],
+    '﷼': ['SAR'],
+    '฿': ['THB'],
+    '₺': ['TRY'],
+    'NT$': ['TWD'],
+    'TSh': ['TZS'],
+    '₴': ['UAH'],
+    'USh': ['UGX'],
+    '$U': ['UYU'],
+    '₫': ['VND'],
+    'ZAR': ['ZAR']
+}
+
 # --- HELPERS ---
 
 def _get_today(user):
@@ -275,8 +338,9 @@ def settings(request):
         elif action == 'update_currency-symbol':
             profile.currency_symbol = request.POST.get('currency_symbol')
             profile.save()
+            messages.success(request, "Currency symbol updated.")
             return redirect('settings')
-            
+
         elif action == 'update_timezone':
             tz = request.POST.get('timezone')
             if tz in available_timezones:
@@ -288,5 +352,6 @@ def settings(request):
     return render(request, 'core/settings.html', {
         'profile': profile,
         'password_form': password_form,
-        'timezones': available_timezones
+        'timezones': available_timezones,
+        'currencies': CURRENCIES
     })

@@ -36,31 +36,21 @@
   </div>
 
   <div class="card glass-panel flex-column">
-    <h3 class="font-size-2"><i class="fas fa-paint-brush"></i> Preferences</h3>
-
-    <form method="post" class="styled-form">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="update_theme">
-
-      <div class="form-field">
-        <label>Color Theme</label>
-        <select name="theme" onchange="this.form.submit()">
-          <option value="light" {% if profile.theme == 'light' %}selected{% endif %}>Light Mode</option>
-          <option value="dark" {% if profile.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
-        </select>
-      </div>
-    </form>
+    <h3 class="font-size-2"><i class="fas fa-globe"></i> Regional Settings</h3>
 
     <form method="post" class="styled-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="update_currency-symbol">
 
       <div class="form-field">
-        <label>Currency Symbol</label>
-        <div class="input-wrapper">
-          <i class="fas fa-coins input-icon"></i>
-          <input type="text" name="currency_symbol" value="{{ profile.currency_symbol }}" maxlength="5" onchange="this.form.submit()">
-        </div>
+        <label>Currency</label>
+        <select name="currency_symbol" data-search="true" onchange="this.form.submit()">
+          {% for symbol, codes in currencies.items %}
+            <option value="{{ symbol }}" {% if profile.currency_symbol == symbol %}selected{% endif %}>
+              {{ codes|join:", " }} ({{ symbol }})
+            </option>
+          {% endfor %}
+        </select>
       </div>
     </form>
 
@@ -89,6 +79,23 @@
           </button>
           <button type="submit" class="btn btn-outline btn-sm btn-full">Save</button>
         </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card glass-panel flex-column">
+    <h3 class="font-size-2"><i class="fas fa-paint-brush"></i> Preferences</h3>
+
+    <form method="post" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_theme">
+
+      <div class="form-field">
+        <label>Color Theme</label>
+        <select name="theme" onchange="this.form.submit()">
+          <option value="light" {% if profile.theme == 'light' %}selected{% endif %}>Light Mode</option>
+          <option value="dark" {% if profile.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
+        </select>
       </div>
     </form>
   </div>
