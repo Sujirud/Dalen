@@ -117,11 +117,13 @@ body {
 .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
 
 .pull-right { float: right !important; }
+
 .text-right { text-align: right !important; }
 .text-muted { color: var(--text-muted); }
 .text-danger { color: var(--danger); }
 .text-success { color: var(--success-dark); }
 .font-bold { font-weight: 700; }
+
 .hidden { display: none !important; }
 @media (max-width: 600px) { .hidden-mobile { display: none !important; } }
 
@@ -548,6 +550,16 @@ dialog[open]::backdrop { opacity: 1; }
 /* -------------------------------------------------------------------------- */
 /* 11. COMPONENTS: TRANSACTION TABS & UPLOAD                                  */
 /* -------------------------------------------------------------------------- */
+input[name="tab_control"] {
+  opacity: 0 !important;
+  position: fixed !important;
+  pointer-events: none !important;
+}
+#tab_manual:focus-visible ~ .tabs-header label[for="tab_manual"],
+#tab_scan:focus-visible ~ .tabs-header label[for="tab_scan"] {
+  box-shadow: inset 0 0 0 1px var(--primary), 0 0 0 5px var(--primary-light) !important;
+}
+
 .tabs-header {
   display: flex; background: var(--input-bg); padding: 0.5rem;
   border-radius: 1.2rem; gap: 0.5rem;
@@ -619,7 +631,6 @@ dialog[open]::backdrop { opacity: 1; }
 /* -------------------------------------------------------------------------- */
 /* 12. SLIM SELECT                                                            */
 /* -------------------------------------------------------------------------- */
-
 .ss-main {
   align-items: center;
   height: 5.5rem;
