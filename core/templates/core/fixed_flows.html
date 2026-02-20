@@ -34,9 +34,9 @@
             </td>
             <td>
               {% if item.amount < 0 %}
-                <span class="text-danger font-bold">{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
+                <span class="text-danger font-bold no-wrap">{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
               {% else %}
-                <span class="text-success font-bold">+{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
+                <span class="text-success font-bold no-wrap">+{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
               {% endif %}
             </td>
             
@@ -140,7 +140,7 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary shadow-hover">Save Item</button>
+        <button type="submit" class="btn btn-primary">Save Item</button>
       </div>
     </form>
   </div>

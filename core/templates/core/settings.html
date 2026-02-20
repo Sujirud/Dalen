@@ -30,7 +30,7 @@
           <h4>Password</h4>
           <p>Change your account password</p>
         </div>
-        <button class="btn btn-outline btn-sm" onclick="openModal('passwordModal')">Change Password</button>
+        <button id="changePasswordBtn" class="btn btn-outline btn-sm">Change Password</button>
       </div>
     </div>
   </div>
@@ -101,11 +101,11 @@
   </div>
 </div>
 
-<dialog id="passwordModal">
-  <div class="card panel">
+<script>
+  const passwordModalContent = `
     <div class="modal-header">
       <h3>Change Password</h3>
-      <button type="button" class="close-btn" onclick="closeModal('passwordModal')">
+      <button type="button" class="close-btn" onclick="window.dialog.close()">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -130,24 +130,12 @@
       {% endfor %}
       
       <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal('passwordModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary shadow-hover">Set New Password</button>
+        <button type="button" class="btn btn-outline" onclick="window.dialog.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Set New Password</button>
       </div>
     </form>
-  </div>
-</dialog>
-
-<script>
-  function openModal(modalId) {
-    document.getElementById(modalId)?.showModal();
-  }
-  function closeModal(modalId) {
-    document.getElementById(modalId)?.close();
-  }
-
-  document.querySelectorAll('dialog').forEach(dialog => {
-    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
-  });
+  `
+  document.getElementById("changePasswordBtn").addEventListener("click", () => window.dialog.open(passwordModalContent));
 
   // Automatically re-open modal if there are backend errors
   {% if password_form.errors %}

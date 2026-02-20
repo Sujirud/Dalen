@@ -59,7 +59,32 @@
       {% endif %}
       {% block content %}{% endblock %}
     </main>
+
+    <dialog id="modal-dialog"><div id="modal-container" class="card-small panel"></div></dialog>
   </div>
+
+  <script>
+    class Dialog {
+      constructor() {
+        this.container = document.getElementById("modal-dialog");
+        this.modal = document.getElementById("modal-container");
+
+        this.container.addEventListener('click', (e) => { if (e.target === this.container) this.container.close(); });
+      }
+
+      open(content) {
+        this.modal.innerHTML = content;
+        this.container.showModal();
+        document.body.style.overflow = 'hidden';
+      }
+      close() {
+        this.container.close();
+        document.body.style.overflow = '';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { window.dialog = new Dialog(); });
+  </script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {

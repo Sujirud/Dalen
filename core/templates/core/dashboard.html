@@ -21,12 +21,9 @@
         <i class="fas fa-edit"></i>
       </a>
 
-      <form action="{% url 'delete_goal' %}" method="post" onsubmit="return confirm('Are you sure you want to delete this goal?');">
-        {% csrf_token %}
-        <button type="submit" class="reset-link font-size-1-8" title="Delete Goal">
-          <i class="fas fa-trash"></i>
-        </button>
-      </form>
+      <button id="deleteGoalBtn" class="reset-link font-size-1-8" title="Delete Goal">
+        <i class="fas fa-trash"></i>
+      </button>
     </div>
   </div>
 
@@ -84,6 +81,31 @@
     </div>
     <div id="chart"></div>
   </div>
+
+  <script>
+    const deleteGoalContent = `
+      <form action="{% url 'delete_goal' %}" method="post" class="flex-column">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h3>Delete Goal</h3>
+          <button type="button" class="close-btn" onclick="window.dialog.close()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div>
+          <p>Are you sure you want to delete your current goal? This will reset all progress.</p>
+          <p class="text-danger font-bold text-right">This action cannot be undone.</p>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline btn-sm" onclick="window.dialog.close()">Cancel</button>
+          <button type="submit" class="btn btn-danger btn-sm">Delete Goal</button>
+        </div>
+      </form>
+    `
+    document.getElementById("deleteGoalBtn").addEventListener("click", () => window.dialog.open(deleteGoalContent));
+  </script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -223,7 +245,7 @@
     <p class="empty-state-desc">
       You don't have an active savings plan. Tell us your goal, and we'll calculate your daily safe-to-spend limit automatically.
     </p>
-    <a href="{% url 'goal_setup' %}" class="btn btn-primary btn-lg shadow-hover" title="Create New Goal">
+    <a href="{% url 'goal_setup' %}" class="btn btn-primary btn-lg" title="Create New Goal">
       <i class="fas fa-plus-circle"></i> Create New Goal
     </a>
   </div>
@@ -287,9 +309,9 @@
 
               const row = `
               <tr>
-                <td class="text-muted">${t.date}</td>
-                <td class="font-bold cell-round-left">${t.description}</td>
-                <td class="text-right cell-round-right ${amountClass} font-bold">${sign}${t.amount.toFixed(2)} ${currencySign}</td>
+                <td class="text-muted cell-round-left">${t.date}</td>
+                <td class="font-bold">${t.description}</td>
+                <td class="text-right cell-round-right ${amountClass} font-bold no-wrap">${sign}${t.amount.toFixed(2)} ${currencySign}</td>
               </tr>`;
               tbody.innerHTML += row;
             });
