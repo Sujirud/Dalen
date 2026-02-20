@@ -3,12 +3,12 @@ from .models import Goal, Transaction, RecurringItem
 
 @admin.register(RecurringItem)
 class RecurringItemAdmin(admin.ModelAdmin):
-    list_display = ('name', 'amount', 'frequency_type', 'user', 'start_date')
+    list_display = ('name', 'user', 'amount', 'frequency_type', 'start_date', 'interval_days', 'end_date')
     list_filter = ('frequency_type', 'user')
 
 @admin.register(Goal)
 class GoalAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'target_amount', 'deadline', 'is_active')
+    list_display = ('name', 'user', 'target_amount', 'created_at', 'deadline', 'is_active')
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
