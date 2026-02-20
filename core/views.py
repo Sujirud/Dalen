@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
+from django.contrib.auth.models import User
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib import messages
 from django.http import JsonResponse
@@ -317,9 +318,19 @@ def settings(request):
         action = request.POST.get('action')
 
         if action == 'update_username':
-            user.username = request.POST.get('username')
-            user.save()
-            messages.success(request, "Username updated.")
+            new_username = request.POST.get('username', '').strip()
+
+            if not new_username:
+                messages.error(request, "Username cannot be empty.")
+
+            elif User.objects.filter(username=new_username).exclude(pk=user.pk).exists():
+                messages.error(request, "This username is already taken. Please choose another one.")
+
+            else:
+                user.username = new_username
+                user.save()
+                messages.success(request, "Username updated successfully.")
+                
             return redirect('settings')
 
         elif action == 'change_password':
