@@ -1,17 +1,17 @@
 {% extends 'core/base.html' %}
 {% block content %}
 <div class="glass-panel pd-4 flex-column">
-  <h2><i class="fas fa-receipt"></i> Add Transaction</h2>
+  <h2><i class="fas fa-receipt"></i><span>Add Transaction</span></h2>
 
   <input type="radio" name="tab_control" id="tab_manual" checked>
   <input type="radio" name="tab_control" id="tab_scan">
 
   <div class="tabs-header">
     <label for="tab_manual" class="tab-label">
-      <i class="fas fa-keyboard"></i> Manual Entry
+      <i class="fas fa-keyboard"></i><span>Manual Entry</span>
     </label>
     <label for="tab_scan" class="tab-label">
-      <i class="fas fa-camera"></i> Upload Receipt
+      <i class="fas fa-camera"></i><span>Upload Receipt</span>
     </label>
   </div>
 
@@ -78,7 +78,7 @@
 
     <div class="form-actions">
       <button type="submit" class="btn btn-primary btn-full">
-        <i class="fas fa-magic"></i> Analyze & Save
+        <i class="fas fa-magic"></i><span>Analyze & Save</span>
       </button>
     </div>
   </form>

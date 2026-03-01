@@ -129,17 +129,31 @@ body {
 .hidden { display: none !important; }
 @media (max-width: 600px) { .hidden-mobile { display: none !important; } }
 
-h2 i, h3 i { margin-right: 0.8rem; }
+i:has(+ span) { margin-right: 0.4em; }
 
 .help-text { display: block; margin: 1.4rem; color: var(--text-muted); }
-.error-text { display: block; margin: 1.4rem 0; color: var(--danger); font-weight: 600; }
-.error-text i { margin-right: 0.8rem; }
+.error-text { display: block; margin: 0 1.4rem; color: var(--danger); font-weight: 600; }
+.error-text::before {
+  content: "\f06a";
+  font-family: "Font Awesome 6 Free"; font-weight: 900;
+  margin-right: 0.4em;
+}
 
 /* Alerts */
-.alert { padding: 1rem 1.6rem; border-radius: var(--radius-md); margin: 0 1rem 1.6rem; font-weight: 600; display: flex; gap: 1rem; align-items: center; }
+.alert {
+  display: flex; align-items: center; gap: 1.2rem;
+  padding: 1rem 1.6rem; margin: 0 1rem; border-radius: var(--radius-md);
+  font-weight: 600;
+}
+
 .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
 .alert-error, .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+
+:where(.alert-success, .alert-error, .alert-danger, .alert-info)::before { font-family: "Font Awesome 6 Free"; font-weight: 900; }
+.alert-success::before { content: "\f058"; }
+.alert-error::before , .alert-danger::before { content: "\f06a"; }
+.alert-info::before { content: "\f05a"; }
 
 /* Dialogs/Modals */
 dialog {
@@ -165,11 +179,12 @@ dialog[open]::backdrop { opacity: 1; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; }
 .modal-header h3 { font-size: 2.2rem; font-weight: 700; }
 .close-btn {
-  background: transparent; border: none; font-size: 2.4rem; color: var(--text-muted);
-  cursor: pointer; transition: all 0.2s; width: 3.2rem; height: 3.2rem; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; color: var(--text-muted);
+  width: 3.2rem; height: 3.2rem; border-radius: 50%;
+  transition: all 0.2s;
 }
-.close-btn:hover { background: var(--input-bg); color: var(--text-main); }
+.close-btn:hover { background: var(--input-border); color: var(--text-main); }
 
 /* Landing Page Elements */
 .logo-circle {

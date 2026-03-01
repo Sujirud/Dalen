@@ -2,12 +2,12 @@
 {% block content %}
 <div class="flex-column">
   <div class="ml-2">
-    <h2><i class="fas fa-sliders-h"></i> Settings</h2>
+    <h2><i class="fas fa-sliders-h"></i><span>Settings</span></h2>
     <p>Manage your account preferences.</p>
   </div>
 
   <div class="card glass-panel flex-column">
-    <h3 class="font-size-2"><i class="fas fa-user-circle"></i> Account</h3>
+    <h3 class="font-size-2"><i class="fas fa-user-circle"></i><span>Account</span></h3>
 
     <form method="post" class="styled-form">
       {% csrf_token %}
@@ -36,7 +36,7 @@
   </div>
 
   <div class="card glass-panel flex-column">
-    <h3 class="font-size-2"><i class="fas fa-globe"></i> Regional Settings</h3>
+    <h3 class="font-size-2"><i class="fas fa-globe"></i><span>Regional Settings</span></h3>
 
     <form method="post" class="styled-form">
       {% csrf_token %}
@@ -62,8 +62,9 @@
         <div>
           <label>
             Time Zone
-            <small id="clockDisplay" class="ml-2" style="color: var(--primary);">
-              <i class="far fa-clock"></i> Local time: --:--
+            <small class="ml-2" style="color: var(--primary);">
+              <i class="far fa-clock"></i>
+              <span id="clockDisplay"></span>
             </small>
           </label>
           <select name="timezone" id="timezoneSelect" data-search="true">
@@ -75,7 +76,7 @@
 
         <div class="flex-column" style="gap: 0;">
           <button type="button" class="btn btn-outline btn-sm btn-full" onclick="detectTimezone()" title="Detect my location">
-            <i class="fas fa-location-arrow"></i> Auto
+            <i class="fas fa-location-arrow"></i><span>Auto</span>
           </button>
           <button type="submit" class="btn btn-outline btn-sm btn-full">Save</button>
         </div>
@@ -84,7 +85,7 @@
   </div>
 
   <div class="card glass-panel flex-column">
-    <h3 class="font-size-2"><i class="fas fa-paint-brush"></i> Preferences</h3>
+    <h3 class="font-size-2"><i class="fas fa-paint-brush"></i><span>Preferences</span></h3>
 
     <form method="post" class="styled-form">
       {% csrf_token %}
@@ -122,9 +123,7 @@
         <small class="help-text">{{ field.help_text }}</small>
         {% endif %}
         {% if field.errors %}
-        <small class="error-text">
-          <i class="fas fa-exclamation-circle"></i> {{ field.errors.0 }}
-        </small>
+        <small class="error-text">{{ field.errors.0 }}</small>
         {% endif %}
       </div>
       {% endfor %}
@@ -171,13 +170,12 @@
       const tz = select.value;
       try {
         const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', { 
+        display.innerHTML = now.toLocaleTimeString('en-US', { 
           timeZone: tz, 
           hour: '2-digit', 
           minute: '2-digit',
           weekday: 'short'
         });
-        display.innerHTML = `<i class="far fa-clock"></i> ${timeString}`;
       } catch (e) {
         display.textContent = "";
       }

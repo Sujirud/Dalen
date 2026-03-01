@@ -5,11 +5,11 @@
   <div class="card glass-panel span-full">
     <div class="flex-between mb-2">
       <div>
-        <h2><i class="fas fa-sync-alt"></i> Fixed Flows</h2>
+        <h2><i class="fas fa-sync-alt"></i><span>Fixed Flows</span></h2>
         <p>Manage recurring income (Salary) and expenses (Rent, Subs).</p>
       </div>
       <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm">
-        <i class="fas fa-arrow-left"></i> Back to Dashboard
+        <i class="fas fa-arrow-left"></i><span>Back to Dashboard</span>
       </a>
     </div>
 
@@ -81,7 +81,7 @@
   </div>
 
   <div class="card glass-panel span-full">
-    <h3><i class="fas fa-plus-circle"></i> Add Fixed Flow</h3>
+    <h3><i class="fas fa-plus-circle"></i><span>Add Fixed Flow</span></h3>
 
     <form method="post" class="styled-form">
       {% csrf_token %}
