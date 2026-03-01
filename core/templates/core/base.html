@@ -36,12 +36,9 @@
           <a href="{% url 'settings' %}" class="icon-btn" title="Settings">
             <i class="fas fa-cog"></i>
           </a>
-          <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="icon-btn logout-btn" title="Sign Out">
-              <i class="fas fa-sign-out-alt"></i>
-            </button>
-          </form>
+          <button id="logoutBtn" class="icon-btn logout-btn" title="Sign Out">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
         </div>
       </div>
     </nav>
@@ -85,6 +82,31 @@
 
     document.addEventListener('DOMContentLoaded', () => { window.dialog = new Dialog(); });
   </script>
+
+  {% if user.is_authenticated %}
+  <script>
+    const logoutModalContent = `
+    <form action="{% url 'logout' %}" method="post" class="flex-column">
+      {% csrf_token %}
+
+      <div class="modal-header">
+        <h3>Confirm Logout</h3>
+        <button type="button" class="close-btn" onclick="window.dialog.close()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <p>Are you sure you want to log out?</p>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.dialog.close()">Cancel</button>
+        <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+      </div>
+    </form>
+    `
+    document.getElementById("logoutBtn").addEventListener("click", () => window.dialog.open(logoutModalContent));
+  </script>
+  {% endif %}
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
