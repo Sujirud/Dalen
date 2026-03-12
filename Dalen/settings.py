@@ -11,21 +11,25 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from the .env file
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-v)ywg+3c7wlr8dwo2ht_vcy-%hxogls0)l2i62ch#y9+byvgx7"
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-v)ywg...')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
 
 
 # Application definition
@@ -38,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    'core',
     'fontawesomefree',
     'django_htmx',
 ]
@@ -122,10 +127,6 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 # --- GPS APP CONFIGURATION ---
-import os
-
-INSTALLED_APPS.append('core')
-
 # Auth Redirects
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
