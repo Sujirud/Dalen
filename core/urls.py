@@ -15,5 +15,5 @@ urlpatterns = [
     path('add/', views.add_transaction, name='transaction'),
     path('settings/', views.settings, name='settings'),
 
-    path('api/transactions/', views.transaction_api, name='transaction_api'),
+    path('htmx/transactions/', views.transaction_list, name='htmx_transactions'),
 ]

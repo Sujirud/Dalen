@@ -130,33 +130,6 @@ def dashboard(request):
     return render(request, 'core/dashboard.html', context)
 
 @login_required
-def transaction_api(request):
-    """
-    API Endpoint to fetch transactions via AJAX
-    """
-    today = _get_today(request.user)
-    
-    days = int(request.GET.get('days', 30))
-    start_date = today - timedelta(days=days)
-
-    transactions = Transaction.objects.filter(
-        user=request.user,
-        date__gte=start_date
-    ).order_by('-date', '-created_at')
-
-    data = []
-    for t in transactions:
-        data.append({
-            'id': t.id,
-            'date': t.date.strftime("%b %d, %Y"),
-            'description': t.description,
-            'amount': float(t.amount),
-            'is_expense': t.amount < 0
-        })
-
-    return JsonResponse({'transactions': data})
-
-@login_required
 def setup_goal(request):
     current_goal = Goal.objects.filter(user=request.user, is_active=True).first()
     today = _get_today(request.user)
@@ -366,3 +339,19 @@ def settings(request):
         'timezones': available_timezones,
         'currencies': CURRENCIES
     })
+
+@login_required
+def transaction_list(request):
+    """
+    HTMX Endpoint to fetch transaction rows as HTML partials.
+    """
+    today = _get_today(request.user)
+    days = int(request.GET.get('days', 7))
+    start_date = today - timedelta(days=days)
+
+    transactions = Transaction.objects.filter(
+        user=request.user,
+        date__gte=start_date
+    ).order_by('-date', '-created_at')
+
+    return render(request, 'core/partials/transaction_list.html', {'transactions': transactions})

@@ -257,8 +257,20 @@
       <h3><i class="fas fa-list-ul"></i><span>Recent Transactions</span></h3>
 
       <div class="flex-between">
-        <button class="btn btn-outline btn-sm txn-filter" onclick="loadTransactions(30)" data-days="30">30 Days</button>
-        <button class="btn btn-outline btn-sm txn-filter active" onclick="loadTransactions(7)" data-days="7">7 Days</button>
+        <button class="btn btn-outline btn-sm txn-filter" 
+          hx-get="{% url 'htmx_transactions' %}?days=30" 
+          hx-target="#txn-list-body"
+          onclick="setActiveTab(this)"
+        >
+          30 Days
+        </button>
+        <button class="btn btn-outline btn-sm txn-filter active" 
+          hx-get="{% url 'htmx_transactions' %}?days=7" 
+          hx-target="#txn-list-body"
+          onclick="setActiveTab(this)"
+        >
+          7 Days
+        </button>
       </div>
     </div>
 
@@ -271,58 +283,32 @@
             <th class="text-right">Amount</th>
           </tr>
         </thead>
-        <tbody id="txn-list-body"></tbody>
+        <tbody id="txn-list-body" 
+          hx-get="{% url 'htmx_transactions' %}?days=7" 
+          hx-trigger="load"
+        >
+          <tr>
+            <td colspan="3" class="text-muted text-center" style="padding: 2rem;">
+              <i class="fas fa-spinner fa-spin"></i> Loading transactions...
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const currencySign = "{{ user.userprofile.currency_symbol }}";
+    function setActiveTab(clickedBtn) {
+      document.querySelectorAll('.txn-filter').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'transparent';
+        b.style.color = 'var(--text-muted)';
+      });
 
-      window.loadTransactions = async function(days) {
-        // Update buttons UI
-        document.querySelectorAll('.txn-filter').forEach(b => {
-          b.classList.remove('active');
-          b.style.background = 'transparent';
-          b.style.color = 'var(--text-muted)';
-        });
-        const activeBtn = document.querySelector('.txn-filter[data-days="' + days + '"]');
-        if(activeBtn) {
-          activeBtn.classList.add('active');
-          activeBtn.style.background = 'var(--primary-light)';
-          activeBtn.style.color = 'var(--primary)';
-        }
-
-        // Fetch Data
-        try {
-          const response = await fetch(`{% url 'transaction_api' %}?days=${days}`);
-          const data = await response.json();
-          const tbody = document.getElementById('txn-list-body');
-          tbody.innerHTML = ''; // Clear current
-
-          if (data.transactions.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" class="text-muted text-center" style="padding: 2rem;">No transactions found in this period.</td></tr>`;
-          } else {
-            data.transactions.forEach(t => {
-              const amountClass = t.is_expense ? 'text-danger' : 'text-success';
-              const sign = t.is_expense ? '' : '+';
-
-              const row = `
-              <tr>
-                <td class="text-muted cell-round-left">${t.date}</td>
-                <td class="font-bold">${t.description}</td>
-                <td class="text-right cell-round-right ${amountClass} font-bold no-wrap">${sign}${t.amount.toFixed(2)} ${currencySign}</td>
-              </tr>`;
-              tbody.innerHTML += row;
-            });
-          }
-        } catch (error) { console.error("Error loading transactions:", error); }
-      };
-
-      // Load initial transactions
-      loadTransactions(7);
-    });
+      clickedBtn.classList.add('active');
+      clickedBtn.style.background = 'var(--primary-light)';
+      clickedBtn.style.color = 'var(--primary)';
+    }
   </script>
 
 </div>
