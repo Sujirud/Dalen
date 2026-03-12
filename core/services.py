@@ -11,6 +11,7 @@ class FinancialGPS:
         self.user = user
         self.goal = Goal.objects.filter(user=user, is_active=True).first()
         self.user_tz = zoneinfo.ZoneInfo(self.user.userprofile.timezone)
+        self.recurring_items = list(RecurringItem.objects.filter(user=user))
 
     def get_today(self):
         """Returns the current date in the user's local timezone."""
@@ -21,9 +22,8 @@ class FinancialGPS:
         Helper: Calculates the sum of all recurring items between start_date and end_date.
         """
         future_sum = Decimal(0)
-        recurring_items = RecurringItem.objects.filter(user=self.user)
 
-        for item in recurring_items:        
+        for item in self.recurring_items:        
             current_check_date = item.start_date
             target_day_of_month = item.start_date.day
 
