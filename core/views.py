@@ -212,7 +212,11 @@ def recurring_management(request):
 
                 interval = None
                 if freq_type == 'custom':
-                    interval = int(request.POST.get('interval_days'))
+                    interval_raw = request.POST.get('interval_days')
+                    interval = int(interval_raw) if interval_raw else 0
+                    if interval <= 0:
+                        messages.error(request, "Interval must be at least 1 day.")
+                        return redirect('fixed_flows')
 
                 RecurringItem.objects.create(
                     user=user,

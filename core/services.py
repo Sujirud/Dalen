@@ -34,7 +34,8 @@ class FinancialGPS:
                     max_day = (next_month + relativedelta(day=31)).day
                     current_check_date = next_month.replace(day=min(target_day_of_month, max_day))
                 else: 
-                    current_check_date += timedelta(days=item.interval_days)
+                    interval = item.interval_days if item.interval_days and item.interval_days > 0 else 1
+                    current_check_date += timedelta(days=interval)
 
             # 2. Sum up occurrences until end_date
             while current_check_date <= end_date:
@@ -49,8 +50,9 @@ class FinancialGPS:
                     max_day = (next_month + relativedelta(day=31)).day
                     current_check_date = next_month.replace(day=min(target_day_of_month, max_day))
                 else:
-                    current_check_date += timedelta(days=item.interval_days)
-        
+                    interval = item.interval_days if item.interval_days and item.interval_days > 0 else 1
+                    current_check_date += timedelta(days=interval)
+
         return future_sum
 
     def get_status(self):
