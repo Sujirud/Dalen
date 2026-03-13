@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Dalen</title>
+  <title>{{ page_title|default:"Dalen" }}</title>
   <link rel="icon" href="{% static 'img/favicon.svg' %}">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="{% static 'js/slimselect.min.js' %}"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
   <link rel="stylesheet" href="{% static 'fontawesomefree/css/all.min.css' %}" type="text/css">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -31,6 +33,7 @@
 <body>
   <div class="flex">
     {% if user.is_authenticated %}
+    {% comment %} Desktop Navigation {% endcomment %}
     <nav class="desktop-nav glass-panel">
       <div class="brand-wrapper mb-2">
         <div class="brand-icon">
@@ -40,46 +43,95 @@
       </div>
 
       <div>
-        <a class="nav-btn active" href="{% url 'dashboard' %}">
+        <a class="nav-btn" href="{% url 'dashboard' %}" 
+          hx-get="{% url 'dashboard' %}" 
+          hx-target="#main-content" 
+          hx-swap="innerHTML" 
+          hx-push-url="true"
+        >
           <i class="fas fa-home"></i><span>Dashboard</span>
         </a>
-        <a class="nav-btn" href="{% url 'fixed_flows' %}">
+        <a class="nav-btn" href="{% url 'fixed_flows' %}" 
+          hx-get="{% url 'fixed_flows' %}" 
+          hx-target="#main-content" 
+          hx-swap="innerHTML" 
+          hx-push-url="true"
+        >
           <i class="fas fa-receipt"></i><span>Fixed flows</span>
         </a>
-        <a class="nav-btn" href="{% url 'goal_setup' %}">
+        <a class="nav-btn" href="{% url 'goal_setup' %}" 
+          hx-get="{% url 'goal_setup' %}" 
+          hx-target="#main-content" 
+          hx-swap="innerHTML" 
+          hx-push-url="true"
+        >
           <i class="fas fa-calendar-alt"></i><span>Planning</span>
         </a>
       </div>
 
       <div>
-        <a class="nav-btn mb-2" href="{% url 'settings' %}">
+        <a class="nav-btn" href="{% url 'settings' %}" 
+          hx-get="{% url 'settings' %}" 
+          hx-target="#main-content" 
+          hx-swap="innerHTML" 
+          hx-push-url="true"
+        >
           <i class="fas fa-cog"></i><span>Settings</span>
         </a>
 
-        <div class="flex items-center gap-1 pd-1">
+        <div class="flex items-center gap-1 pd-1 mt-2">
           <i class="fas fa-circle-user text-30"></i>
           {{ user.username }}
         </div>
       </div>
     </nav>
 
+    {% comment %} Mobile Navigation {% endcomment %}
     <nav class="mobile-nav glass-panel">
-      <a class="nav-btn active" href="{% url 'dashboard' %}">
+      <a class="nav-btn" href="{% url 'dashboard' %}" 
+        hx-get="{% url 'dashboard' %}" 
+        hx-target="#main-content" 
+        hx-swap="innerHTML" 
+        hx-push-url="true"
+      >
         <i class="fas fa-home"></i><span>Dashboard</span>
       </a>
-      <a class="nav-btn" href="{% url 'fixed_flows' %}">
+      <a class="nav-btn" href="{% url 'fixed_flows' %}" 
+        hx-get="{% url 'fixed_flows' %}" 
+        hx-target="#main-content" 
+        hx-swap="innerHTML" 
+        hx-push-url="true"
+      >
         <i class="fas fa-receipt"></i><span>Fixed flows</span>
       </a>
       <div></div>
-      <a class="nav-btn" href="{% url 'goal_setup' %}">
+      <a class="nav-btn" href="{% url 'goal_setup' %}" 
+        hx-get="{% url 'goal_setup' %}" 
+        hx-target="#main-content" 
+        hx-swap="innerHTML" 
+        hx-push-url="true"
+      >
         <i class="fas fa-calendar-alt"></i><span>Planning</span>
       </a>
-      <a class="nav-btn" href="{% url 'settings' %}">
+      <a class="nav-btn" href="{% url 'settings' %}" 
+        hx-get="{% url 'settings' %}" 
+        hx-target="#main-content" 
+        hx-swap="innerHTML" 
+        hx-push-url="true"
+      >
         <i class="fas fa-cog"></i><span>Settings</span>
       </a>
     </nav>
 
-    <a href="{% url 'transaction' %}" class="fab-btn" title="Add Transaction"><i class="fas fa-plus"></i></a>
+    {% comment %} Floating Action Button (Add Transaction) {% endcomment %}
+    <a class="fab-btn" href="{% url 'transaction' %}" title="Add Transaction"
+      hx-get="{% url 'transaction' %}" 
+      hx-target="#main-content" 
+      hx-swap="innerHTML" 
+      hx-push-url="true"
+    >
+      <i class="fas fa-plus"></i>
+    </a>
     {% endif %}
 
     <div class="app-wrapper no-scrollbar">
@@ -97,17 +149,35 @@
         </div>
       </header>
 
-      <main class="content-container">
+      <main id="main-content" class="content-container">
         {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
-        {% endfor %}
+          {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
+          {% endfor %}
         {% endif %}
 
         {% block content %}{% endblock %}
       </main>
     </div>
   </div>
+
+  <script>
+    function updateActiveNav(path) {
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll(`.nav-btn[href="${path}"]`).forEach(btn => {
+        btn.classList.add('active');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateActiveNav(window.location.pathname);
+    });
+
+    document.body.addEventListener('htmx:pushedIntoHistory', function(evt) {
+      const currentPath = new URL(evt.detail.path, window.location.origin).pathname;
+      updateActiveNav(currentPath);
+    });
+  </script>
 
   <dialog id="modal-dialog"><div id="modal-container" class="card-small panel"></div></dialog>
 
@@ -135,16 +205,34 @@
   </script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const selects = document.querySelectorAll('select');
+    // Initialize SlimSelect on Load
+    document.body.addEventListener('htmx:load', function(evt) {
+      const container = evt.detail.elt || evt.target;
+      if (!container || typeof container.querySelectorAll !== 'function') return;
 
+      const selects = Array.from(container.querySelectorAll('select'));
       selects.forEach(select => {
-        const enableSearch = select.dataset.search == 'true';
+        if (!select.slim) {
+          const enableSearch = select.dataset.search === 'true';
+          select.slim = new SlimSelect({
+            select: select,
+            settings: { showSearch: enableSearch }
+          });
+        }
+      });
+    });
 
-        select.slim = new SlimSelect({
-          select: select,
-          settings: { showSearch: enableSearch }
-        });
+    // Cleanup SlimSelect before HTMX removes elements
+    document.body.addEventListener('htmx:beforeCleanupElement', function(evt) {
+      const container = evt.target;
+      if (!container || typeof container.querySelectorAll !== 'function') return;
+
+      const selects = Array.from(container.querySelectorAll('select'));
+      selects.forEach(select => {
+        if (select.slim) {
+          select.slim.destroy();
+          select.slim = null;
+        }
       });
     });
   </script>

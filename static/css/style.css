@@ -170,7 +170,7 @@ body {
 i:has(+ span) { margin-right: 0.4em; }
 
 .help-text { display: block; margin: 1.4rem; color: var(--text-light); }
-.error-text { display: block; margin: 0 1.4rem; color: var(--danger); font-weight: 600; }
+.error-text { display: block; margin: 1.4rem; color: var(--danger); font-weight: 600; }
 .error-text::before {
   content: "\f06a";
   font-family: "Font Awesome 6 Free"; font-weight: 900;
@@ -288,11 +288,12 @@ dialog[open]::backdrop { opacity: 1; }
   flex: none;
   overflow-y: auto;
   width: 26rem; height: 100vh; padding: 2rem 2rem 3rem;
+  border-width: 0 1px 0 0 !important;
 
   .nav-btn {
     display: grid; grid-template-columns: 2rem auto; gap: 1rem;
     width: 100%; padding: 1.2rem 1.8rem; margin-bottom: 0.5rem; border-radius: 1rem;
-    color: var(--text-light);
+    color: var(--text-light); line-height: 1.2;
     transition: all 0.2s;
   }
   .nav-btn i { font-size: 1.6rem; margin: 0 auto; }
@@ -725,6 +726,7 @@ input[name="tab_control"] {
 /* 12. SLIM SELECT                                                            */
 /* -------------------------------------------------------------------------- */
 .ss-main {
+  display: flex !important;
   align-items: center;
   height: 5.5rem;
   padding: 1.4rem 1.6rem;
@@ -774,6 +776,7 @@ input[name="tab_control"] {
 
 /* Dropdown Menu */
 .ss-content {
+  display: flex !important;
   background: var(--bg-surface);
   border: 1px solid var(--input-border);
   box-shadow: var(--shadow-lg);

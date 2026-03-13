@@ -4,7 +4,6 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib import messages
-from django.http import JsonResponse
 from django.utils import timezone as django_timezone
 from .models import UserProfile, Goal, Transaction, RecurringItem
 from .services import FinancialGPS
@@ -121,7 +120,9 @@ def dashboard(request):
         chart_safe = None
         chart_actual = None
 
-    context = { 
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'Dashboard | Dalen',
         'data': data,
         'chart_dates': chart_dates,
         'chart_safe': chart_safe,
@@ -169,7 +170,14 @@ def setup_goal(request):
     # Calculate min_date for the date picker (Tomorrow)
     min_date = today + timedelta(days=1)
 
-    return render(request, 'core/goal_setup.html', {'current_goal': current_goal, 'min_date': min_date})
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'Goal | Dalen',
+        'current_goal': current_goal,
+        'min_date': min_date
+    }
+
+    return render(request, 'core/goal_setup.html', context)
 
 @login_required
 def delete_goal(request):
@@ -233,7 +241,13 @@ def recurring_management(request):
                 print(e)
                 messages.error(request, "Error adding item.")
 
-    return render(request, 'core/fixed_flows.html', {'items': items})
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'Fixed flows | Dalen',
+        'items': items
+    }
+
+    return render(request, 'core/fixed_flows.html', context)
 
 @login_required
 def add_transaction(request):
@@ -281,8 +295,13 @@ def add_transaction(request):
         except Exception as e:
             print(e)
             messages.error(request, "Error adding transaction.")
-            
-    return render(request, 'core/transaction.html')
+
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'Transaction | Dalen',
+    }
+
+    return render(request, 'core/transaction.html', context)
 
 @login_required
 def settings(request):
@@ -307,7 +326,7 @@ def settings(request):
                 user.username = new_username
                 user.save()
                 messages.success(request, "Username updated successfully.")
-                
+
             return redirect('settings')
 
         elif action == 'change_password':
@@ -337,12 +356,16 @@ def settings(request):
                 messages.success(request, "Time zone updated.")
             return redirect('settings')
 
-    return render(request, 'core/settings.html', {
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'Setting | Dalen',
         'profile': profile,
         'password_form': password_form,
         'timezones': available_timezones,
         'currencies': CURRENCIES
-    })
+    }
+
+    return render(request, 'core/settings.html', context)
 
 @login_required
 def transaction_list(request):

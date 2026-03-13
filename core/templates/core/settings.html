@@ -1,4 +1,4 @@
-{% extends 'core/base.html' %}
+{% extends base_template %}
 {% block content %}
 <div class="flex-col gap-2">
   <div class="ml-2">
@@ -9,7 +9,7 @@
   <div class="card glass-panel flex-col gap-2">
     <h3 class="text-xl"><i class="fas fa-user-circle"></i><span>Account</span></h3>
 
-    <form method="post" class="styled-form">
+    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="update_username">
       <h4>Username</h4>
@@ -38,13 +38,13 @@
   <div class="card glass-panel flex-col gap-2">
     <h3 class="text-xl"><i class="fas fa-globe"></i><span>Regional Settings</span></h3>
 
-    <form method="post" class="styled-form">
+    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="update_currency-symbol">
 
       <div class="form-field">
         <label>Currency</label>
-        <select name="currency_symbol" data-search="true" onchange="this.form.submit()">
+        <select name="currency_symbol" data-search="true" hx-post="." hx-target="#main-content">
           {% for symbol, codes in currencies.items %}
             <option value="{{ symbol }}" {% if profile.currency_symbol == symbol %}selected{% endif %}>
               {{ codes|join:", " }} ({{ symbol }})
@@ -54,7 +54,7 @@
       </div>
     </form>
 
-    <form method="post" class="styled-form" id="timezoneForm">
+    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="update_timezone">
 
@@ -87,13 +87,13 @@
   <div class="card glass-panel flex-col gap-2">
     <h3 class="text-xl"><i class="fas fa-paint-brush"></i><span>Preferences</span></h3>
 
-    <form method="post" class="styled-form">
+    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="update_theme">
 
       <div class="form-field">
         <label>Color Theme</label>
-        <select name="theme" onchange="this.form.submit()">
+        <select name="theme" hx-post="." hx-target="#main-content" onchange="document.documentElement.setAttribute('data-theme', this.value)">
           <option value="light" {% if profile.theme == 'light' %}selected{% endif %}>Light Mode</option>
           <option value="dark" {% if profile.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
         </select>
@@ -103,88 +103,91 @@
 </div>
 
 <script>
-  const passwordModalContent = `
-    <div class="modal-header">
-      <h3>Change Password</h3>
-      <button type="button" class="close-btn" onclick="window.dialog.close()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-
-    <form method="post" class="styled-form">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="change_password">
-
-      {% for field in password_form %}
-      <div class="form-field">
-        <label>{{ field.label }}</label>
-        {{ field }}
-        {% if field.help_text %}
-        <small class="help-text">{{ field.help_text }}</small>
-        {% endif %}
-        {% if field.errors %}
-        <small class="error-text">{{ field.errors.0 }}</small>
-        {% endif %}
+  (function() {
+    const passwordModalContent = `
+      <div class="modal-header">
+        <h3>Change Password</h3>
+        <button type="button" class="close-btn" onclick="window.dialog.close()">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
-      {% endfor %}
+
+      <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="change_password">
+
+        {% for field in password_form %}
+        <div class="form-field">
+          <label>{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+          <small class="help-text">{{ field.help_text }}</small>
+          {% endif %}
+          {% if field.errors %}
+          <small class="error-text">{{ field.errors.0 }}</small>
+          {% endif %}
+        </div>
+        {% endfor %}
       
-      <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="window.dialog.close()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Set New Password</button>
-      </div>
-    </form>
-  `
-  document.getElementById("changePasswordBtn").addEventListener("click", () => window.dialog.open(passwordModalContent));
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="window.dialog.close()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Set New Password</button>
+        </div>
+      </form>
+    `
+    document.getElementById("changePasswordBtn").addEventListener("click", () => window.dialog.open(passwordModalContent));
 
-  // Automatically re-open modal if there are backend errors
-  {% if password_form.errors %}
-  document.addEventListener('DOMContentLoaded', openModal('passwordModal'));
-  {% endif %}
+    // Automatically re-open modal if there are backend errors
+    {% if password_form.errors %}
+    window.dialog.open(passwordModalContent);
+    {% endif %}
+  })();
 </script>
 
 <script>
-  const select = document.getElementById('timezoneSelect');
-  const display = document.getElementById('clockDisplay');
+  (function() {
+    const select = document.getElementById('timezoneSelect');
+    const display = document.getElementById('clockDisplay');
 
-  function detectTimezone() {
-    try {
-      const detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      if (select && detectedTz) {
+    function detectTimezone() {
+      try {
+        const detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (select && detectedTz) {
+          const exists = Array.from(select.options).some(opt => opt.value === detectedTz);
 
-        const exists = Array.from(select.options).some(opt => opt.value === detectedTz);
+          if (exists) {
+            if (select.slim) select.slim.setSelected(detectedTz);
+            else select.value = detectedTz;
 
-        if (exists) {
-          if (select.slim) select.slim.setSelected(detectedTz);
-          else select.value = detectedTz;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+          } else {
+            alert("Your system timezone (" + detectedTz + ") is not supported by the server.");
+          }
+        }
+      } catch (e) { console.error("Timezone detection failed", e); }
+    }
 
-          updateClock(); // Visually update immediately
-        } else {
-          alert("Your system timezone (" + detectedTz + ") is not supported by the server.");
+    function updateClock() {
+      if (select && display) {
+        const tz = select.value;
+        try {
+          const now = new Date();
+          display.innerHTML = now.toLocaleTimeString('en-US', { 
+            timeZone: tz, 
+            hour: '2-digit', 
+            minute: '2-digit',
+            weekday: 'short'
+          });
+        } catch (e) {
+          display.textContent = "";
         }
       }
-    } catch (e) { console.error("Timezone detection failed", e); }
-  }
-
-  function updateClock() {
-    if (select && display) {
-      const tz = select.value;
-      try {
-        const now = new Date();
-        display.innerHTML = now.toLocaleTimeString('en-US', { 
-          timeZone: tz, 
-          hour: '2-digit', 
-          minute: '2-digit',
-          weekday: 'short'
-        });
-      } catch (e) {
-        display.textContent = "";
-      }
     }
-  }
 
-  if (select) select.addEventListener('change', updateClock);
-
-  setInterval(updateClock, 10000);
-  document.addEventListener('DOMContentLoaded', updateClock);
+    updateClock()
+    if (select) select.addEventListener('change', updateClock);
+    if (window.clockInterval) clearInterval(window.clockInterval);
+    window.clockInterval = setInterval(updateClock, 10000);
+  })();
 </script>
 {% endblock %}
