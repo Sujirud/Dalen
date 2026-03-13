@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="glass-panel pd-4 flex-column">
+<div class="glass-panel pd-4 flex-col gap-2">
   <h2><i class="fas fa-receipt"></i><span>Add Transaction</span></h2>
 
   <input type="radio" name="tab_control" id="tab_manual" checked>
@@ -15,7 +15,7 @@
     </label>
   </div>
 
-  <form method="post" class="styled-form tab-content flex-column content-manual">
+  <form method="post" class="styled-form tab-content flex-col gap-2 content-manual">
     {% csrf_token %}
 
     <div class="form-field">
@@ -60,7 +60,7 @@
     </div>
   </form>
 
-  <form method="post" enctype="multipart/form-data" class="tab-content flex-column content-scan" id="uploadForm">
+  <form method="post" enctype="multipart/form-data" class="tab-content flex-col gap-2 content-scan" id="uploadForm">
     {% csrf_token %}
     
     <div id="upload-zone">

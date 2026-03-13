@@ -1,106 +1,111 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="dashboard-grid">
-  
-{% if data %}
+<div class="flex-col gap-3">
+  <div class="mb-1">
+    <h4 class="text-muted">Today</h4>
+    <h1>Good afternoon, {{ user.username }}</h1>
+  </div>
 
-  <div class="dashboard-header-card glass-panel span-full">
-    <div class="goal-info">
-      <div class="goal-icon-circle">
-        <i class="fas fa-flag"></i>
+  {% if data %}
+  <div class="flex justify-center mb-1">
+    <div class="ring-container">
+      <svg class="ring-svg" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" class="ring-track" />
+        <circle id="ring" cx="50" cy="50" r="45" fill="none" stroke="var(--success)" stroke-width="4" stroke-linecap="round" class="progress-ring__circle" stroke-dasharray="283" stroke-dashoffset="283" />
+      </svg>
+      <div class="ring-content">
+        <span class="text-12 font-medium text-muted uppercase flex items-center gap-1 mb-2">
+          <i class="fas fa-check-circle text-emerald"></i> Safe to Spend
+        </span>
+        <div class="flex gap-1">
+          <span class="text-muted safe-currency">{{ user.userprofile.currency_symbol }}</span>
+          <span id="safe-amount-main" class="safe-amount-value">{{ data.remaining_today }}</span>
+        </div>
+        <div class="text-14 text-muted font-medium mt-2">
+          out of <span>{{ user.userprofile.currency_symbol }}{{ data.base_budget }}</span> daily
+        </div>
+        <div class="pill mt-2 pill-success">
+          On Track
+        </div>
       </div>
-      <div class="goal-text">
-        <span class="goal-label">Current Goal</span>
-        <span class="goal-title">{{ data.goal_name }}</span>
-      </div>
-      <div class="days-badge">{{ data.remaining_days }} days remaining</div>
-    </div>
-
-    <div class="flex-between">
-      <a href="{% url 'goal_setup' %}" class="reset-link font-size-1-8" title="Update Goal">
-        <i class="fas fa-edit"></i>
-      </a>
-
-      <button id="deleteGoalBtn" class="reset-link font-size-1-8" title="Delete Goal">
-        <i class="fas fa-trash"></i>
-      </button>
     </div>
   </div>
 
-  <div class="card main-metric-card {% if data.remaining_today < 0 %}metric-danger{% endif %}">
-    <div class="card-glow"></div>
-    <div class="metric-content">
-        <p class="metric-label">Safe to Spend Today</p>
-        <div class="metric-value">
-          <span class="currency">{{ user.userprofile.currency_symbol }}</span>{{ data.remaining_today }}
-        </div>
-        <div class="metric-footer">
-          <div class="spent-pill">
-            <i class="fas fa-receipt"></i>
-            <span>Spent Today: {{ data.spent_today }} {{ user.userprofile.currency_symbol }}</span>
-          </div>
-        </div>
+  <div class="goal-card">
+    <div class="bg-decor-accent"></div>
+    <div class="bg-decor-primary"></div>
+    <div class="bg-icon">
+      <i class="fas fa-flag"></i>
     </div>
-  </div>
 
-  <div class="card glass-panel progress-card">
-    <div class="progress-header">
-      <span>Timeline Progress</span>
-      <span>{{ data.progress_percent }}%</span>
-    </div>
-    <div class="progress-track-container">
-      <div class="progress-track">
+    <div class="flex-col gap-1">
+      <div class="flex justify-between">
+        <span class="text-14 font-medium uppercase text-muted letter-spacing-5">Current Goal</span>
+        <span class="pill goal-pill">
+          <i class="far fa-calendar"></i>
+          <span>{{ data.remaining_days }} Days Left</span>
+        </span>
+      </div>
+
+      <div class="flex items-center gap-1">
+        <div class="goal-icon"><i class="far fa-flag"></i></div>
+        <h3 class="text-30 letter-spacing-5">{{ data.goal_name }}</h3>
+      </div>
+
+      <div class="flex justify-between items-end">
+        <div class="flex items-baseline gap-1">
+          <span class="text-30 font-bold" id="goal-saved">$2,100</span>
+          <span class="text-14 font-bold text-muted">/ <span id="goal-target">$5,000</span></span>
+        </div>
+        <p class="text-14 font-bold text-emerald">{{ data.progress_percent }}%</p>
+      </div>
+
+      <div class="goal-progress-bg">
         <div class="progress-fill" style="width: {{ data.progress_percent }}%;">
-          <div class="progress-glare"></div>
+          <div class="progress-overlay"></div>
         </div>
       </div>
     </div>
-    <div>
-      <small class="text-muted">Daily Allowance: <strong>{{ data.base_budget }} {{ user.userprofile.currency_symbol }}</strong></small>
-    </div>
   </div>
-
-  <a href="{% url 'transaction' %}" class="fab-btn" title="Add Transaction">
-    <i class="fas fa-plus"></i>
-  </a>
 
   <script>
-    const deleteGoalContent = `
-      <form action="{% url 'delete_goal' %}" method="post" class="flex-column">
-        {% csrf_token %}
-        <div class="modal-header">
-          <h3>Delete Goal</h3>
-          <button type="button" class="close-btn" onclick="window.dialog.close()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
+    document.addEventListener('DOMContentLoaded', () => {
+      const circle = document.getElementById('ring');
+      if (circle) {
+        const radius = circle.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
 
-        <div>
-          <p>Are you sure you want to delete your current goal? This will reset all progress.</p>
-          <p class="text-danger font-bold text-right">This action cannot be undone.</p>
-        </div>
+        const safe = parseFloat("{{ data.remaining_today }}".replace(/,/g, '')) || 0;
+        const base = parseFloat("{{ data.base_budget }}".replace(/,/g, '')) || 1;
+        
+        let percent = safe / base;
+        if (percent < 0) percent = 0;
+        if (percent > 1) percent = 1;
 
-        <div class="form-actions">
-          <button type="button" class="btn btn-outline btn-sm" onclick="window.dialog.close()">Cancel</button>
-          <button type="submit" class="btn btn-danger btn-sm">Delete Goal</button>
-        </div>
-      </form>
-    `
-    document.getElementById("deleteGoalBtn").addEventListener("click", () => window.dialog.open(deleteGoalContent));
+        const offset = circumference - (percent * circumference);
+
+        setTimeout(() => {
+          circle.style.strokeDashoffset = offset;
+          if (percent < 0.1) circle.style.stroke = 'var(--danger)';
+          else if (percent < 0.3) circle.style.stroke = '#EAB308';
+          else circle.style.stroke = 'var(--success)';
+        }, 100);
+      }
+    });
   </script>
 
   {% if chart_dates %}
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-  <div class="card glass-panel span-full">
-    <div class="flex-between">
+  <div class="card glass-panel">
+    <div class="flex justify-between items-center flex-wrap gap-1">
       <div>
-        <h3><i class="fas fa-chart-line"></i><span>Spending Velocity</span></h3>
+        <h3><i class="fas fa-chart-line"></i><span>Spending Trend</span></h3>
         <p class="text-muted" style="font-size: 1.2rem;">Budget Limit vs. Actual Spending</p>
       </div>
 
-      <div class="flex-between">
-        <button class="btn btn-outline btn-sm time-filter" data-days="90">90 Days</button>
+      <div class="flex justify-between items-center flex-wrap gap-1">
         <button class="btn btn-outline btn-sm time-filter" data-days="30">30 Days</button>
         <button class="btn btn-outline btn-sm time-filter active" data-days="7">7 Days</button>
       </div>
@@ -213,9 +218,9 @@
         buttons.forEach(b => {
           b.classList.remove('active');
           b.style.background = 'transparent';
-          b.style.color = 'var(--text-muted)';
+          b.style.color = 'var(--text-light)';
         });
-            
+
         const activeBtn = document.querySelector('.time-filter[data-days="' + days + '"]');
         if(activeBtn) {
           activeBtn.classList.add('active');
@@ -234,10 +239,9 @@
       setTimeout(() => handleZoom(7), 100);
     });
   </script>
-
   {% endif %}
 
-{% else %}
+  {% else %}
   <div class="dashboard-header-card glass-panel empty-state">
     <div class="logo-circle empty-state-logo">
       <i class="fas fa-compass"></i>
@@ -250,13 +254,13 @@
       <i class="fas fa-plus-circle"></i><span>Create New Goal</span>
     </a>
   </div>
-{% endif %}
+  {% endif %}
 
-  <div class="card glass-panel span-full">
-    <div class="flex-between">
+  <div>
+    <div class="flex justify-between items-center flex-wrap gap-1 mb-1">
       <h3><i class="fas fa-list-ul"></i><span>Recent Transactions</span></h3>
 
-      <div class="flex-between">
+      <div class="flex justify-between items-center flex-wrap gap-1">
         <button class="btn btn-outline btn-sm txn-filter" 
           hx-get="{% url 'htmx_transactions' %}?days=30" 
           hx-target="#txn-list-body"
@@ -274,7 +278,7 @@
       </div>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-wrapper">
       <table class="styled-table">
         <thead>
           <tr>
@@ -302,7 +306,7 @@
       document.querySelectorAll('.txn-filter').forEach(b => {
         b.classList.remove('active');
         b.style.background = 'transparent';
-        b.style.color = 'var(--text-muted)';
+        b.style.color = 'var(--text-light)';
       });
 
       clickedBtn.classList.add('active');

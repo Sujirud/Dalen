@@ -9,7 +9,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="{% static 'js/slimselect.min.js' %}"></script>
 
@@ -29,45 +29,87 @@
   </script>
 </head>
 <body>
-  <div class="app-background"></div>
-  <div class="app-wrapper">
+  <div class="flex">
     {% if user.is_authenticated %}
-    <nav class="top-nav glass-panel">
-      <div class="nav-content">
-        <a href="{% url 'dashboard' %}" class="nav-brand">
-          <div class="brand-icon-wrapper">
-            <img src="{% static 'img/logo.svg' %}" alt="Logo">
-          </div>
-          <span>Dalen</span>
+    <nav class="desktop-nav glass-panel">
+      <div class="brand-wrapper mb-2">
+        <div class="brand-icon">
+          <img src="{% static 'img/logo.svg' %}" alt="Logo">
+        </div>
+        <span>Dalen</span>
+      </div>
+
+      <div>
+        <a class="nav-btn active" href="{% url 'dashboard' %}">
+          <i class="fas fa-home"></i><span>Dashboard</span>
         </a>
-        <div class="nav-user">
-          <span class="username hidden-mobile">Hi, {{ user.username }}</span>
-          <a href="{% url 'fixed_flows' %}" class="icon-btn" title="Fixed Income & Expenses">
-            <i class="fas fa-file-invoice-dollar"></i>
-          </a>
-          <a href="{% url 'settings' %}" class="icon-btn" title="Settings">
-            <i class="fas fa-cog"></i>
-          </a>
-          <button id="logoutBtn" class="icon-btn logout-btn" title="Sign Out">
-            <i class="fas fa-sign-out-alt"></i>
-          </button>
+        <a class="nav-btn" href="{% url 'fixed_flows' %}">
+          <i class="fas fa-receipt"></i><span>Fixed flows</span>
+        </a>
+        <a class="nav-btn" href="{% url 'goal_setup' %}">
+          <i class="fas fa-calendar-alt"></i><span>Planning</span>
+        </a>
+      </div>
+
+      <div>
+        <a class="nav-btn mb-2" href="{% url 'settings' %}">
+          <i class="fas fa-cog"></i><span>Settings</span>
+        </a>
+
+        <div class="flex items-center gap-1 pd-1">
+          <i class="fas fa-circle-user text-30"></i>
+          {{ user.username }}
         </div>
       </div>
     </nav>
+
+    <nav class="mobile-nav glass-panel">
+      <a class="nav-btn active" href="{% url 'dashboard' %}">
+        <i class="fas fa-home"></i><span>Dashboard</span>
+      </a>
+      <a class="nav-btn" href="{% url 'fixed_flows' %}">
+        <i class="fas fa-receipt"></i><span>Fixed flows</span>
+      </a>
+      <div></div>
+      <a class="nav-btn" href="{% url 'goal_setup' %}">
+        <i class="fas fa-calendar-alt"></i><span>Planning</span>
+      </a>
+      <a class="nav-btn" href="{% url 'settings' %}">
+        <i class="fas fa-cog"></i><span>Settings</span>
+      </a>
+    </nav>
+
+    <a href="{% url 'transaction' %}" class="fab-btn" title="Add Transaction"><i class="fas fa-plus"></i></a>
     {% endif %}
 
-    <main class="content-container">
-      {% if messages %}
-      {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
-      {% endfor %}
-      {% endif %}
+    <div class="app-wrapper no-scrollbar">
+      <header class="mobile-header glass-panel">
+        <div class="brand-wrapper">
+          <div class="brand-icon">
+            <img src="{% static 'img/logo.svg' %}" alt="Logo">
+          </div>
+          <span>Dalen</span>
+        </div>
 
-      {% block content %}{% endblock %}
-    </main>
+        <div class="flex items-center gap-1 pd-1">
+          <i class="fas fa-circle-user text-30"></i>
+          {{ user.username }}
+        </div>
+      </header>
 
-    <dialog id="modal-dialog"><div id="modal-container" class="card-small panel"></div></dialog>
+      <main class="content-container">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+      </main>
+    </div>
   </div>
+
+  <dialog id="modal-dialog"><div id="modal-container" class="card-small panel"></div></dialog>
 
   <script>
     class Dialog {
@@ -91,31 +133,6 @@
 
     document.addEventListener('DOMContentLoaded', () => { window.dialog = new Dialog(); });
   </script>
-
-  {% if user.is_authenticated %}
-  <script>
-    const logoutModalContent = `
-    <form action="{% url 'logout' %}" method="post" class="flex-column">
-      {% csrf_token %}
-
-      <div class="modal-header">
-        <h3>Confirm Logout</h3>
-        <button type="button" class="close-btn" onclick="window.dialog.close()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <p>Are you sure you want to log out?</p>
-
-      <div class="form-actions">
-        <button type="button" class="btn btn-outline btn-sm" onclick="window.dialog.close()">Cancel</button>
-        <button type="submit" class="btn btn-danger btn-sm">Logout</button>
-      </div>
-    </form>
-    `
-    document.getElementById("logoutBtn").addEventListener("click", () => window.dialog.open(logoutModalContent));
-  </script>
-  {% endif %}
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {

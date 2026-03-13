@@ -1,9 +1,9 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="dashboard-grid">
+<div class="flex-col gap-2">
 
-  <div class="card glass-panel span-full">
-    <div class="flex-between mb-2">
+  <div class="card glass-panel">
+    <div class="flex justify-between items-center flex-wrap gap-1 mb-2">
       <div>
         <h2><i class="fas fa-sync-alt"></i><span>Fixed Flows</span></h2>
         <p>Manage recurring income (Salary) and expenses (Rent, Subs).</p>
@@ -14,7 +14,7 @@
     </div>
 
     {% if items %}
-    <div class="table-responsive">
+    <div class="table-wrapper">
       <table class="styled-table">
         <thead>
           <tr>
@@ -80,7 +80,7 @@
     {% endif %}
   </div>
 
-  <div class="card glass-panel span-full">
+  <div class="card glass-panel">
     <h3><i class="fas fa-plus-circle"></i><span>Add Fixed Flow</span></h3>
 
     <form method="post" class="styled-form">
