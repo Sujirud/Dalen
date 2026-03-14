@@ -75,7 +75,7 @@
         </div>
 
         <div class="flex-col">
-          <button type="button" class="btn btn-outline btn-sm" onclick="detectTimezone()" title="Detect my location">
+          <button type="button" id="detectTimezoneBtn" class="btn btn-outline btn-sm" title="Detect my location">
             <i class="fas fa-location-arrow"></i><span>Auto</span>
           </button>
           <button type="submit" class="btn btn-outline btn-sm">Save</button>
@@ -148,6 +148,7 @@
   (function() {
     const select = document.getElementById('timezoneSelect');
     const display = document.getElementById('clockDisplay');
+    const detectBtn = document.getElementById('detectTimezoneBtn');
 
     function detectTimezone() {
       try {
@@ -166,6 +167,8 @@
         }
       } catch (e) { console.error("Timezone detection failed", e); }
     }
+
+    if (detectBtn) detectBtn.addEventListener('click', detectTimezone);
 
     function updateClock() {
       if (select && display) {
