@@ -15,6 +15,7 @@
 
   --success: #10b981;
   --success-dark: #059669;
+  --warning: #eab308;
   --danger-rgb: 239, 68, 68;
   --danger: rgb(var(--danger-rgb));
 
@@ -416,6 +417,7 @@ dialog[open]::backdrop { opacity: 1; }
 
 .pill { padding: 0.4rem 1.2rem; border-radius: 9999px; font-size: 1.2rem; font-weight: 700; }
 .pill-success { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+.pill-danger { background-color: rgba(var(--danger-rgb), 0.1); color: var(--danger); }
 
 .goal-pill { background: rgba(0, 0, 0, 0.04); border: 1px solid rgba(0, 0, 0, 0.05); color: var(--success-dark); backdrop-filter: blur(8px); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
 [data-theme="dark"] .goal-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: var(--success); }

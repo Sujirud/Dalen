@@ -106,11 +106,9 @@ def register(request):
 def dashboard(request):
     gps = FinancialGPS(request.user)
     data = gps.get_status()
-    
-    # 1. Fetch historical data (90 days buffer)
+
     history = gps.get_historical_data(days=90)
-    
-    # 2. Prepare JSON for Frontend
+
     if history:
         chart_dates = json.dumps(history['dates'])
         chart_safe = json.dumps(history['safe_spend'])
@@ -120,9 +118,23 @@ def dashboard(request):
         chart_safe = None
         chart_actual = None
 
+    today_date = _get_today(request.user).strftime("%A, %B %d")
+
+    user_tz = zoneinfo.ZoneInfo(request.user.userprofile.timezone)
+    local_hour = django_timezone.now().astimezone(user_tz).hour
+    
+    if local_hour < 12:
+        greeting = "Good morning"
+    elif local_hour < 17:
+        greeting = "Good afternoon"
+    else:
+        greeting = "Good evening"
+
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
         'page_title': 'Dashboard | Dalen',
+        'today_date': today_date,
+        'greeting': greeting,
         'data': data,
         'chart_dates': chart_dates,
         'chart_safe': chart_safe,

@@ -100,11 +100,12 @@ class FinancialGPS:
         return {
             'goal_name': self.goal.name,
             'remaining_days': remaining_days,
+            'current_net_worth': round(current_net_worth, 2),
+            'target_amount': round(self.goal.target_amount, 2),
             'progress_percent': int(max(0, min(100, progress))),
             'base_budget': round(base_daily_budget, 2),
             'spent_today': round(spent_today, 2),
-            'remaining_today': round(remaining_today_actual, 2),
-            'status': 'off_track' if remaining_today_actual < 0 else 'on_track'
+            'remaining_today': round(remaining_today_actual, 2)
         }
 
     def get_historical_data(self, days=30):
