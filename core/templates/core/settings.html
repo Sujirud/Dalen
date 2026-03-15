@@ -33,6 +33,18 @@
         <button id="changePasswordBtn" class="btn btn-outline btn-sm">Change Password</button>
       </div>
     </div>
+
+    <div class="styled-form">
+      <div class="form-field row">
+        <div>
+          <h4>Log Out</h4>
+          <p>Sign out of your account on this device</p>
+        </div>
+        <button id="logoutBtn" class="btn btn-outline btn-sm">
+          <i class="fas fa-sign-out-alt"></i><span>Log Out</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="card glass-panel flex-col gap-2">
@@ -104,6 +116,27 @@
 
 <script>
   (function() {
+    const logoutModalContent = `
+    <form method="post" action="{% url 'logout' %}" class="flex-col gap-2">
+      {% csrf_token %}
+
+      <div class="modal-header">
+        <h3>Confirm Logout</h3>
+        <button type="button" class="close-btn" onclick="window.dialog.close()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <p>Are you sure you want to log out?</p>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.dialog.close()">Cancel</button>
+        <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+      </div>
+    </form>
+    `
+    document.getElementById("logoutBtn").addEventListener("click", () => window.dialog.open(logoutModalContent));
+
     const passwordModalContent = `
       <div class="modal-header">
         <h3>Change Password</h3>
