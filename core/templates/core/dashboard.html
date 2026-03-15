@@ -104,8 +104,8 @@
     })();
   </script>
 
-  {% if chart_dates %}
-  <div class="card glass-panel">
+  {% if chart_data %}
+  <div class="card glass-panel gap-1">
     <div class="flex justify-between items-center flex-wrap gap-1">
       <div>
         <h3><i class="fas fa-chart-line"></i><span>Spending Trend</span></h3>
@@ -114,7 +114,7 @@
 
       <div class="flex justify-between items-center flex-wrap gap-1">
         <button class="btn btn-outline btn-sm time-filter" data-days="30">30 Days</button>
-        <button class="btn btn-outline btn-sm time-filter active" data-days="7">7 Days</button>
+        <button class="btn btn-outline btn-sm time-filter btn-primary" data-days="7">7 Days</button>
       </div>
     </div>
     <div id="chart"></div>
@@ -123,117 +123,98 @@
   <script>
     (function () {
       const currencySign = "{{ user.userprofile.currency_symbol }}";
+      const chart_data = {{ chart_data|safe }};
 
-      // --- 1. Data Injection (Safe Django Pattern) ---
-      const rawDates = {{ chart_dates|safe }};
-      const safeData = {{ chart_safe|safe }};
-      const actualData = {{ chart_actual|safe }};
+      const rootStyles = getComputedStyle(document.documentElement);
+      const chart_colors = {
+        primary: rootStyles.getPropertyValue('--primary').trim(),
+        danger: rootStyles.getPropertyValue('--danger').trim(),
+        grid: rootStyles.getPropertyValue('--input-border').trim(),
+        text: rootStyles.getPropertyValue('--text-light').trim()
+      };
+      const chart_theme = document.documentElement.getAttribute('data-theme');
 
-      // --- 2. Color & Theme Configuration ---
-      function getThemeColors(isDark) {
-        return {
-          primary: isDark ? '#60a5fa' : '#3b82f6',
-          danger:  isDark ? '#f87171' : '#ef4444',
-          grid:    isDark ? '#334155' : '#e2e8f0',
-          text:    isDark ? '#94a3b8' : '#64748b'
-        };
-      }
-
-      const initialTheme = document.documentElement.getAttribute('data-theme') === 'dark';
-      let currentColors = getThemeColors(initialTheme);
-
-      // --- 3. Chart Setup ---
       const options = {
         series: [{
           name: 'Safe Budget',
           type: 'area',
-          data: safeData
+          data: chart_data.safe_spend
         }, {
           name: 'Actual Spend',
           type: 'line',
-          data: actualData
+          data: chart_data.actual_spend
         }],
         chart: {
           height: 320,
           type: 'line',
-          fontFamily: 'Plus Jakarta Sans, sans-serif',
+          fontFamily: 'Outfit, sans-serif',
           background: 'transparent',
           toolbar: { show: false },
-          zoom: { enabled: false },
-          animations: { enabled: true }
+          zoom: { enabled: false }
         },
-        colors: [currentColors.primary, currentColors.danger],
-        stroke: {
-          width: [2, 3],
-          curve: 'smooth',
-          dashArray: [0, 0]
-        },
+        colors: [chart_colors.primary, chart_colors.danger],
+        stroke: { width: [2, 2] },
         fill: {
-          type: ['gradient', 'solid'],
-          gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.4,
-            opacityTo: 0.05,
-            stops: [0, 90, 100]
-          }
+          type: ['solid', 'solid'],
+          opacity: [0.05, 1]
         },
-        dataLabels: { enabled: false },
-        labels: rawDates,
+        labels: chart_data.dates,
         xaxis: {
           type: 'datetime',
           tooltip: { enabled: false },
           axisBorder: { show: false },
           axisTicks: { show: false },
-          labels: { 
-            style: { colors: currentColors.text, fontSize: '12px' },
+          labels: {
+            style: { colors: chart_colors.text, fontSize: '12px' },
             datetimeFormatter: { year: 'yyyy', month: 'MMM', day: 'dd MMM' }
           }
         },
         yaxis: {
           labels: {
-            style: { colors: currentColors.text },
-            formatter: (value) => { return value.toFixed(0); }
+            style: { colors: chart_colors.text },
+            formatter: (value) => { return Math.round(value).toLocaleString(); }
           },
         },
         grid: {
-          borderColor: currentColors.grid,
+          borderColor: chart_colors.grid,
           strokeDashArray: 4,
-          yaxis: { lines: { show: true } },
           xaxis: { lines: { show: false } },
-          padding: { top: 0, right: 0, bottom: 0, left: 10 }
         },
-        theme: { mode: initialTheme ? 'dark' : 'light' },
+        legend: { labels: { colors: chart_colors.text } },
+        theme: { mode: chart_theme },
         tooltip: {
-          theme: initialTheme ? 'dark' : 'light',
-          y: { formatter: function (val) { return currencySign + " " + val } }
+          theme: chart_theme,
+          y: { formatter: function (val) { return currencySign + " " + Math.round(val).toLocaleString(); } }
         }
       };
 
       const chart = new ApexCharts(document.querySelector("#chart"), options);
       chart.render();
 
-      // --- 4. Interactivity: Zoom ---
       const buttons = document.querySelectorAll('.time-filter');
-      const getLastDateTimestamp = () => new Date(rawDates[rawDates.length - 1]).getTime();
 
       function handleZoom(days) {
-        const endDate = getLastDateTimestamp();
-        const startDate = endDate - (days * 24 * 60 * 60 * 1000);
-            
-        chart.zoomX(startDate, endDate);
+        const startIndex = Math.max(0, chart_data.dates.length - days);
 
-        buttons.forEach(b => {
-          b.classList.remove('active');
-          b.style.background = 'transparent';
-          b.style.color = 'var(--text-light)';
+        const slicedDates = chart_data.dates.slice(startIndex);
+        const slicedSafe = chart_data.safe_spend.slice(startIndex);
+        const slicedActual = chart_data.actual_spend.slice(startIndex);
+
+        chart.updateOptions({
+          labels: slicedDates,
+          series: [{
+            name: 'Safe Budget',
+            data: slicedSafe
+          }, {
+            name: 'Actual Spend',
+            data: slicedActual
+          }]
         });
 
+        buttons.forEach(b => b.classList.remove('btn-primary'));
+
         const activeBtn = document.querySelector('.time-filter[data-days="' + days + '"]');
-        if(activeBtn) {
-          activeBtn.classList.add('active');
-          activeBtn.style.background = 'var(--primary-light)';
-          activeBtn.style.color = 'var(--primary)';
-        }
+        if (activeBtn) activeBtn.classList.add('btn-primary');
       }
 
       buttons.forEach(btn => {
@@ -275,7 +256,7 @@
         >
           30 Days
         </button>
-        <button class="btn btn-outline btn-sm txn-filter active" 
+        <button class="btn btn-outline btn-sm txn-filter btn-primary" 
           hx-get="{% url 'htmx_transactions' %}?days=7" 
           hx-target="#txn-list-body"
           onclick="setActiveTab(this)"
@@ -311,14 +292,10 @@
   <script>
     function setActiveTab(clickedBtn) {
       document.querySelectorAll('.txn-filter').forEach(b => {
-        b.classList.remove('active');
-        b.style.background = 'transparent';
-        b.style.color = 'var(--text-light)';
+        b.classList.remove('btn-primary');
       });
 
-      clickedBtn.classList.add('active');
-      clickedBtn.style.background = 'var(--primary-light)';
-      clickedBtn.style.color = 'var(--primary)';
+      clickedBtn.classList.add('btn-primary');
     }
   </script>
 

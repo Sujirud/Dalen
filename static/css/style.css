@@ -82,6 +82,8 @@ h4 { font-size: 1.8rem; }
 
 ul { padding-left: 10px; }
 
+a { color: var(--text-main); }
+
 button {
   display: block;
   background: none;
@@ -136,9 +138,9 @@ body {
 
 .flex-wrap { flex-wrap: wrap; }
 
-.gap-1 { gap: 1rem; }
-.gap-2 { gap: 2rem; }
-.gap-3 { gap: 3rem; }
+.gap-1 { gap: 1rem !important; }
+.gap-2 { gap: 2rem !important; }
+.gap-3 { gap: 3rem !important; }
 
 .pull-right { float: right !important; }
 
@@ -458,6 +460,11 @@ dialog[open]::backdrop { opacity: 1; }
   height: 100%;
 }
 
+/* ApexCharts */
+#chart { min-height: 0 !important; }
+.apexcharts-legend { gap: 8px; margin-top: 6px; }
+.apexcharts-legend-series { gap: 4px; }
+
 /* Floating Action Button */
 .fab-btn {
   display: flex; align-items: center; justify-content: center;
@@ -632,9 +639,15 @@ dialog[open]::backdrop { opacity: 1; }
 }
 .btn-outline:hover { border-color: var(--text-main); color: var(--text-main); }
 
+.btn-outline.btn-primary {
+  border-color: rgba(var(--primary-rgb), 0.4);
+  color: var(--primary);
+}
+.btn-outline.btn-primary:hover { border-color: var(--primary); }
+
 .btn-outline.btn-danger {
   border-color: rgba(var(--danger-rgb), 0.4);
-  color: var(--danger);;
+  color: var(--danger);
 }
 .btn-outline.btn-danger:hover { border-color: var(--danger); }
 

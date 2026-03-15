@@ -107,16 +107,7 @@ def dashboard(request):
     gps = FinancialGPS(request.user)
     data = gps.get_status()
 
-    history = gps.get_historical_data(days=90)
-
-    if history:
-        chart_dates = json.dumps(history['dates'])
-        chart_safe = json.dumps(history['safe_spend'])
-        chart_actual = json.dumps(history['actual_spend'])
-    else:
-        chart_dates = None
-        chart_safe = None
-        chart_actual = None
+    chart_data = json.dumps(gps.get_chart_data(days=30))
 
     today_date = _get_today(request.user).strftime("%A, %B %d")
 
@@ -136,9 +127,7 @@ def dashboard(request):
         'today_date': today_date,
         'greeting': greeting,
         'data': data,
-        'chart_dates': chart_dates,
-        'chart_safe': chart_safe,
-        'chart_actual': chart_actual,
+        'chart_data': chart_data,
     }
     return render(request, 'core/dashboard.html', context)
 

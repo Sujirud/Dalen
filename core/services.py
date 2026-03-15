@@ -108,7 +108,7 @@ class FinancialGPS:
             'remaining_today': round(remaining_today_actual, 2)
         }
 
-    def get_historical_data(self, days=30):
+    def get_chart_data(self, days):
         """
         Reconstructs the 'Safe to Spend' vs 'Actual' for the past N days.
         """
@@ -122,7 +122,7 @@ class FinancialGPS:
         start_date = max(requested_start, goal_start_date)
         days_to_process = (today - start_date).days
 
-        if days_to_process < 1:
+        if days_to_process < 3:
             return None
 
         # Pre-fetch transactions to minimize DB hits
@@ -147,10 +147,10 @@ class FinancialGPS:
         # Iterate day by day using the calculated range
         for i in range(days_to_process + 1):
             current_date = start_date + timedelta(days=i)
-            
+
             # Filter transactions for this specific day
             day_txns = [t for t in all_txns if t['date'] == current_date]
-            
+
             day_income = sum(t['amount'] for t in day_txns if t['amount'] > 0)
             day_expenses = sum(abs(t['amount']) for t in day_txns if t['amount'] < 0)
             net_change = day_income - day_expenses
