@@ -134,6 +134,7 @@ def dashboard(request):
 @login_required
 def setup_goal(request):
     current_goal = Goal.objects.filter(user=request.user, is_active=True).first()
+    completed_goals = Goal.objects.filter(user=request.user, is_active=False).order_by('-deadline')
     today = _get_today(request.user)
 
     if request.method == 'POST':
@@ -164,7 +165,7 @@ def setup_goal(request):
                 )
                 messages.success(request, "New goal created!")
 
-            return redirect('dashboard')
+            return redirect('goal_setup')
         except ValueError:
             messages.error(request, "Invalid input. Please check your numbers.")
 
@@ -175,6 +176,7 @@ def setup_goal(request):
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
         'page_title': 'Goal | Dalen',
         'current_goal': current_goal,
+        'completed_goals': completed_goals,
         'min_date': min_date
     }
 
@@ -184,7 +186,7 @@ def setup_goal(request):
 def delete_goal(request):
     if request.method == 'POST':
         Goal.objects.filter(user=request.user, is_active=True).delete()
-    return redirect('dashboard')
+    return redirect('goal_setup')
 
 @login_required
 def recurring_management(request):
