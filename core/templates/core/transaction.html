@@ -1,6 +1,6 @@
 {% extends base_template %}
 {% block content %}
-<div class="glass-panel pd-4 flex-col gap-2">
+<div class="glass-panel card pd-4">
   <h2><i class="fas fa-receipt"></i><span>Add Transaction</span></h2>
 
   <input type="radio" name="tab_control" id="tab_manual" checked>
@@ -25,7 +25,7 @@
         <input type="text" name="description" placeholder="e.g. Coffee" maxlength="100" autocomplete="off">
       </div>
     </div>
-    
+
     <div class="form-row">
       <div class="form-field">
         <label>Amount</label>
@@ -44,28 +44,22 @@
       </div>
     </div>
 
-    <div class="form-row">
-      <div class="form-field">
-        <label>Date</label>
-        <input type="date" name="txn_date" id="txn_date" required>
-      </div>
-      <div class="form-field">
-        <label>Time</label>
-        <input type="time" name="txn_time" id="txn_time">
-      </div>
+    <div class="form-field">
+      <label>Date</label>
+      <input type="date" name="txn_date" id="txn_date" required>
     </div>
 
-    <div class="form-actions">
+    <div class="form-actions mt-2">
       <button type="submit" class="btn btn-fill btn-primary btn-full">Record Transaction</button>
     </div>
   </form>
 
   <form method="post" action="." hx-post="." hx-target="#main-content" hx-encoding="multipart/form-data" class="tab-content flex-col gap-2 content-scan" id="uploadForm">
     {% csrf_token %}
-    
+
     <div id="upload-zone">
       <input type="file" name="receipt_images" id="fileInput" class="file-input" accept="image/*" required multiple>
-      
+
       <div class="zone-content">
         <i class="fas fa-cloud-upload-alt upload-icon"></i>
         <h3>Upload Receipt Images</h3>
@@ -76,7 +70,7 @@
 
     <div id="previewContainer" class="preview-grid mt-2 hidden"></div>
 
-    <div class="form-actions">
+    <div class="form-actions mt-2">
       <button type="submit" class="btn btn-fill btn-primary btn-full">
         <i class="fas fa-magic"></i><span>Analyze & Save</span>
       </button>
@@ -88,19 +82,9 @@
 
 <script>
   (function() {
-    // 1. Set Date/Time Defaults
+    // 1. Set Date Defaults
     const dateInput = document.getElementById('txn_date');
-    const timeInput = document.getElementById('txn_time');
-    
-    if (dateInput) {
-        dateInput.valueAsDate = new Date();
-    }
-    if (timeInput) {
-        const now = new Date();
-        // Format to HH:MM for HTML time input
-        const timeString = now.toTimeString().split(' ')[0].substring(0,5);
-        timeInput.value = timeString;
-    }
+    if (dateInput) dateInput.valueAsDate = new Date();
 
     // 2. Receipt Upload Logic
     const fileInput = document.getElementById('fileInput');
@@ -162,7 +146,7 @@
 
         const info = document.createElement('div');
         info.className = 'preview-info';
-        
+
         const name = document.createElement('span');
         name.textContent = file.name;
 
