@@ -199,7 +199,7 @@ def recurring_management(request):
             item = get_object_or_404(RecurringItem, id=item_id, user=user)
             item.delete()
             messages.success(request, "Item removed.")
-            return redirect('fixed_flows')
+            return redirect('recurring_items')
 
         elif action == 'create':
             try:
@@ -225,7 +225,7 @@ def recurring_management(request):
                     interval = int(interval_raw) if interval_raw else 0
                     if interval <= 0:
                         messages.error(request, "Interval must be at least 1 day.")
-                        return redirect('fixed_flows')
+                        return redirect('recurring_items')
 
                 RecurringItem.objects.create(
                     user=user,
@@ -237,18 +237,18 @@ def recurring_management(request):
                     interval_days=interval
                 )
                 messages.success(request, "Recurring item added.")
-                return redirect('fixed_flows')
+                return redirect('recurring_items')
             except Exception as e:
                 print(e)
                 messages.error(request, "Error adding item.")
 
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
-        'page_title': 'Fixed flows | Dalen',
+        'page_title': 'Recurring Items | Dalen',
         'items': items
     }
 
-    return render(request, 'core/fixed_flows.html', context)
+    return render(request, 'core/recurring_items.html', context)
 
 @login_required
 def add_transaction(request):

@@ -5,7 +5,7 @@
   <div class="card glass-panel">
     <div class="flex justify-between items-center flex-wrap gap-1 mb-2">
       <div>
-        <h2><i class="fas fa-sync-alt"></i><span>Fixed Flows</span></h2>
+        <h2><i class="fas fa-sync-alt"></i><span>Recurring Bills & Income</span></h2>
         <p>Manage recurring income (Salary) and expenses (Rent, Subs).</p>
       </div>
       <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm">
@@ -74,14 +74,14 @@
     {% else %}
     <div class="empty-list-state">
       <i class="fas fa-clipboard-list empty-icon"></i>
-      <p>No fixed flows defined yet.</p>
+      <p>No recurring items defined yet.</p>
       <small>Adding your Rent and Salary here makes the daily budget strictly accurate.</small>
     </div>
     {% endif %}
   </div>
 
   <div class="card glass-panel">
-    <h3><i class="fas fa-plus-circle"></i><span>Add Fixed Flow</span></h3>
+    <h3><i class="fas fa-plus-circle"></i><span>New Recurring Item</span></h3>
 
     <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}

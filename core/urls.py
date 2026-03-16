@@ -11,7 +11,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('setup-goal/', views.setup_goal, name='goal_setup'),
     path('delete-goal/', views.delete_goal, name='delete_goal'),
-    path('fixed-flows/', views.recurring_management, name='fixed_flows'),
+    path('recurring-items/', views.recurring_management, name='recurring_items'),
     path('add/', views.add_transaction, name='transaction'),
     path('settings/', views.settings, name='settings'),
 
