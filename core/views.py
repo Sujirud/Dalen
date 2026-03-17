@@ -107,7 +107,8 @@ def dashboard(request):
     gps = FinancialGPS(request.user)
     data = gps.get_status()
 
-    chart_data = json.dumps(gps.get_chart_data(days=30))
+    chart_data = gps.get_chart_data(days=30)
+    chart_data_json = json.dumps(chart_data) if chart_data else None
 
     today_date = _get_today(request.user).strftime("%A, %B %d")
 
@@ -127,7 +128,7 @@ def dashboard(request):
         'today_date': today_date,
         'greeting': greeting,
         'data': data,
-        'chart_data': chart_data,
+        'chart_data': chart_data_json,
     }
     return render(request, 'core/dashboard.html', context)
 
