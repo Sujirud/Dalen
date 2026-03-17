@@ -277,6 +277,9 @@ dialog[open]::backdrop { opacity: 1; }
   #main-content { padding: 2.4rem 2.4rem 9rem; }
 }
 
+#main-content:not(.htmx-settling) { transition: opacity 0.3s ease-out, transform 0.3s ease-out; }
+#main-content.htmx-settling { opacity: 0; transform: translateY(10px); }
+
 .center-stage {
   display: flex; justify-content: center; align-items: center;
   min-height: 80vh;
