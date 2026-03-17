@@ -151,7 +151,7 @@
       </header>
       {% endif %}
 
-      <main id="main-content" class="content-container">
+      <main id="main-content">
         {% if messages %}
           {% for message in messages %}
           <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
@@ -181,13 +181,13 @@
     });
   </script>
 
-  <dialog id="modal-dialog"><div id="modal-container" class="card-small panel"></div></dialog>
+  <dialog id="modal-dialog"><div class="modal-card surface-panel"></div></dialog>
 
   <script>
     class Dialog {
       constructor() {
         this.container = document.getElementById("modal-dialog");
-        this.modal = document.getElementById("modal-container");
+        this.modal = document.querySelector(".modal-card");
 
         this.container.addEventListener('click', (e) => { if (e.target === this.container) this.container.close(); });
       }

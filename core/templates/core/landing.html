@@ -3,18 +3,18 @@
 {% block content %}
 <div class="center-stage">
   <div class="landing-card glass-panel">
-    <div>
-      <div class="logo-circle">
-        <img src="{% static 'img/logo.svg' %}" alt="Logo">
-      </div>
-      <h1 class="app-title gradient-text">Dalen</h1>
-      <p class="app-tagline">Your Daily Spending Compass.</p>
-      <p class="app-desc">Simply set a savings goal, and we'll calculate exactly what is safe to spend today. No complex spreadsheets required.</p>
+    <div class="logo-circle">
+      <img src="{% static 'img/logo.svg' %}" alt="Logo">
     </div>
 
-    <div class="auth-buttons">
-      <a href="{% url 'login' %}" class="btn btn-fill btn-primary btn-lg">Log In</a>
-      <a href="{% url 'register' %}" class="btn btn-outline btn-lg">Get Started</a>
+    <h1 class="landing-title text-gradient">Dalen</h1>
+
+    <p class="landing-tagline">Your Daily Spending Compass.</p>
+    <p class="landing-desc">Simply set a savings goal, and we'll calculate exactly what is safe to spend today. No complex spreadsheets required.</p>
+
+    <div class="flex flex-wrap gap-2">
+      <a href="{% url 'login' %}" class="btn btn-fill btn-primary btn-lg flex-1 no-wrap">Log In</a>
+      <a href="{% url 'register' %}" class="btn btn-outline btn-lg flex-1 no-wrap">Get Started</a>
     </div>
   </div>
 </div>

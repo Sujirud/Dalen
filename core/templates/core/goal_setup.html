@@ -19,7 +19,7 @@
     <div class="flex-col gap-2">
     {% if current_goal %}
     <div class="current-goal-card glass-panel">
-      <div class="flex justify-between items-start flex-wrap gap-2 mb-1">
+      <div class="flex justify-between items-start flex-wrap gap-1 mb-1">
         <div class="flex items-center gap-2">
           <div class="goal-icon">
             <i class="far fa-flag"></i>
@@ -29,7 +29,7 @@
               <h3 class="font-bold text-20">{{ current_goal.name }}</h3>
               <span class="pill pill-success">Active</span>
             </div>
-            <p class="text-14 text-muted">Target: {{ current_goal.deadline|date:'M d, Y' }}</p>
+            <p class="text-14 text-light">Target: {{ current_goal.deadline|date:'M d, Y' }}</p>
           </div>
         </div>
 
@@ -48,7 +48,7 @@
 
       <div class="flex justify-between mb-1 text-14">
         <span>Target Amount</span>
-        <span class="text-muted">{{ user.userprofile.currency_symbol }}{{ current_goal.target_amount }}</span>
+        <span class="text-light">{{ user.userprofile.currency_symbol }}{{ current_goal.target_amount }}</span>
       </div>
 
       <div class="goal-progress-bg">
@@ -69,7 +69,7 @@
             </div>
             <div>
               <h3 class="font-bold text-20">{{ goal.name }}</h3>
-              <p class="text-14 text-muted">Ended: {{ goal.deadline|date:'M d, Y' }}</p>
+              <p class="text-14 text-light">Ended: {{ goal.deadline|date:'M d, Y' }}</p>
             </div>
           </div>
           <i class="fas fa-check-circle text-success text-20"></i>
@@ -79,7 +79,7 @@
     {% endif %}
 
     {% if not current_goal and not completed_goals %}
-    <div class="empty-list-state">
+    <div class="empty-card">
       <p>No financial plan set.</p>
       <small>You don't have any active or completed savings goals yet. Click "New Goal" above to create your first plan and get started.</small>
     </div>
@@ -93,7 +93,7 @@
       const modalContent = `
         <div class="modal-header">
           <h3>{% if current_goal %}Edit Current Plan{% else %}New Savings Goal{% endif %}</h3>
-          <button type="button" class="close-btn" onclick="window.dialog.close()">
+          <button type="button" class="modal-close" onclick="window.dialog.close()">
             <i class="fas fa-times"></i>
           </button>
         </div>

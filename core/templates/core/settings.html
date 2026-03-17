@@ -7,7 +7,7 @@
   </div>
 
   <div class="card glass-panel flex-col gap-2">
-    <h3 class="text-xl"><i class="fas fa-user-circle"></i><span>Account</span></h3>
+    <h3 class="text-24"><i class="fas fa-user-circle"></i><span>Account</span></h3>
 
     <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
@@ -48,7 +48,7 @@
   </div>
 
   <div class="card glass-panel flex-col gap-2">
-    <h3 class="text-xl"><i class="fas fa-globe"></i><span>Regional Settings</span></h3>
+    <h3 class="text-24"><i class="fas fa-globe"></i><span>Regional Settings</span></h3>
 
     <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
@@ -97,7 +97,7 @@
   </div>
 
   <div class="card glass-panel flex-col gap-2">
-    <h3 class="text-xl"><i class="fas fa-paint-brush"></i><span>Preferences</span></h3>
+    <h3 class="text-24"><i class="fas fa-paint-brush"></i><span>Preferences</span></h3>
 
     <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
@@ -122,7 +122,7 @@
 
       <div class="modal-header">
         <h3>Confirm Logout</h3>
-        <button type="button" class="close-btn" onclick="window.dialog.close()">
+        <button type="button" class="modal-close" onclick="window.dialog.close()">
           <i class="fas fa-times"></i>
         </button>
       </div>
@@ -140,7 +140,7 @@
     const passwordModalContent = `
       <div class="modal-header">
         <h3>Change Password</h3>
-        <button type="button" class="close-btn" onclick="window.dialog.close()">
+        <button type="button" class="modal-close" onclick="window.dialog.close()">
           <i class="fas fa-times"></i>
         </button>
       </div>
