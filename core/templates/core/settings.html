@@ -1,13 +1,13 @@
 {% extends base_template %}
 {% block content %}
-<div class="flex-col gap-2">
-  <div class="ml-2">
-    <h2><i class="fas fa-sliders-h"></i><span>Settings</span></h2>
+<div class="flex-col gap-3">
+  <div>
+    <h1>Settings</h1>
     <p>Manage your account preferences.</p>
   </div>
 
   <div class="card glass-panel flex-col gap-2">
-    <h3 class="text-24"><i class="fas fa-user-circle"></i><span>Account</span></h3>
+    <h3 class="text-24"><i class="ph ph-user"></i><span>Account</span></h3>
 
     <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
@@ -15,10 +15,7 @@
       <h4>Username</h4>
 
       <div class="form-field row">
-        <div class="input-wrapper">
-          <i class="fas fa-user input-icon"></i>
-          <input type="text" name="username" value="{{ user.username }}" required>
-        </div>
+        <input type="text" name="username" value="{{ user.username }}" required>
 
         <button type="submit" class="btn btn-outline btn-sm">Change Username</button>
       </div>
@@ -41,14 +38,14 @@
           <p>Sign out of your account on this device</p>
         </div>
         <button id="logoutBtn" class="btn btn-outline btn-danger btn-sm">
-          <i class="fas fa-sign-out-alt"></i><span>Log Out</span>
+          <i class="ph-bold ph-sign-out"></i><span>Log Out</span>
         </button>
       </div>
     </div>
   </div>
 
   <div class="card glass-panel flex-col gap-2">
-    <h3 class="text-24"><i class="fas fa-globe"></i><span>Regional Settings</span></h3>
+    <h3 class="text-24"><i class="ph ph-globe"></i><span>Regional Settings</span></h3>
 
     <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
@@ -75,7 +72,7 @@
           <label>
             Time Zone
             <small class="ml-2" style="color: var(--primary);">
-              <i class="far fa-clock"></i>
+              <i class="ph ph-clock"></i>
               <span id="clockDisplay"></span>
             </small>
           </label>
@@ -88,7 +85,7 @@
 
         <div class="flex-col">
           <button type="button" id="detectTimezoneBtn" class="btn btn-outline btn-sm" title="Detect my location">
-            <i class="fas fa-location-arrow"></i><span>Auto</span>
+            <i class="ph-bold ph-navigation-arrow"></i><span>Auto</span>
           </button>
           <button type="submit" class="btn btn-outline btn-sm">Save</button>
         </div>
@@ -97,7 +94,7 @@
   </div>
 
   <div class="card glass-panel flex-col gap-2">
-    <h3 class="text-24"><i class="fas fa-paint-brush"></i><span>Preferences</span></h3>
+    <h3 class="text-24"><i class="ph ph-paint-brush"></i><span>Preferences</span></h3>
 
     <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
@@ -123,7 +120,7 @@
       <div class="modal-header">
         <h3>Confirm Logout</h3>
         <button type="button" class="modal-close" onclick="window.dialog.close()">
-          <i class="fas fa-times"></i>
+          <i class="ph-bold ph-x"></i>
         </button>
       </div>
 
@@ -141,7 +138,7 @@
       <div class="modal-header">
         <h3>Change Password</h3>
         <button type="button" class="modal-close" onclick="window.dialog.close()">
-          <i class="fas fa-times"></i>
+          <i class="ph-bold ph-x"></i>
         </button>
       </div>
 

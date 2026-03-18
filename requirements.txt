@@ -1,7 +1,6 @@
 asgiref==3.11.1
 Django==6.0.2
 django-htmx==1.27.0
-fontawesomefree==6.6.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.2
 six==1.17.0

@@ -16,9 +16,9 @@
       <div class="ring-content">
         <span class="text-12 font-medium text-light uppercase mb-2">
           {% if data.remaining_today > 0 %}
-            <i class="fas fa-check-circle text-emerald"></i>
+            <i class="ph-fill ph-check-circle text-emerald"></i>
           {% else %}
-            <i class="fas fa-exclamation-circle text-danger"></i>
+            <i class="ph-fill ph-warning-circle text-danger"></i>
           {% endif %}
           <span>Safe to Spend</span>
         </span>
@@ -44,20 +44,20 @@
     <div class="bg-decor-accent"></div>
     <div class="bg-decor-primary"></div>
     <div class="bg-icon">
-      <i class="fas fa-flag"></i>
+      <i class="ph-fill ph-flag"></i>
     </div>
 
     <div class="flex-col gap-1">
       <div class="flex justify-between">
         <span class="text-14 font-medium uppercase text-light letter-spacing-5">Current Goal</span>
         <span class="pill goal-pill">
-          <i class="far fa-calendar"></i>
+          <i class="ph ph-calendar-blank"></i>
           <span>{{ data.remaining_days }} Days Left</span>
         </span>
       </div>
 
       <div class="flex items-center gap-1">
-        <div class="goal-icon"><i class="far fa-flag"></i></div>
+        <div class="goal-icon"><i class="ph ph-flag"></i></div>
         <h3 class="text-30 letter-spacing-5">{{ data.goal_name }}</h3>
       </div>
 
@@ -108,7 +108,7 @@
   <div class="card glass-panel gap-1">
     <div class="flex justify-between items-center flex-wrap gap-1">
       <div>
-        <h3><i class="fas fa-chart-line"></i><span>Spending Trend</span></h3>
+        <h3><i class="ph ph-chart-line"></i><span>Spending Trend</span></h3>
         <p class="text-light" style="font-size: 1.2rem;">Budget Limit vs. Actual Spending</p>
       </div>
 
@@ -231,20 +231,20 @@
 
   {% else %}
   <div class="glass-panel dashboard-empty">
-    <i class="logo-circle fas fa-compass"></i>
+    <i class="logo-circle ph-fill ph-compass"></i>
 
     <h2>Let's set a course.</h2>
     <p>You don't have an active savings plan. Tell us your goal, and we'll calculate your daily safe-to-spend limit automatically.</p>
 
     <a href="{% url 'goal_setup' %}" class="btn btn-fill btn-primary btn-lg mt-2" title="Create New Goal">
-      <i class="fas fa-plus-circle"></i><span>Create New Goal</span>
+      <i class="ph ph-plus-circle"></i><span>Create New Goal</span>
     </a>
   </div>
   {% endif %}
 
   <div class="pd-1">
     <div class="flex justify-between items-center flex-wrap gap-1 mb-1">
-      <h3><i class="fas fa-list-ul"></i><span>Recent Transactions</span></h3>
+      <h3>Recent Transactions</h3>
 
       <div class="flex justify-between items-center flex-wrap gap-1">
         <button class="btn btn-outline btn-sm txn-filter" 
@@ -279,7 +279,7 @@
         >
           <tr>
             <td colspan="3" class="text-light text-center" style="padding: 2rem;">
-              <i class="fas fa-spinner fa-spin"></i> Loading transactions...
+              <i class="throbber mr-1"></i> Loading transactions...
             </td>
           </tr>
         </tbody>

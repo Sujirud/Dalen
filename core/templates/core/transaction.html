@@ -1,17 +1,17 @@
 {% extends base_template %}
 {% block content %}
 <div class="glass-panel card pd-4">
-  <h2><i class="fas fa-receipt"></i><span>Add Transaction</span></h2>
+  <h2><i class="ph ph-receipt"></i><span>Add Transaction</span></h2>
 
   <input type="radio" name="tab_control" id="tab_manual" checked>
   <input type="radio" name="tab_control" id="tab_scan">
 
   <div class="tabs-header">
     <label for="tab_manual" class="tab-label">
-      <i class="fas fa-keyboard"></i><span>Manual Entry</span>
+      <i class="ph-fill ph-keyboard"></i><span>Manual Entry</span>
     </label>
     <label for="tab_scan" class="tab-label">
-      <i class="fas fa-camera"></i><span>Upload Receipt</span>
+      <i class="ph-fill ph-camera"></i><span>Upload Receipt</span>
     </label>
   </div>
 
@@ -21,7 +21,7 @@
     <div class="form-field">
       <label>Description</label>
       <div class="input-wrapper">
-        <i class="fas fa-tag input-icon"></i>
+        <i class="ph ph-tag input-icon"></i>
         <input type="text" name="description" placeholder="e.g. Coffee" maxlength="100" autocomplete="off">
       </div>
     </div>
@@ -61,7 +61,7 @@
       <input type="file" name="receipt_images" id="fileInput" class="file-input" accept="image/*" required multiple>
 
       <div class="zone-content">
-        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+        <i class="ph ph-upload-simple upload-icon"></i>
         <h3>Upload Receipt Images</h3>
         <p>Tap to select or drag files here.</p>
         <small class="text-light">We'll extract the date and total automatically.</small>
@@ -71,9 +71,7 @@
     <div id="previewContainer" class="preview-grid mt-2 hidden"></div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-fill btn-primary btn-full">
-        <i class="fas fa-magic"></i><span>Analyze & Save</span>
-      </button>
+      <button type="submit" class="btn btn-fill btn-primary btn-full">Analyze & Save</span></button>
     </div>
   </form>
 
@@ -152,7 +150,7 @@
 
         const delBtn = document.createElement('button');
         delBtn.className = 'deleteimg-btn';
-        delBtn.innerHTML = '<i class="fas fa-times"></i>';
+        delBtn.innerHTML = '<i class="ph-bold ph-x"></i>';
         delBtn.type = 'button';
         delBtn.onclick = () => removeFile(index);
 

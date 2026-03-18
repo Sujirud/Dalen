@@ -52,7 +52,7 @@
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="item_id" value="{{ item.id }}">
             <button type="submit" class="icon-btn danger pull-right" title="Delete Item">
-              <i class="fas fa-trash"></i>
+              <i class="ph ph-trash-simple"></i>
             </button>
           </form>
         </td>
@@ -63,14 +63,14 @@
 </div>
 {% else %}
 <div class="empty-card mt-3 mb-4">
-  <i class="fas fa-clipboard-list"></i>
+  <i class="ph-fill ph-clipboard-text"></i>
   <p>No recurring items defined yet.</p>
   <small>Adding your Rent and Salary here makes the daily budget strictly accurate.</small>
 </div>
 {% endif %}
 
 <div class="card glass-panel mt-1">
-  <h3><i class="fas fa-plus-circle"></i><span>New Recurring Item</span></h3>
+  <h3><i class="ph ph-plus-circle"></i><span>New Recurring Item</span></h3>
 
   <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
     {% csrf_token %}

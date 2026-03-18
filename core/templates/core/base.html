@@ -11,11 +11,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
   <script src="{% static 'js/slimselect.min.js' %}"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-  <link rel="stylesheet" href="{% static 'fontawesomefree/css/all.min.css' %}" type="text/css">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
@@ -49,7 +50,7 @@
           hx-swap="innerHTML" 
           hx-push-url="true"
         >
-          <i class="fas fa-home"></i><span>Dashboard</span>
+          <i class="ph ph-house-line"></i><span>Dashboard</span>
         </a>
         <a class="nav-btn" href="{% url 'recurring_items' %}" 
           hx-get="{% url 'recurring_items' %}" 
@@ -57,7 +58,7 @@
           hx-swap="innerHTML" 
           hx-push-url="true"
         >
-          <i class="fas fa-receipt"></i><span>Recurring Items</span>
+          <i class="ph ph-receipt"></i><span>Recurring Items</span>
         </a>
         <a class="nav-btn" href="{% url 'goal_setup' %}" 
           hx-get="{% url 'goal_setup' %}" 
@@ -65,7 +66,7 @@
           hx-swap="innerHTML" 
           hx-push-url="true"
         >
-          <i class="fas fa-calendar-alt"></i><span>Planning</span>
+          <i class="ph ph-target"></i><span>Planning</span>
         </a>
       </div>
 
@@ -76,11 +77,11 @@
           hx-swap="innerHTML" 
           hx-push-url="true"
         >
-          <i class="fas fa-cog"></i><span>Settings</span>
+          <i class="ph ph-gear-six"></i><span>Settings</span>
         </a>
 
         <div class="flex items-center gap-1 pd-1 mt-2">
-          <i class="fas fa-circle-user text-30"></i>
+          <i class="ph-fill ph-user-circle text-30"></i>
           {{ user.username }}
         </div>
       </div>
@@ -94,7 +95,7 @@
         hx-swap="innerHTML" 
         hx-push-url="true"
       >
-        <i class="fas fa-home"></i><span>Dashboard</span>
+        <i class="ph ph-house-line"></i><span>Dashboard</span>
       </a>
       <a class="nav-btn" href="{% url 'recurring_items' %}" 
         hx-get="{% url 'recurring_items' %}" 
@@ -102,7 +103,7 @@
         hx-swap="innerHTML" 
         hx-push-url="true"
       >
-        <i class="fas fa-receipt"></i><span>Recurring Items</span>
+        <i class="ph ph-receipt"></i><span>Recurring Items</span>
       </a>
       <div></div>
       <a class="nav-btn" href="{% url 'goal_setup' %}" 
@@ -111,7 +112,7 @@
         hx-swap="innerHTML" 
         hx-push-url="true"
       >
-        <i class="fas fa-calendar-alt"></i><span>Planning</span>
+        <i class="ph ph-target"></i><span>Planning</span>
       </a>
       <a class="nav-btn" href="{% url 'settings' %}" 
         hx-get="{% url 'settings' %}" 
@@ -119,7 +120,7 @@
         hx-swap="innerHTML" 
         hx-push-url="true"
       >
-        <i class="fas fa-cog"></i><span>Settings</span>
+        <i class="ph ph-gear-six"></i><span>Settings</span>
       </a>
     </nav>
 
@@ -130,7 +131,7 @@
       hx-swap="innerHTML" 
       hx-push-url="true"
     >
-      <i class="fas fa-plus"></i>
+      <i class="ph-bold ph-plus"></i>
     </a>
     {% endif %}
 
@@ -146,7 +147,7 @@
 
         <div class="flex items-center gap-1">
           {{ user.username }}
-          <i class="fas fa-circle-user text-30"></i>
+          <i class="ph-fill ph-user-circle text-30"></i>
         </div>
       </header>
       {% endif %}

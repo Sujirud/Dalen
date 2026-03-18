@@ -6,13 +6,13 @@
   <div>
     <div class="flex justify-between items-center mb-2">
       <h2 class="text-24">
-        <i class="fas fa-font-awesome text-primary"></i><span>Savings Goals</span>
+        <i class="ph ph-flag-banner text-primary"></i><span>Savings Goals</span>
       </h2>
 
       <button id="newGoalBtn" class="text-primary text-14 font-medium"
         {% if current_goal %}style="opacity: 0.5; cursor: not-allowed;" disabled{% endif %}
       >
-        <i class="fas fa-plus"></i><span>New Goal</span>
+        <i class="ph ph-plus"></i><span>New Goal</span>
       </button>
     </div>
 
@@ -22,7 +22,7 @@
       <div class="flex justify-between items-start flex-wrap gap-1 mb-1">
         <div class="flex items-center gap-2">
           <div class="goal-icon">
-            <i class="far fa-flag"></i>
+            <i class="ph ph-flag"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
@@ -35,12 +35,12 @@
 
         <div class="flex items-center gap-1">
           <button type="button" class="btn btn-outline btn-sm" id="editGoalBtn">
-            <i class="fas fa-pen"></i><span>Edit</span>
+            <i class="ph ph-pen"></i><span>Edit</span>
           </button>
           <form method="post" action="{% url 'delete_goal' %}" hx-post="{% url 'delete_goal' %}" hx-target="#main-content" class="inline-form" hx-confirm="Delete {{ current_goal.name }}? This will remove your active plan.">
             {% csrf_token %}
             <button type="submit" class="btn btn-outline btn-danger btn-sm" title="Delete Goal">
-              <i class="fas fa-trash"></i>
+              <i class="ph ph-trash-simple"></i>
             </button>
           </form>
         </div>
@@ -65,14 +65,14 @@
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-2">
             <div class="goal-icon">
-              <i class="far fa-flag"></i>
+              <i class="ph ph-flag"></i>
             </div>
             <div>
               <h3 class="font-bold text-20">{{ goal.name }}</h3>
               <p class="text-14 text-light">Ended: {{ goal.deadline|date:'M d, Y' }}</p>
             </div>
           </div>
-          <i class="fas fa-check-circle text-success text-20"></i>
+          <i class="ph-fill ph-check-circle text-success text-20"></i>
         </div>
       </div>
       {% endfor %}
@@ -94,7 +94,7 @@
         <div class="modal-header">
           <h3>{% if current_goal %}Edit Current Plan{% else %}New Savings Goal{% endif %}</h3>
           <button type="button" class="modal-close" onclick="window.dialog.close()">
-            <i class="fas fa-times"></i>
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
         <form method="post" class="styled-form">
@@ -103,7 +103,7 @@
           <div class="form-field">
             <label>Goal Name</label>
             <div class="input-wrapper">
-              <i class="fas fa-pen input-icon"></i>
+              <i class="ph ph-pen input-icon"></i>
               <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" required value="{{ current_goal.name|default:''|escapejs }}">
             </div>
           </div>
@@ -120,7 +120,7 @@
             <div class="form-field">
               <label>Deadline</label>
               <div class="input-wrapper">
-                <i class="fas fa-calendar-alt input-icon"></i>
+                <i class="ph ph-calendar-blank input-icon"></i>
                 <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required value="{{ current_goal.deadline|date:'Y-m-d'|default:'' }}">
               </div>
             </div>

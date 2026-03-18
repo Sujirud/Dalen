@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     'core',
-    'fontawesomefree',
     'django_htmx',
 ]
 
