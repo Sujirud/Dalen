@@ -133,78 +133,27 @@ def dashboard(request):
     return render(request, 'core/dashboard.html', context)
 
 @login_required
-def setup_goal(request):
-    current_goal = Goal.objects.filter(user=request.user, is_active=True).first()
-    completed_goals = Goal.objects.filter(user=request.user, is_active=False).order_by('-deadline')
-    today = _get_today(request.user)
-
-    if request.method == 'POST':
-        user = request.user
-
-        try:
-            goal_name = request.POST.get('goal_name')
-            target_amount = Decimal(request.POST.get('goal_amount', 0))
-
-            deadline_str = request.POST.get('deadline')
-            deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
-
-            if current_goal:
-                # Update existing goal
-                current_goal.name = goal_name
-                current_goal.target_amount = target_amount
-                current_goal.deadline = deadline
-                current_goal.save()
-                messages.success(request, "Goal updated successfully.")
-            else:
-                # Create new goal
-                Goal.objects.filter(user=user).update(is_active=False)
-                Goal.objects.create(
-                    user=user,
-                    name=goal_name,
-                    target_amount=target_amount,
-                    deadline=deadline
-                )
-                messages.success(request, "New goal created!")
-
-            return redirect('goal_setup')
-        except ValueError:
-            messages.error(request, "Invalid input. Please check your numbers.")
-
-    # Calculate min_date for the date picker (Tomorrow)
-    min_date = today + timedelta(days=1)
-
-    context = {
-        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
-        'page_title': 'Goal | Dalen',
-        'current_goal': current_goal,
-        'completed_goals': completed_goals,
-        'min_date': min_date
-    }
-
-    return render(request, 'core/goal_setup.html', context)
-
-@login_required
-def delete_goal(request):
-    if request.method == 'POST':
-        Goal.objects.filter(user=request.user, is_active=True).delete()
-    return redirect('goal_setup')
-
-@login_required
-def recurring_management(request):
+def planning(request):
     user = request.user
-    items = RecurringItem.objects.filter(user=user).order_by('start_date')
+
+    current_goal = Goal.objects.filter(user=user, is_active=True).first()
+    completed_goals = Goal.objects.filter(user=user, is_active=False).order_by('-deadline')
+    recurring_items = RecurringItem.objects.filter(user=user).order_by('start_date')
+    today = _get_today(user)
 
     if request.method == 'POST':
         action = request.POST.get('action')
 
-        if action == 'delete':
+        # --- RECURRING ITEM DELETE LOGIC ---
+        if action == 'delete_recurring':
             item_id = request.POST.get('item_id')
             item = get_object_or_404(RecurringItem, id=item_id, user=user)
             item.delete()
             messages.success(request, "Item removed.")
-            return redirect('recurring_items')
+            return redirect('planning')
 
-        elif action == 'create':
+        # --- RECURRING ITEM CREATE LOGIC ---
+        elif action == 'create_recurring':
             try:
                 rec_name = request.POST.get('rec_name')
                 rec_amount = Decimal(request.POST.get('rec_amount', 0))
@@ -228,7 +177,7 @@ def recurring_management(request):
                     interval = int(interval_raw) if interval_raw else 0
                     if interval <= 0:
                         messages.error(request, "Interval must be at least 1 day.")
-                        return redirect('recurring_items')
+                        return redirect('planning')
 
                 RecurringItem.objects.create(
                     user=user,
@@ -240,18 +189,58 @@ def recurring_management(request):
                     interval_days=interval
                 )
                 messages.success(request, "Recurring item added.")
-                return redirect('recurring_items')
-            except Exception as e:
-                print(e)
+                return redirect('planning')
+            except Exception:
                 messages.error(request, "Error adding item.")
+
+        # --- GOAL SETUP LOGIC ---
+        else: 
+            try:
+                goal_name = request.POST.get('goal_name')
+                target_amount = Decimal(request.POST.get('goal_amount', 0))
+                deadline_str = request.POST.get('deadline')
+                deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+
+                if current_goal:
+                    # Update existing goal
+                    current_goal.name = goal_name
+                    current_goal.target_amount = target_amount
+                    current_goal.deadline = deadline
+                    current_goal.save()
+                    messages.success(request, "Goal updated successfully.")
+                else:
+                    # Create new goal
+                    Goal.objects.filter(user=user).update(is_active=False)
+                    Goal.objects.create(
+                        user=user,
+                        name=goal_name,
+                        target_amount=target_amount,
+                        deadline=deadline
+                    )
+                    messages.success(request, "New goal created!")
+
+                return redirect('planning')
+            except ValueError:
+                messages.error(request, "Invalid input. Please check your numbers.")
+
+    min_date = today + timedelta(days=1)
 
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
-        'page_title': 'Recurring Items | Dalen',
-        'items': items
+        'page_title': 'Planning | Dalen',
+        'current_goal': current_goal,
+        'completed_goals': completed_goals,
+        'recurring_items': recurring_items, 
+        'min_date': min_date
     }
 
-    return render(request, 'core/recurring_items.html', context)
+    return render(request, 'core/planning.html', context)
+
+@login_required
+def delete_goal(request):
+    if request.method == 'POST':
+        Goal.objects.filter(user=request.user, is_active=True).delete()
+    return redirect('planning')
 
 @login_required
 def add_transaction(request):

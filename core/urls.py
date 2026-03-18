@@ -9,11 +9,11 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='landing'), name='logout'),
 
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('setup-goal/', views.setup_goal, name='goal_setup'),
-    path('delete-goal/', views.delete_goal, name='delete_goal'),
-    path('recurring-items/', views.recurring_management, name='recurring_items'),
-    path('add/', views.add_transaction, name='transaction'),
+    path('planning/', views.planning, name='planning'),
     path('settings/', views.settings, name='settings'),
+    path('add/', views.add_transaction, name='transaction'),
+
+    path('delete-goal/', views.delete_goal, name='delete_goal'),
 
     path('htmx/transactions/', views.transaction_list, name='htmx_transactions'),
 ]

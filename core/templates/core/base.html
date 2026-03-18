@@ -52,16 +52,8 @@
         >
           <i class="ph ph-house-line"></i><span>Dashboard</span>
         </a>
-        <a class="nav-btn" href="{% url 'recurring_items' %}" 
-          hx-get="{% url 'recurring_items' %}" 
-          hx-target="#main-content" 
-          hx-swap="innerHTML" 
-          hx-push-url="true"
-        >
-          <i class="ph ph-receipt"></i><span>Recurring Items</span>
-        </a>
-        <a class="nav-btn" href="{% url 'goal_setup' %}" 
-          hx-get="{% url 'goal_setup' %}" 
+        <a class="nav-btn" href="{% url 'planning' %}" 
+          hx-get="{% url 'planning' %}" 
           hx-target="#main-content" 
           hx-swap="innerHTML" 
           hx-push-url="true"
@@ -97,17 +89,10 @@
       >
         <i class="ph ph-house-line"></i><span>Dashboard</span>
       </a>
-      <a class="nav-btn" href="{% url 'recurring_items' %}" 
-        hx-get="{% url 'recurring_items' %}" 
-        hx-target="#main-content" 
-        hx-swap="innerHTML" 
-        hx-push-url="true"
-      >
-        <i class="ph ph-receipt"></i><span>Recurring Items</span>
-      </a>
       <div></div>
-      <a class="nav-btn" href="{% url 'goal_setup' %}" 
-        hx-get="{% url 'goal_setup' %}" 
+      <div></div>
+      <a class="nav-btn" href="{% url 'planning' %}" 
+        hx-get="{% url 'planning' %}" 
         hx-target="#main-content" 
         hx-swap="innerHTML" 
         hx-push-url="true"
