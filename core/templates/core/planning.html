@@ -154,141 +154,130 @@
   </div>
 </div>
 
-<script>
-  (function() {
-    const modalContent = `
-      <div class="modal-header">
-        <h3>{% if current_goal %}Edit Current Plan{% else %}New Savings Goal{% endif %}</h3>
-        <button type="button" class="modal-close" onclick="window.dialog.close()">
-          <i class="ph-bold ph-x"></i>
-        </button>
+<dialog id="goalModal">
+  <div class="modal-card surface-panel">
+    <div class="modal-header">
+      <h3>{% if current_goal %}Edit Current Plan{% else %}New Savings Goal{% endif %}</h3>
+      <button type="button" class="modal-close" onclick="closeModal()">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    </div>
+
+    <form method="post" class="styled-form">
+      {% csrf_token %}
+
+      <div class="form-field">
+        <label>Goal Name</label>
+        <div class="input-wrapper">
+          <i class="ph ph-pen input-icon"></i>
+          <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" required value="{{ current_goal.name|default:''|escapejs }}">
+        </div>
       </div>
 
-      <form method="post" class="styled-form">
-        {% csrf_token %}
+      <div class="form-row">
+        <div class="form-field">
+          <label>Target Amount</label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">{{ user.userprofile.currency_symbol }}</span>
+            <input type="number" min="1" max="1000000000000" name="goal_amount" placeholder="0.00" required value="{{ current_goal.target_amount|default:'' }}">
+          </div>
+        </div>
 
         <div class="form-field">
-          <label>Goal Name</label>
+          <label>Deadline</label>
           <div class="input-wrapper">
-            <i class="ph ph-pen input-icon"></i>
-            <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" required value="{{ current_goal.name|default:''|escapejs }}">
+            <i class="ph ph-calendar-blank input-icon"></i>
+            <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required value="{{ current_goal.deadline|date:'Y-m-d'|default:'' }}">
           </div>
         </div>
-
-        <div class="form-row">
-          <div class="form-field">
-            <label>Target Amount</label>
-            <div class="input-wrapper">
-              <span class="currency-symbol">{{ user.userprofile.currency_symbol }}</span>
-              <input type="number" min="1" max="1000000000000" name="goal_amount" placeholder="0.00" required value="{{ current_goal.target_amount|default:'' }}">
-            </div>
-          </div>
-
-          <div class="form-field">
-            <label>Deadline</label>
-            <div class="input-wrapper">
-              <i class="ph ph-calendar-blank input-icon"></i>
-              <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required value="{{ current_goal.deadline|date:'Y-m-d'|default:'' }}">
-            </div>
-          </div>
-        </div>
-
-        {% if current_goal %}
-        <div class="alert alert-info">Updating a plan will recalculate your daily budget.</div>
-        {% endif %}
-
-        <div class="form-actions">
-          <button type="button" class="btn btn-outline btn-full" onclick="window.dialog.close()">Cancel</button>
-          <button type="submit" class="btn btn-fill btn-primary btn-full">
-            {% if current_goal %}Save Changes{% else %}Create Plan{% endif %}
-          </button>
-        </div>
-      </form>
-    `;
-
-    const editBtn = document.getElementById("editGoalBtn");
-    if (editBtn) editBtn.addEventListener("click", () => window.dialog.open(modalContent));
-
-    const newBtn = document.getElementById("newGoalBtn");
-    if (newBtn && !newBtn.disabled) newBtn.addEventListener("click", () => window.dialog.open(modalContent));
-  })();
-</script>
-
-<script>
-  (function() {
-    const modalContent = `
-      <div class="modal-header">
-        <h3>New Recurring Item</h3>
-        <button type="button" class="modal-close" onclick="window.dialog.close()">
-          <i class="ph-bold ph-x"></i>
-        </button>
       </div>
 
-      <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="create_recurring">
+      {% if current_goal %}
+      <div class="alert alert-info">Updating a plan will recalculate your daily budget.</div>
+      {% endif %}
 
-        <div class="form-row">
-          <div class="form-field">
-            <label>Name</label>
-            <input type="text" name="rec_name" placeholder="e.g. Monthly Salary or Netflix" maxlength="50" required>
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-fill btn-primary">
+          {% if current_goal %}Save Changes{% else %}Create Plan{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="recurringItemModal">
+  <div class="modal-card surface-panel">
+    <div class="modal-header">
+      <h3>New Recurring Item</h3>
+      <button type="button" class="modal-close" onclick="closeModal()">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    </div>
+
+    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create_recurring">
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Name</label>
+          <input type="text" name="rec_name" placeholder="e.g. Monthly Salary or Netflix" maxlength="50" required>
+        </div>
+        <div class="form-field">
+          <label>Amount</label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">{{ user.userprofile.currency_symbol }}</span>
+            <input type="number" min="1" max="1000000000000" name="rec_amount" placeholder="0.00" required>
           </div>
-          <div class="form-field">
-            <label>Amount</label>
-            <div class="input-wrapper">
-              <span class="currency-symbol">{{ user.userprofile.currency_symbol }}</span>
-              <input type="number" step="0.01" min="0" max="9999999999999" name="rec_amount" placeholder="0.00" required>
-            </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Type</label>
+          <select name="rec_type">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Frequency</label>
+          <select name="frequency_type" id="freqSelector">
+            <option value="monthly">Monthly</option>
+            <option value="custom">Custom Interval</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Start Date</label>
+          <input type="date" name="start_date_custom" id="startDate" required>
+
+          <div id="monthlyHelptext" class="hidden">
+            <small class="help-text">For monthly items, we'll repeat on this day every month.</small>
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-field">
-            <label>Type</label>
-            <select name="rec_type">
-              <option value="expense">Expense (-)</option>
-              <option value="income">Income (+)</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Frequency</label>
-            <select name="frequency_type" id="freqSelector">
-              <option value="monthly">Monthly</option>
-              <option value="custom">Custom Interval</option>
-            </select>
-          </div>
+        <div id="intervalInput" class="form-field hidden">
+          <label>Repeat Every (Days)</label>
+          <input type="number" name="interval_days" placeholder="e.g. 14">
         </div>
 
-        <div class="form-row">
-          <div class="form-field">
-            <label>Start Date</label>
-            <input type="date" name="start_date_custom" id="startDate" required>
+        <div class="form-field">
+          <label>End Date (Optional)</label>
+          <input type="date" name="end_date_custom">
+         </div>
+      </div>
 
-            <div id="monthlyHelptext" class="hidden">
-              <small class="help-text">For monthly items, we'll repeat on this day every month.</small>
-            </div>
-          </div>
-
-          <div id="intervalInput" class="form-field hidden">
-            <label>Repeat Every (Days)</label>
-            <input type="number" name="interval_days" placeholder="e.g. 14">
-          </div>
-
-          <div class="form-field">
-            <label>End Date (Optional)</label>
-            <input type="date" name="end_date_custom">
-           </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="submit" class="btn btn-fill btn-primary">Save Item</button>
-        </div>
-      </form>
-    `;
-
-    document.getElementById("newItemBtn")?.addEventListener("click", () => window.dialog.open(modalContent));
-  })();
-</script>
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-fill btn-primary">Save Item</button>
+      </div>
+    </form>
+  </div>
+</dialog>
 
 <script>
   (function() {
@@ -313,6 +302,15 @@
 
     // Set default start date to today
     document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+  })();
+</script>
+
+<script>
+  (function() {
+    const newBtn = document.getElementById("newGoalBtn");
+    if (newBtn && !newBtn.disabled) newBtn.addEventListener("click", () => openModal("goalModal"));
+    document.getElementById("editGoalBtn")?.addEventListener("click", () => openModal("goalModal"));
+    document.getElementById("newItemBtn")?.addEventListener("click", () => openModal("recurringItemModal"));
   })();
 </script>
 {% endblock %}

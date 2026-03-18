@@ -167,29 +167,20 @@
     });
   </script>
 
-  <dialog id="modal-dialog"><div class="modal-card surface-panel"></div></dialog>
-
   <script>
-    class Dialog {
-      constructor() {
-        this.container = document.getElementById("modal-dialog");
-        this.modal = document.querySelector(".modal-card");
+    window.openModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.showModal();
+    };
 
-        this.container.addEventListener('click', (e) => { if (e.target === this.container) this.container.close(); });
-      }
+    window.closeModal = function() {
+      const activeModal = document.querySelector('dialog[open]');
+      if (activeModal) activeModal.close();
+    };
 
-      open(content) {
-        this.modal.innerHTML = content;
-        this.container.showModal();
-        document.body.style.overflow = 'hidden';
-      }
-      close() {
-        this.container.close();
-        document.body.style.overflow = '';
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => { window.dialog = new Dialog(); });
+    document.addEventListener('click', (e) => {
+      if (e.target.tagName === 'DIALOG') e.target.close();
+    });
   </script>
 
   <script>
@@ -202,9 +193,14 @@
       selects.forEach(select => {
         if (!select.slim) {
           const enableSearch = select.dataset.search === 'true';
+          const isInDialog = select.closest('dialog') !== null;
+
           select.slim = new SlimSelect({
             select: select,
-            settings: { showSearch: enableSearch }
+            settings: {
+              showSearch: enableSearch,
+              ...(isInDialog && { contentLocation: select.parentElement }) 
+            }
           });
         }
       });

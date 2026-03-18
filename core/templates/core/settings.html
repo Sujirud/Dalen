@@ -111,15 +111,14 @@
   </div>
 </div>
 
-<script>
-  (function() {
-    const logoutModalContent = `
+<dialog id="logoutModal">
+  <div class="modal-card surface-panel">
     <form method="post" action="{% url 'logout' %}" class="flex-col gap-2">
       {% csrf_token %}
 
       <div class="modal-header">
         <h3>Confirm Logout</h3>
-        <button type="button" class="modal-close" onclick="window.dialog.close()">
+        <button type="button" class="modal-close" onclick="closeModal()">
           <i class="ph-bold ph-x"></i>
         </button>
       </div>
@@ -127,52 +126,46 @@
       <p>Are you sure you want to log out?</p>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-outline btn-sm" onclick="window.dialog.close()">Cancel</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
         <button type="submit" class="btn btn-fill btn-danger btn-sm">Logout</button>
       </div>
     </form>
-    `
-    document.getElementById("logoutBtn").addEventListener("click", () => window.dialog.open(logoutModalContent));
+  </div>
+</dialog>
 
-    const passwordModalContent = `
-      <div class="modal-header">
-        <h3>Change Password</h3>
-        <button type="button" class="modal-close" onclick="window.dialog.close()">
-          <i class="ph-bold ph-x"></i>
-        </button>
+<dialog id="passwordModal">
+  <div class="modal-card surface-panel">
+    <div class="modal-header">
+      <h3>Change Password</h3>
+      <button type="button" class="modal-close" onclick="closeModal()">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    </div>
+
+    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="change_password">
+
+      {% for field in password_form %}
+      <div class="form-field">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+        <small class="help-text">{{ field.help_text }}</small>
+        {% endif %}
+        {% if field.errors %}
+        <small class="error-text">{{ field.errors.0 }}</small>
+        {% endif %}
       </div>
-
-      <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="change_password">
-
-        {% for field in password_form %}
-        <div class="form-field">
-          <label>{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}
-          <small class="help-text">{{ field.help_text }}</small>
-          {% endif %}
-          {% if field.errors %}
-          <small class="error-text">{{ field.errors.0 }}</small>
-          {% endif %}
-        </div>
-        {% endfor %}
+      {% endfor %}
       
-        <div class="form-actions">
-          <button type="button" class="btn btn-outline" onclick="window.dialog.close()">Cancel</button>
-          <button type="submit" class="btn btn-fill btn-primary">Set New Password</button>
-        </div>
-      </form>
-    `
-    document.getElementById("changePasswordBtn").addEventListener("click", () => window.dialog.open(passwordModalContent));
-
-    // Automatically re-open modal if there are backend errors
-    {% if password_form.errors %}
-    window.dialog.open(passwordModalContent);
-    {% endif %}
-  })();
-</script>
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-fill btn-primary">Set New Password</button>
+      </div>
+    </form>
+  </div>
+</dialog>
 
 <script>
   (function() {
@@ -221,6 +214,17 @@
     if (select) select.addEventListener('change', updateClock);
     if (window.clockInterval) clearInterval(window.clockInterval);
     window.clockInterval = setInterval(updateClock, 10000);
+  })();
+</script>
+
+<script>
+  (function() {
+    document.getElementById("logoutBtn")?.addEventListener("click", () => openModal("logoutModal"));
+    document.getElementById("changePasswordBtn")?.addEventListener("click", () => openModal("passwordModal"));
+
+    {% if password_form.errors %}
+    openModal("passwordModal"); // Automatically re-open modal if there are backend errors
+    {% endif %}      
   })();
 </script>
 {% endblock %}
