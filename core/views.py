@@ -104,23 +104,25 @@ def register(request):
 
 @login_required
 def dashboard(request):
-    gps = FinancialGPS(request.user)
-    data = gps.get_status()
-
-    chart_data = gps.get_chart_data(days=30)
-    chart_data_json = json.dumps(chart_data) if chart_data else None
-
     today_date = _get_today(request.user).strftime("%A, %B %d")
 
     user_tz = zoneinfo.ZoneInfo(request.user.userprofile.timezone)
     local_hour = django_timezone.now().astimezone(user_tz).hour
-    
+
     if local_hour < 12:
         greeting = "Good morning"
     elif local_hour < 17:
         greeting = "Good afternoon"
     else:
         greeting = "Good evening"
+
+    gps = FinancialGPS(request.user)
+    data = gps.get_status()
+
+    chart_data = gps.get_chart_data(days=30)
+    chart_data_json = json.dumps(chart_data) if chart_data else None
+
+    recent_transactions = Transaction.objects.filter(user=request.user).order_by('-date', '-created_at')[:5]
 
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
@@ -129,7 +131,9 @@ def dashboard(request):
         'greeting': greeting,
         'data': data,
         'chart_data': chart_data_json,
+        'recent_transactions': recent_transactions,
     }
+
     return render(request, 'core/dashboard.html', context)
 
 @login_required
@@ -359,19 +363,3 @@ def settings(request):
     }
 
     return render(request, 'core/settings.html', context)
-
-@login_required
-def transaction_list(request):
-    """
-    HTMX Endpoint to fetch transaction rows as HTML partials.
-    """
-    today = _get_today(request.user)
-    days = int(request.GET.get('days', 7))
-    start_date = today - timedelta(days=days)
-
-    transactions = Transaction.objects.filter(
-        user=request.user,
-        date__gte=start_date
-    ).order_by('-date', '-created_at')
-
-    return render(request, 'core/partials/transaction_list.html', {'transactions': transactions})

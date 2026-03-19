@@ -14,6 +14,4 @@ urlpatterns = [
     path('add/', views.add_transaction, name='transaction'),
 
     path('delete-goal/', views.delete_goal, name='delete_goal'),
-
-    path('htmx/transactions/', views.transaction_list, name='htmx_transactions'),
 ]
