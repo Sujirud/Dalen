@@ -265,31 +265,21 @@
       </a>
     </div>
 
-    <div class="table-wrapper">
-      <table class="styled-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th class="text-right">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for t in recent_transactions %}
-          <tr>
-            <td class="cell-round-left text-light">{{ t.date|date:"M d, Y" }}</td>
-            <td class="font-bold">{{ t.description|default:"-" }}</td>
-            <td class="cell-round-right text-right font-bold no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
-              {% if t.amount > 0 %}+{% endif %}{{ t.amount|floatformat:2 }} {{ user.userprofile.currency_symbol }}
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="3" class="text-light text-center pd-2">No recent transactions.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="txn-list pd-1">
+      {% for t in recent_transactions %}
+      <div class="txn-card">
+        <div>
+          <p class="font-medium">{{ t.description|default:"-" }}</p>
+          <small class="text-light">{{ t.date|date:"M d, Y" }}</small>
+        </div>
+
+        <div class="font-medium no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
+          {% if t.amount > 0 %}+{% endif %}{{ t.amount|floatformat:2 }} {{ user.userprofile.currency_symbol }}
+        </div>
+      </div>
+      {% empty %}
+      <div class="txn-card justify-center glass-panel text-light pd-2">No transactions recorded yet.</div>
+      {% endfor %}
     </div>
   </div>
 </div>

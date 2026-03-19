@@ -150,13 +150,13 @@ body {
 .flex { display: flex; flex-direction: row; }
 .flex-col { display: flex; flex-direction: column; }
 
-.items-center { align-items: center; }
-.items-start { align-items: flex-start; }
-.items-end { align-items: flex-end; }
-.items-baseline { align-items: baseline; }
+.items-center { align-items: center !important; }
+.items-start { align-items: flex-start !important; }
+.items-end { align-items: flex-end !important; }
+.items-baseline { align-items: baseline !important; }
 
-.justify-between { justify-content: space-between; }
-.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between !important; }
+.justify-center { justify-content: center !important; }
 
 .flex-1 { flex: 1; }
 
@@ -360,35 +360,6 @@ dialog[open]::backdrop { opacity: 1; }
   p { font-size: 1.9rem; font-weight: 600; }
   small { font-size: 1.5rem; max-width: 50rem; }
 }
-
-/* --------------------------------------------------------------------------
-  COMPONENT: TABLES
--------------------------------------------------------------------------- */
-.table-wrapper { overflow-x: auto; }
-
-.styled-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 0.5rem;
-}
-
-.styled-table th {
-  text-align: left;
-  color: var(--text-light);
-  font-size: 1.2rem;
-  text-transform: uppercase;
-  padding: 1rem;
-}
-
-.styled-table tbody tr {
-  background: var(--bg-table-row);
-  transition: transform 0.2s;
-}
-
-.styled-table td { padding: 1rem 1.5rem; vertical-align: middle; }
-
-.cell-round-left { border-radius: 0.8rem 0 0 0.8rem; }
-.cell-round-right { border-radius: 0 0.8rem 0.8rem 0; }
 
 /* --------------------------------------------------------------------------
   COMPONENT: FORMS & INPUTS                  
@@ -741,6 +712,20 @@ dialog[open]::backdrop { opacity: 1; }
 }
 
 /* --------------------------------------------------------------------------
+  TRANSACTIONS
+-------------------------------------------------------------------------- */
+.txn-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.txn-card {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.6rem 1.4rem;
+  border-radius: 1rem;
+  transition: background 0.2s;
+
+  small { font-size: 1.2rem; }
+}
+.txn-card:hover { background: var(--hover-bg); }
+
+/* --------------------------------------------------------------------------
   PLANNING
 -------------------------------------------------------------------------- */
 .current-goal-card {
@@ -763,7 +748,7 @@ dialog[open]::backdrop { opacity: 1; }
   border: none;
 }
 
-:is(.current-goal-card, .completed-goal-card, .recurring-item-card) h3 { font-size: 1.8rem; }
+:is(.current-goal-card, .completed-goal-card, .recurring-item-card) h3 { font-size: 1.8rem; font-weight: 500; }
 
 .day-pill {
   padding: 0.2rem 0.8rem;

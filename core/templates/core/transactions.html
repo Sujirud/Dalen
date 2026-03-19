@@ -3,31 +3,21 @@
 <div>
   <h1 class="mb-3">All Transactions</h1>
 
-  <div class="table-wrapper">
-    <table class="styled-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Description</th>
-          <th class="text-right">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for t in transactions %}
-        <tr>
-          <td class="cell-round-left text-light">{{ t.date|date:"M d, Y" }}</td>
-          <td class="font-bold">{{ t.description|default:"-" }}</td>
-          <td class="cell-round-right text-right font-bold no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
-            {% if t.amount > 0 %}+{% endif %}{{ t.amount|floatformat:2 }} {{ user.userprofile.currency_symbol }}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="3" class="text-light text-center pd-2">No transactions recorded yet.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="card glass-panel txn-list">
+    {% for t in transactions %}
+    <div class="txn-card">
+      <div>
+        <p class="font-medium">{{ t.description|default:"-" }}</p>
+        <small class="text-light">{{ t.date|date:"M d, Y" }}</small>
+      </div>
+
+      <div class="font-medium no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
+        {% if t.amount > 0 %}+{% endif %}{{ t.amount|floatformat:2 }} {{ user.userprofile.currency_symbol }}
+      </div>
+    </div>
+    {% empty %}
+    <div class="text-light text-center pd-2">No transactions recorded yet.</div>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}
