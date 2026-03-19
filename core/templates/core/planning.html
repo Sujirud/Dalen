@@ -1,11 +1,11 @@
 {% extends base_template %}
 {% block content %}
-<h1 class="mb-4">My Financial Plan</h1>
+<h1 class="mb-3">My Financial Plan</h1>
 
 <div class="grid-2">
   <div>
     <div class="flex justify-between items-center flex-wrap gap-1 mb-2">
-      <h2 class="text-24">
+      <h2 class="text-20">
         <i class="ph-bold ph-flag-banner text-primary"></i><span>Savings Goals</span>
       </h2>
 
@@ -27,7 +27,7 @@
             <div>
               <div class="flex items-center gap-1">
                 <h3>{{ current_goal.name }}</h3>
-                <span class="pill pill-success">Active</span>
+                <span class="pill success">Active</span>
               </div>
               <p class="text-12 text-light">Target: {{ current_goal.deadline|date:'M d, Y' }}</p>
             </div>
@@ -38,7 +38,7 @@
               <i class="ph ph-pen"></i>
             </button>
 
-            <form method="post" action="{% url 'delete_goal' %}" hx-post="{% url 'delete_goal' %}" hx-target="#main-content" class="inline-form" hx-confirm="Delete {{ current_goal.name }}? This will remove your active plan.">
+            <form method="post" action="{% url 'delete_goal' %}" hx-post="{% url 'delete_goal' %}" hx-target="#main-content" hx-confirm="Delete {{ current_goal.name }}? This will remove your active plan.">
               {% csrf_token %}
               <button type="submit" class="icon-btn danger" title="Delete Goal">
                 <i class="ph ph-trash-simple"></i>
@@ -52,10 +52,8 @@
           <span class="text-light">{{ user.userprofile.currency_symbol }}{{ current_goal.target_amount }}</span>
         </div>
 
-        <div class="goal-progress-bg">
-          <div class="progress-fill" style="width: {{ current_goal.progress_percentage|default:0 }}%;">
-             <div class="progress-overlay"></div>
-          </div>
+        <div class="progress-track" style="height: 0.6rem;">
+          <div class="progress-fill" style="width: 0%;"></div>
         </div>
       </div>
       {% endif %}
@@ -90,7 +88,7 @@
 
   <div>
     <div class="flex justify-between items-center gap-1 flex-wrap mb-2">
-      <h2 class="text-24">
+      <h2 class="text-20">
         <i class="ph-bold ph-repeat text-primary"></i><span>Recurring Bills & Income</span>
       </h2>
 
@@ -100,7 +98,7 @@
     </div>
 
     {% if recurring_items %}
-    <div class="flex-col gap-2">
+    <div class="flex-col gap-1">
       {% for item in recurring_items %}
       <div class="recurring-item-card glass-panel">
         <div class="flex justify-between items-center gap-1">
@@ -132,7 +130,7 @@
               {% endif %}
             </div>
 
-            <form method="post" action="." hx-post="." hx-target="#main-content" class="inline-form" hx-confirm="Delete {{ item.name }}? This will affect future budget calculations.">
+            <form method="post" action="." hx-post="." hx-target="#main-content" hx-confirm="Delete {{ item.name }}? This will affect future budget calculations.">
               {% csrf_token %}
               <input type="hidden" name="action" value="delete_recurring">
               <input type="hidden" name="item_id" value="{{ item.id }}">
@@ -178,7 +176,7 @@
         <div class="form-field">
           <label>Target Amount</label>
           <div class="input-wrapper">
-            <span class="currency-symbol">{{ user.userprofile.currency_symbol }}</span>
+            <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
             <input type="number" min="1" max="1000000000000" name="goal_amount" placeholder="0.00" required value="{{ current_goal.target_amount|default:'' }}">
           </div>
         </div>
@@ -227,7 +225,7 @@
         <div class="form-field">
           <label>Amount</label>
           <div class="input-wrapper">
-            <span class="currency-symbol">{{ user.userprofile.currency_symbol }}</span>
+            <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
             <input type="number" min="1" max="1000000000000" name="rec_amount" placeholder="0.00" required>
           </div>
         </div>

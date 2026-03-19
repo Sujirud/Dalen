@@ -7,7 +7,7 @@
   </div>
 
   <div class="card glass-panel flex-col gap-2">
-    <h3 class="text-24"><i class="ph ph-user"></i><span>Account</span></h3>
+    <h3 class="text-24"><i class="ph-bold ph-user"></i><span>Account</span></h3>
 
     <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
       {% csrf_token %}
@@ -126,8 +126,8 @@
       <p>Are you sure you want to log out?</p>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-fill btn-danger btn-sm">Logout</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-fill btn-danger">Logout</button>
       </div>
     </form>
   </div>

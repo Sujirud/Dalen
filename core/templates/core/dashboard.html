@@ -11,10 +11,10 @@
     <div class="ring-container">
       <svg class="ring-svg" viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" class="ring-track" />
-        <circle id="ring" cx="50" cy="50" r="45" fill="none" stroke-width="4" stroke-linecap="round" class="progress-ring__circle" />
+        <circle id="ring" cx="50" cy="50" r="45" fill="none" stroke-width="4" stroke-linecap="round" class="ring-progress" />
       </svg>
       <div class="ring-content">
-        <span class="text-12 font-medium text-light uppercase mb-2">
+        <span class="text-12 font-medium text-light uppercase">
           {% if data.remaining_today > 0 %}
             <i class="ph-fill ph-check-circle text-success"></i>
           {% else %}
@@ -23,13 +23,13 @@
           <span>Safe to Spend</span>
         </span>
         <div class="flex gap-1">
-          <span class="text-light safe-currency">{{ user.userprofile.currency_symbol }}</span>
-          <span id="safe-amount-main" class="safe-amount-value">{{ data.remaining_today }}</span>
+          <span class="safe-currency">{{ user.userprofile.currency_symbol }}</span>
+          <span id="safe-amount">{{ data.remaining_today }}</span>
         </div>
-        <div class="text-14 text-light font-medium mt-2">
-          out of <span>{{ user.userprofile.currency_symbol }}{{ data.base_budget }}</span> daily
+        <div class="text-14 text-light font-medium">
+          out of {{ user.userprofile.currency_symbol }}{{ data.base_budget }} daily
         </div>
-        <div class="pill mt-2 {% if data.remaining_today > 0 %}pill-success{% else %}pill-danger{% endif %}">
+        <div class="mt-1 pill {% if data.remaining_today > 0 %}success{% else %}danger{% endif %}">
           {% if data.remaining_today > 0 %}
             On Track
           {% else %}
@@ -58,21 +58,19 @@
 
       <div class="flex items-center gap-1">
         <div class="goal-icon"><i class="ph ph-flag"></i></div>
-        <h3 class="text-30 letter-spacing-5">{{ data.goal_name }}</h3>
+        <h3 class="text-30">{{ data.goal_name }}</h3>
       </div>
 
       <div class="flex justify-between items-end">
         <div class="flex items-baseline gap-1">
-          <span class="text-30 font-bold" id="goal-saved">{{ user.userprofile.currency_symbol }}{{ data.current_net_worth }}</span>
+          <span class="text-26 font-bold" id="goal-saved">{{ user.userprofile.currency_symbol }}{{ data.current_net_worth }}</span>
           <span class="text-14 font-bold text-light">/ <span id="goal-target">{{ user.userprofile.currency_symbol }}{{ data.target_amount }}</span></span>
         </div>
         <p class="text-14 font-bold text-success">{{ data.progress_percent }}%</p>
       </div>
 
-      <div class="goal-progress-bg">
-        <div class="progress-fill" style="width: {{ data.progress_percent }}%;">
-          <div class="progress-overlay"></div>
-        </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width: {{ data.progress_percent }}%;"></div>
       </div>
     </div>
   </div>
@@ -81,13 +79,14 @@
     (function() {
       const circle = document.getElementById('ring');
       if (circle) {
+        // Calculate circumference
         const radius = circle.r.baseVal.value;
         const circumference = radius * 2 * Math.PI;
         circle.style.strokeDasharray = `${circumference} ${circumference}`;
 
         const safe = parseFloat("{{ data.remaining_today }}".replace(/,/g, '')) || 0;
         const base = parseFloat("{{ data.base_budget }}".replace(/,/g, '')) || 1;
-        
+
         let percent = safe / base;
         if (percent < 0) percent = 0;
         if (percent > 1) percent = 1;
@@ -100,6 +99,14 @@
           else if (percent < 0.4) circle.style.stroke = 'var(--warning)';
           else circle.style.stroke = 'var(--success)';
         }, 100);
+
+        // Format the safe amount with smaller decimals
+        const safeAmountEl = document.getElementById('safe-amount');
+        if (safeAmountEl) {
+          const formattedSafe = safe.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          const parts = formattedSafe.split('.');
+          safeAmountEl.innerHTML = `${parts[0]}<span style="font-size: 0.4em;">.${parts[1]}</span>`;
+        }
       }
     })();
   </script>
@@ -236,8 +243,13 @@
     <h2>Let's set a course.</h2>
     <p>You don't have an active savings plan. Tell us your goal, and we'll calculate your daily safe-to-spend limit automatically.</p>
 
-    <a href="{% url 'planning' %}" class="btn btn-fill btn-primary btn-lg mt-2" title="Create New Goal">
-      <i class="ph ph-plus-circle"></i><span>Create New Goal</span>
+    <a title="Create New Goal" class="btn btn-fill btn-primary btn-lg mt-2" href="{% url 'planning' %}" 
+      hx-get="{% url 'planning' %}" 
+      hx-target="#main-content" 
+      hx-swap="innerHTML" 
+      hx-push-url="true"
+    >
+      <i class="ph-fill ph-plus-circle"></i><span>Create New Goal</span>
     </a>
   </div>
   {% endif %}
