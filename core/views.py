@@ -137,6 +137,18 @@ def dashboard(request):
     return render(request, 'core/dashboard.html', context)
 
 @login_required
+def transactions(request):
+    transactions = Transaction.objects.filter(user=request.user).order_by('-date', '-created_at')
+
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'Transactions | Dalen',
+        'transactions': transactions,
+    }
+
+    return render(request, 'core/transactions.html', context)
+
+@login_required
 def planning(request):
     user = request.user
 
@@ -247,60 +259,6 @@ def delete_goal(request):
     return redirect('planning')
 
 @login_required
-def add_transaction(request):
-    if request.method == 'POST':
-        today = _get_today(request.user)
-
-        # Handles receipt upload via 'receipt_images' input
-        images = request.FILES.getlist('receipt_images')
-        if images:
-            count = len(images)
-            total_cost = Decimal('100.00') * count * Decimal(-1)
-            Transaction.objects.create(
-                user=request.user,
-                amount=total_cost,
-                description=f"Scanned Receipt ({count} items)",
-                date=today
-            )
-            messages.success(request, f"Processed {count} receipts!")
-            return redirect('dashboard')
-
-        # Handles manual entry
-        try:
-            amount_val = request.POST.get('amount')
-            trans_type = request.POST.get('type')
-            description = request.POST.get('description', 'Transaction')
-            date_val = request.POST.get('txn_date')
-
-            if amount_val:
-                amount = Decimal(amount_val)
-                final_amount = amount if trans_type == 'income' else -abs(amount)
-
-                # Parse Date or Default to Today
-                if date_val:
-                    txn_date = datetime.strptime(date_val, '%Y-%m-%d').date()
-                else:
-                    txn_date = today
-
-                Transaction.objects.create(
-                    user=request.user,
-                    amount=final_amount,
-                    description=description,
-                    date=txn_date
-                )
-                return redirect('dashboard')
-        except Exception as e:
-            print(e)
-            messages.error(request, "Error adding transaction.")
-
-    context = {
-        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
-        'page_title': 'Transaction | Dalen',
-    }
-
-    return render(request, 'core/transaction.html', context)
-
-@login_required
 def settings(request):
     user = request.user
     profile = UserProfile.objects.get(user=user)
@@ -363,3 +321,57 @@ def settings(request):
     }
 
     return render(request, 'core/settings.html', context)
+
+@login_required
+def add_transaction(request):
+    if request.method == 'POST':
+        today = _get_today(request.user)
+
+        # Handles receipt upload via 'receipt_images' input
+        images = request.FILES.getlist('receipt_images')
+        if images:
+            count = len(images)
+            total_cost = Decimal('100.00') * count * Decimal(-1)
+            Transaction.objects.create(
+                user=request.user,
+                amount=total_cost,
+                description=f"Scanned Receipt ({count} items)",
+                date=today
+            )
+            messages.success(request, f"Processed {count} receipts!")
+            return redirect('dashboard')
+
+        # Handles manual entry
+        try:
+            amount_val = request.POST.get('amount')
+            trans_type = request.POST.get('type')
+            description = request.POST.get('description', 'Transaction')
+            date_val = request.POST.get('txn_date')
+
+            if amount_val:
+                amount = Decimal(amount_val)
+                final_amount = amount if trans_type == 'income' else -abs(amount)
+
+                # Parse Date or Default to Today
+                if date_val:
+                    txn_date = datetime.strptime(date_val, '%Y-%m-%d').date()
+                else:
+                    txn_date = today
+
+                Transaction.objects.create(
+                    user=request.user,
+                    amount=final_amount,
+                    description=description,
+                    date=txn_date
+                )
+                return redirect('dashboard')
+        except Exception as e:
+            print(e)
+            messages.error(request, "Error adding transaction.")
+
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'Transaction | Dalen',
+    }
+
+    return render(request, 'core/add_transaction.html', context)

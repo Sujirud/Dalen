@@ -258,7 +258,9 @@
     <div class="flex justify-between items-center flex-wrap gap-1 mb-1">
       <h3>Recent Transactions</h3>
 
-      <a href="#" class="text-primary no-underline" style="pointer-events: none; opacity: 0.5;">
+      <a href="{% url 'transactions' %}" class="text-primary no-underline"
+        hx-get="{% url 'transactions' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
+      >
         View All
       </a>
     </div>

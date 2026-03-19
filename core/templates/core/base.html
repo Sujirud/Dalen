@@ -44,30 +44,26 @@
       </div>
 
       <div>
-        <a class="nav-btn" href="{% url 'dashboard' %}" 
-          hx-get="{% url 'dashboard' %}" 
-          hx-target="#main-content" 
-          hx-swap="innerHTML" 
-          hx-push-url="true"
+        <a class="nav-btn" href="{% url 'dashboard' %}"
+          hx-get="{% url 'dashboard' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
         >
           <i class="ph ph-house-line"></i><span>Dashboard</span>
         </a>
-        <a class="nav-btn" href="{% url 'planning' %}" 
-          hx-get="{% url 'planning' %}" 
-          hx-target="#main-content" 
-          hx-swap="innerHTML" 
-          hx-push-url="true"
+        <a class="nav-btn" href="{% url 'transactions' %}"
+          hx-get="{% url 'transactions' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
+        >
+          <i class="ph ph-receipt"></i><span>Transactions</span>
+        </a>
+        <a class="nav-btn" href="{% url 'planning' %}"
+          hx-get="{% url 'planning' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
         >
           <i class="ph ph-target"></i><span>Planning</span>
         </a>
       </div>
 
       <div>
-        <a class="nav-btn" href="{% url 'settings' %}" 
-          hx-get="{% url 'settings' %}" 
-          hx-target="#main-content" 
-          hx-swap="innerHTML" 
-          hx-push-url="true"
+        <a class="nav-btn" href="{% url 'settings' %}"
+          hx-get="{% url 'settings' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
         >
           <i class="ph ph-gear-six"></i><span>Settings</span>
         </a>
@@ -81,40 +77,34 @@
 
     {% comment %} Mobile Navigation {% endcomment %}
     <nav class="mobile-nav glass-panel">
-      <a class="nav-btn" href="{% url 'dashboard' %}" 
-        hx-get="{% url 'dashboard' %}" 
-        hx-target="#main-content" 
-        hx-swap="innerHTML" 
-        hx-push-url="true"
+      <a class="nav-btn" href="{% url 'dashboard' %}"
+        hx-get="{% url 'dashboard' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
       >
         <i class="ph ph-house-line"></i><span>Dashboard</span>
       </a>
+      <a class="nav-btn" href="{% url 'transactions' %}"
+        hx-get="{% url 'transactions' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
+      >
+        <i class="ph ph-receipt"></i><span>Transactions</span>
+      </a>
+
       <div></div>
-      <div></div>
-      <a class="nav-btn" href="{% url 'planning' %}" 
-        hx-get="{% url 'planning' %}" 
-        hx-target="#main-content" 
-        hx-swap="innerHTML" 
-        hx-push-url="true"
+
+      <a class="nav-btn" href="{% url 'planning' %}"
+        hx-get="{% url 'planning' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
       >
         <i class="ph ph-target"></i><span>Planning</span>
       </a>
-      <a class="nav-btn" href="{% url 'settings' %}" 
-        hx-get="{% url 'settings' %}" 
-        hx-target="#main-content" 
-        hx-swap="innerHTML" 
-        hx-push-url="true"
+      <a class="nav-btn" href="{% url 'settings' %}"
+        hx-get="{% url 'settings' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
       >
         <i class="ph ph-gear-six"></i><span>Settings</span>
       </a>
     </nav>
 
     {% comment %} Floating Action Button (Add Transaction) {% endcomment %}
-    <a class="fab-btn" href="{% url 'transaction' %}" title="Add Transaction"
-      hx-get="{% url 'transaction' %}" 
-      hx-target="#main-content" 
-      hx-swap="innerHTML" 
-      hx-push-url="true"
+    <a class="fab-btn" href="{% url 'add_transaction' %}" title="Add Transaction"
+      hx-get="{% url 'add_transaction' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
     >
       <i class="ph-bold ph-plus"></i>
     </a>
