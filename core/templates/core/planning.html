@@ -164,11 +164,34 @@
     <form method="post" class="styled-form">
       {% csrf_token %}
 
-      <div class="form-field">
-        <label>Goal Name</label>
-        <div class="input-wrapper">
-          <i class="ph ph-pen input-icon"></i>
-          <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" required value="{{ current_goal.name|default:''|escapejs }}">
+      <div class="flex gap-2">
+        <div class="form-field flex-none">
+          <label>Goal Icon</label>
+  
+          <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
+            <i class="ph ph-{{ current_goal.icon|default:icon_choices.0.0 }}"></i>
+          </button>
+
+          <div id="iconPopover" popover class="icon-popover">
+            <div class="icon-picker-grid">
+              {% for icon_val, icon_label in icon_choices %}
+                <input type="radio" name="goal_icon" id="icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
+                  {% if current_goal.icon == icon_val %}checked{% elif not current_goal.icon and forloop.first %}checked{% endif %}>
+
+                <label for="icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
+                  <i class="ph ph-{{ icon_val }}"></i>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Goal Name</label>
+          <div class="input-wrapper">
+            <i class="ph ph-pen input-icon"></i>
+            <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" required value="{{ current_goal.name|default:''|escapejs }}">
+          </div>
         </div>
       </div>
 
@@ -193,20 +216,6 @@
       {% if current_goal %}
       <div class="alert alert-info">Updating a plan will recalculate your daily budget.</div>
       {% endif %}
-
-      <div class="form-field">
-        <label>Goal Icon</label>
-        <div class="icon-picker-grid">
-          {% for icon_val, icon_label in icon_choices %}
-            <input type="radio" name="goal_icon" id="icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
-              {% if current_goal.icon == icon_val %}checked{% elif not current_goal.icon and forloop.first %}checked{% endif %}>
-
-            <label for="icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
-              <i class="ph ph-{{ icon_val }}"></i>
-            </label>
-          {% endfor %}
-        </div>
-      </div>
 
       <div class="form-actions">
         <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
@@ -323,6 +332,31 @@
     if (newBtn && !newBtn.disabled) newBtn.addEventListener("click", () => openModal("goalModal"));
     document.getElementById("editGoalBtn")?.addEventListener("click", () => openModal("goalModal"));
     document.getElementById("newItemBtn")?.addEventListener("click", () => openModal("recurringItemModal"));
+  })();
+</script>
+
+<script>
+  (function() {
+    const trigger = document.getElementById("iconTriggerBtn");
+    const popover = document.getElementById("iconPopover");
+    const radios = document.querySelectorAll(".icon-picker-radio");
+
+    trigger.addEventListener("click", () => {
+      if (!CSS.supports("position-anchor: --test")) {
+        const rect = trigger.getBoundingClientRect();
+        popover.style.top = `${rect.bottom + 8}px`; // 8px gap
+        popover.style.left = `${rect.left}px`;
+      }
+    });
+
+    radios.forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        if (e.target.checked) {
+          trigger.innerHTML = `<i class="ph ph-${e.target.value}"></i>`;
+          popover.hidePopover();
+        }
+      });
+    });
   })();
 </script>
 {% endblock %}

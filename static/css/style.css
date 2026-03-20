@@ -158,7 +158,8 @@ body {
 .justify-between { justify-content: space-between !important; }
 .justify-center { justify-content: center !important; }
 
-.flex-1 { flex: 1; }
+.flex-1 { flex: 1 !important; }
+.flex-none { flex: none !important; }
 
 .flex-wrap { flex-wrap: wrap; }
 
@@ -252,7 +253,7 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-  DIALOG
+  DIALOG & POPOVER
 -------------------------------------------------------------------------- */
 dialog {
   display: none; justify-content: center; align-items: center;
@@ -285,7 +286,7 @@ dialog[open]::backdrop { opacity: 1; }
   overflow: auto;
 }
 
-.modal-header { display: flex; justify-content: space-between; align-items: center; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; gap: 2rem; }
 .modal-header h3 { font-size: 2.4rem; font-weight: 700; }
 
 .modal-close {
@@ -295,6 +296,19 @@ dialog[open]::backdrop { opacity: 1; }
   transition: all 0.2s;
 }
 .modal-close:hover { background: var(--hover-dark); color: var(--text-main); }
+
+[popover] {
+  padding: 1.6rem;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+
+  opacity: 0;
+  transition: all 0.15s ease-in-out, overlay 0.15s allow-discrete, display 0.15s allow-discrete;
+}
+[popover]:popover-open { opacity: 1; }
+@starting-style { [popover]:popover-open { opacity: 0; } }
 
 /* --------------------------------------------------------------------------
   LAYOUT
@@ -366,8 +380,8 @@ dialog[open]::backdrop { opacity: 1; }
 -------------------------------------------------------------------------- */
 .styled-form { display: flex; flex-direction: column; gap: 2rem; }
 
-.form-row { display: flex; gap: 3rem;}
-@media (max-width: 45rem) { .form-row { flex-direction: column; gap: 2rem;} }
+.form-row { display: flex; gap: 2rem;}
+@media (max-width: 45rem) { .form-row { flex-direction: column; } }
 
 .form-field { flex: 1; }
 .form-field label {
@@ -1010,6 +1024,35 @@ dialog[open]::backdrop { opacity: 1; }
 /* --------------------------------------------------------------------------
   ICON PICKER WIDGET
 -------------------------------------------------------------------------- */
+.icon-picker-trigger {
+  display: flex; justify-content: center; align-items: center;
+  width: 5rem; height: 5rem;
+  background: var(--input-bg);
+  box-shadow: var(--shadow-inner);
+  border: 1px solid var(--border-color);
+  border-radius: 1.2rem;
+  font-size: 2.2rem;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  anchor-name: --icon-btn; 
+}
+
+.icon-picker-trigger:hover, 
+.icon-picker-trigger:focus-visible {
+  border-color: var(--primary);
+  box-shadow: 0 0 3px 3px rgba(var(--primary-rgb), 0.2);
+}
+
+.icon-popover {
+  width: 50rem; max-width: 80vw;
+
+  position-anchor: --icon-btn;
+  top: calc(anchor(bottom) + 0.8rem);
+  left: anchor(left);
+}
+
 .icon-picker-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(3.4rem, 1fr));
@@ -1017,7 +1060,7 @@ dialog[open]::backdrop { opacity: 1; }
 
   .icon-picker-label {
     display: flex; align-items: center; justify-content: center;
-    width: 3.4rem; height: 3.4rem; margin: 0;
+    width: 3.4rem; height: 3.4rem; margin: 0 auto;
     background: var(--input-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
