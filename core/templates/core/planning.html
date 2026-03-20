@@ -22,7 +22,7 @@
         <div class="flex justify-between items-start gap-1 mb-1">
           <div class="flex items-center gap-1">
             <div class="goal-icon">
-              <i class="ph ph-flag"></i>
+              <i class="ph ph-{{ current_goal.icon }}"></i>
             </div>
             <div>
               <div class="flex items-center gap-1">
@@ -64,7 +64,7 @@
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-2">
               <div class="goal-icon">
-                <i class="ph ph-flag"></i>
+                <i class="ph ph-{{ goal.icon }}"></i>
               </div>
               <div>
                 <h3>{{ goal.name }}</h3>
@@ -124,9 +124,9 @@
           <div class="flex items-center gap-1">
             <div class="text-right">
               {% if item.amount < 0 %}
-                <span class="text-danger font-bold no-wrap">{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
+                <span class="text-danger font-medium no-wrap">{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
               {% else %}
-                <span class="text-success font-bold no-wrap">+{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
+                <span class="text-success font-medium no-wrap">+{{ item.amount }} {{ user.userprofile.currency_symbol }}</span>
               {% endif %}
             </div>
 
@@ -193,6 +193,20 @@
       {% if current_goal %}
       <div class="alert alert-info">Updating a plan will recalculate your daily budget.</div>
       {% endif %}
+
+      <div class="form-field">
+        <label>Goal Icon</label>
+        <div class="icon-picker-grid">
+          {% for icon_val, icon_label in icon_choices %}
+            <input type="radio" name="goal_icon" id="icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
+              {% if current_goal.icon == icon_val %}checked{% elif not current_goal.icon and forloop.first %}checked{% endif %}>
+
+            <label for="icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
+              <i class="ph ph-{{ icon_val }}"></i>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
 
       <div class="form-actions">
         <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>

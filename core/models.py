@@ -33,6 +33,7 @@ class RecurringItem(models.Model):
 class Goal(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    icon = models.CharField(max_length=50)
     target_amount = models.DecimalField(max_digits=19, decimal_places=2)
     deadline = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)

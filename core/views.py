@@ -75,6 +75,81 @@ CURRENCIES = {
     'ZAR': ['ZAR']
 }
 
+ICON_CHOICES = [
+    # General & Finance
+    ('flag', 'Objective'),
+    ('coins', 'Coins'),
+    ('money', 'Cash'),
+    ('credit-card', 'Credit Card'),
+    ('receipt', 'Bills'),
+    ('wallet', 'Wallet'),
+    ('piggy-bank', 'Savings'),
+    ('vault', 'Vault'),
+    ('bank', 'Bank'),
+    ('chart-bar', 'Investment'),
+    ('shield-check', 'Insurance'),
+
+    # Travel
+    ('airplane-tilt', 'Travel'),
+    ('backpack', 'Backpack'),
+    ('suitcase-rolling', 'Luggage'),
+    ('building', 'Hotel'),
+    ('tent', 'Camping'),
+    ('island', 'Island'),
+
+    # Food & Dining
+    ('shopping-cart-simple', 'Shopping'),
+    ('fork-knife', 'Food'),
+    ('gift', 'Gifts'),
+    ('cake', 'Celebration'),
+    ('storefront', 'Store'),
+
+    # Home & Family
+    ('house-line', 'House'),
+    ('armchair', 'Furniture'),
+    ('paint-roller', 'Renovation'),
+    ('heart', 'Relationship'),
+    ('paw-print', 'Pets'),
+    ('baby-carriage', 'Kids'),
+    ('person', 'Person'),
+
+    # Education & Career
+    ('books', 'Books'),
+    ('certificate', 'Certificate'),
+    ('graduation-cap', 'Education'),
+    ('briefcase', 'Business'),
+
+    # Hobbies & Entertainment
+    ('ticket', 'Events'),
+    ('palette', 'Art'),
+    ('music-notes', 'Music'),
+    ('game-controller', 'Gaming'),
+    ('barbell', 'Gym'),
+
+    # Gadgets & Tech
+    ('t-shirt', 'Shirt'),
+    ('pants', 'Pants'),
+    ('sneaker', 'Shoes'),
+    ('watch', 'Watch'),
+    ('headphones', 'Headphones'),
+    ('camera', 'Photography'),
+    ('device-mobile', 'Smartphone'),
+    ('laptop', 'Laptop'),
+    ('desktop', 'Desktop'),
+    ('television', 'TV'),
+
+    # Vehicles
+    ('bicycle', 'Bicycle'),
+    ('motorcycle', 'Motorcycle'),
+    ('car', 'Car'),
+    ('wrench', 'Maintenance'),
+
+    # Health & Emergency
+    ('warning-octagon', 'Emergency Fund'),
+    ('first-aid', 'Medical'),
+    ('heartbeat', 'Health'),
+]
+
 # --- HELPERS ---
 
 def _get_today(user):
@@ -213,6 +288,7 @@ def planning(request):
         else: 
             try:
                 goal_name = request.POST.get('goal_name')
+                goal_icon = request.POST.get('goal_icon')
                 target_amount = Decimal(request.POST.get('goal_amount', 0))
                 deadline_str = request.POST.get('deadline')
                 deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
@@ -220,16 +296,17 @@ def planning(request):
                 if current_goal:
                     # Update existing goal
                     current_goal.name = goal_name
+                    current_goal.icon = goal_icon
                     current_goal.target_amount = target_amount
                     current_goal.deadline = deadline
                     current_goal.save()
                     messages.success(request, "Goal updated successfully.")
                 else:
                     # Create new goal
-                    Goal.objects.filter(user=user).update(is_active=False)
                     Goal.objects.create(
                         user=user,
                         name=goal_name,
+                        icon=goal_icon,
                         target_amount=target_amount,
                         deadline=deadline
                     )
@@ -247,7 +324,8 @@ def planning(request):
         'current_goal': current_goal,
         'completed_goals': completed_goals,
         'recurring_items': recurring_items, 
-        'min_date': min_date
+        'min_date': min_date,
+        'icon_choices': ICON_CHOICES
     }
 
     return render(request, 'core/planning.html', context)
@@ -345,7 +423,7 @@ def add_transaction(request):
         try:
             amount_val = request.POST.get('amount')
             trans_type = request.POST.get('type')
-            description = request.POST.get('description', 'Transaction')
+            description = request.POST.get('description')
             date_val = request.POST.get('txn_date')
 
             if amount_val:
