@@ -87,9 +87,10 @@
         const safe = parseFloat("{{ data.remaining_today }}".replace(/,/g, '')) || 0;
         const base = parseFloat("{{ data.base_budget }}".replace(/,/g, '')) || 1;
 
-        let percent = safe / base;
-        if (percent < 0) percent = 0;
-        if (percent > 1) percent = 1;
+        let percent = 0;
+        if (safe > 0 && base > 0) percent = Math.min(Math.max(safe / base, 0), 1);
+        else if (safe > 0 && base <= 0) percent = 1; // Shouldn't happen, but treat as 100%
+        else percent = 0;
 
         const offset = circumference - (percent * circumference);
 
