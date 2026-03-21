@@ -1,0 +1,33 @@
+{% for t in transactions %}
+<div class="txn-card">
+  <div class="flex items-center gap-1">
+    <div class="txn-icon">
+      <i class="ph ph-{{ t.category.icon|default:'receipt' }}"></i>
+    </div>
+
+    <div>
+      <p class="txn-desc">{{ t.description|default:"-" }}</p>
+
+      <div class="flex items-center">
+        {% if t.category %}
+          <div class="pill txn-cat-pill">{{ t.category }}</div>
+        {% endif %}
+
+        <small class="text-light">{{ t.date|date:"M d, Y" }}</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="font-medium no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
+    {% if t.amount > 0 %}+{% endif %}{{ t.amount|floatformat:2 }} {{ user.userprofile.currency_symbol }}
+  </div>
+</div>
+{% empty %}
+<div class="text-light text-center pd-2">No transactions recorded yet.</div>
+{% endfor %}
+
+{% if transactions.has_next %}
+  <button class="btn btn-outline btn-sm btn-full mt-2" hx-get="{% url 'transactions' %}?page={{ transactions.next_page_number }}" hx-target="this" hx-swap="outerHTML">
+    Load More
+  </button>
+{% endif %}

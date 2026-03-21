@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib import messages
 from django.utils import timezone as django_timezone
+from django.core.paginator import Paginator
 from .models import UserProfile, Goal, Transaction, RecurringItem, Category
 from .services import FinancialGPS
 from datetime import timedelta, datetime
@@ -213,13 +214,23 @@ def dashboard(request):
 
 @login_required
 def transactions(request):
-    transactions = Transaction.objects.filter(user=request.user).select_related('category').order_by('-date', '-created_at')
+    txn_list = Transaction.objects.filter(user=request.user).select_related('category').order_by('-date', '-created_at')
+
+    paginator = Paginator(txn_list, 20)
+    page_number = request.GET.get('page', 1)
+    transactions_page = paginator.get_page(page_number)
 
     context = {
-        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
         'page_title': 'Transactions | Dalen',
-        'transactions': transactions,
+        'transactions': transactions_page,
     }
+
+    # If this is an HTMX request for pagination, return the partial template
+    if request.htmx and request.GET.get('page'):
+        return render(request, 'core/partial/transaction_list.html', context)
+
+    # Standard render
+    context['base_template'] = 'core/base_partial.html' if request.htmx else 'core/base.html'
 
     return render(request, 'core/transactions.html', context)
 
