@@ -23,7 +23,7 @@
       <input type="number" min="0.01" max="1000000000000" name="amount" placeholder="0.00" required>
     </div>
 
-    <div class="flex gap-1 justify-center">
+    <div class="flex gap-2">
       <input type="radio" class="hidden-radio" name="type" id="type_expense" value="expense" checked>
       <label for="type_expense" class="toggle-btn toggle-expense">Expense</label>
 
@@ -70,7 +70,11 @@
     </div>
   </form>
 
-  <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm btn-full">Cancel</a>
+  <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm btn-full"
+    hx-get="{% url 'dashboard' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
+  >
+    Cancel
+  </a>
 </div>
 
 <script>
