@@ -7,6 +7,8 @@
   <title>{{ page_title|default:"Dalen" }}</title>
   <link rel="icon" href="{% static 'img/favicon.svg' %}">
 
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,11 +16,9 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <script src="{% static 'js/slimselect.min.js' %}"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-
+  <script src="https://cdn.jsdelivr.net/npm/@floating-ui/core@1.6.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.3"></script>
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <script>
     document.addEventListener('htmx:configRequest', (event) => {

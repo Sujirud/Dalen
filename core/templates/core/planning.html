@@ -12,7 +12,7 @@
       <button id="newGoalBtn" class="text-primary text-14 font-medium"
         {% if current_goal %}style="opacity: 0.5; cursor: not-allowed;" disabled{% endif %}
       >
-        <i class="ph ph-plus"></i><span>New Goal</span>
+        <i class="ph-bold ph-plus"></i><span>New Goal</span>
       </button>
     </div>
 
@@ -35,13 +35,13 @@
 
           <div class="flex">
             <button type="button" class="icon-btn" id="editGoalBtn" title="Edit Goal">
-              <i class="ph ph-pen"></i>
+              <i class="ph-bold ph-pen"></i>
             </button>
 
             <form method="post" action="{% url 'delete_goal' %}" hx-post="{% url 'delete_goal' %}" hx-target="#main-content" hx-confirm="Delete {{ current_goal.name }}? This will remove your active plan.">
               {% csrf_token %}
               <button type="submit" class="icon-btn danger" title="Delete Goal">
-                <i class="ph ph-trash-simple"></i>
+                <i class="ph-bold ph-trash-simple"></i>
               </button>
             </form>
           </div>
@@ -93,7 +93,7 @@
       </h2>
 
       <button id="newItemBtn" class="text-primary text-14 font-medium">
-        <i class="ph ph-plus"></i><span>New Item</span>
+        <i class="ph-bold ph-plus"></i><span>New Item</span>
       </button>
     </div>
 
@@ -135,7 +135,7 @@
               <input type="hidden" name="action" value="delete_recurring">
               <input type="hidden" name="item_id" value="{{ item.id }}">
               <button type="submit" class="icon-btn danger" title="Delete Item">
-                <i class="ph ph-trash-simple"></i>
+                <i class="ph-bold ph-trash-simple"></i>
               </button>
             </form>
           </div>
@@ -341,22 +341,32 @@
     const popover = document.getElementById("iconPopover");
     const radios = document.querySelectorAll(".icon-picker-radio");
 
-    trigger.addEventListener("click", () => {
-      if (!CSS.supports("position-anchor: --test")) {
-        const rect = trigger.getBoundingClientRect();
-        popover.style.top = `${rect.bottom + 8}px`; // 8px gap
-        popover.style.left = `${rect.left}px`;
-      }
-    });
+    const { computePosition, offset, flip, shift } = window.FloatingUIDOM;
 
-    radios.forEach(radio => {
-      radio.addEventListener("change", (e) => {
-        if (e.target.checked) {
-          trigger.innerHTML = `<i class="ph ph-${e.target.value}"></i>`;
-          popover.hidePopover();
-        }
+    function updatePosition() {
+      computePosition(trigger, popover, {
+        placement: 'bottom-start',
+        strategy: 'fixed',
+        middleware: [offset(8), flip(), shift({ padding: 8 })]
+      }).then(({x, y}) => {
+        Object.assign(popover.style, {left: `${x}px`, top: `${y}px`});
       });
-    });
+    }
+
+    if (trigger && popover) {
+      popover.addEventListener("toggle", (event) => {
+        if (event.newState === "open") updatePosition();
+      });
+
+      radios.forEach(radio => {
+        radio.addEventListener("change", (e) => {
+          if (e.target.checked) {
+            trigger.innerHTML = `<i class="ph ph-${e.target.value}"></i>`;
+            popover.hidePopover();
+          }
+        });
+      });
+    }
   })();
 </script>
 {% endblock %}

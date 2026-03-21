@@ -305,7 +305,7 @@ dialog[open]::backdrop { opacity: 1; }
   border-radius: var(--radius-md);
 
   opacity: 0;
-  transition: all 0.15s ease-in-out, overlay 0.15s allow-discrete, display 0.15s allow-discrete;
+  transition: opacity 0.15s ease-in-out, overlay 0.15s allow-discrete, display 0.15s allow-discrete;
 }
 [popover]:popover-open { opacity: 1; }
 @starting-style { [popover]:popover-open { opacity: 0; } }
@@ -1083,8 +1083,6 @@ dialog[open]::backdrop { opacity: 1; }
   color: var(--primary);
   cursor: pointer;
   transition: all 0.2s;
-
-  anchor-name: --icon-btn; 
 }
 
 .icon-picker-trigger:hover, 
@@ -1093,13 +1091,7 @@ dialog[open]::backdrop { opacity: 1; }
   box-shadow: 0 0 3px 3px rgba(var(--primary-rgb), 0.2);
 }
 
-.icon-popover {
-  width: 50rem; max-width: 80vw;
-
-  position-anchor: --icon-btn;
-  top: calc(anchor(bottom) + 0.8rem);
-  left: anchor(left);
-}
+.icon-popover { width: 50rem; max-width: 80vw; }
 
 .icon-picker-grid {
   display: grid;

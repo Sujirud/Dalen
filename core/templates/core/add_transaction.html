@@ -172,13 +172,21 @@
     const popover = document.getElementById("iconPopover");
     const radios = document.querySelectorAll(".icon-picker-radio");
 
+    const { computePosition, offset, flip, shift } = window.FloatingUIDOM;
+
+    function updatePosition() {
+      computePosition(trigger, popover, {
+        placement: 'bottom-start',
+        strategy: 'fixed',
+        middleware: [offset(8), flip(), shift({ padding: 8 })]
+      }).then(({x, y}) => {
+        Object.assign(popover.style, {left: `${x}px`, top: `${y}px`});
+      });
+    }
+
     if (trigger && popover) {
-      trigger.addEventListener("click", () => {
-        if (!CSS.supports("position-anchor: --test")) {
-          const rect = trigger.getBoundingClientRect();
-          popover.style.top = `${rect.bottom + 8}px`; // 8px gap
-          popover.style.left = `${rect.left}px`;
-        }
+      popover.addEventListener("toggle", (event) => {
+        if (event.newState === "open") updatePosition();
       });
 
       radios.forEach(radio => {
