@@ -1,33 +1,52 @@
-{% for t in transactions %}
-<div class="txn-card">
-  <div class="flex items-center gap-1">
-    <div class="txn-icon">
-      <i class="ph ph-{{ t.category.icon|default:'receipt' }}"></i>
-    </div>
+{% load humanize %}
 
-    <div>
-      <p class="txn-desc">{{ t.description|default:"-" }}</p>
+{% regroup transactions by date as date_groups %}
 
-      <div class="flex items-center">
+{% for group in date_groups %}
+
+  {% if not forloop.first or group.grouper|date:'Y-m-d' != last_date %}
+  <h6 class="txn-group-header">
+    {{ group.grouper|naturalday:"M d, Y"|capfirst }}
+  </h6>
+  {% endif %}
+
+  {% for t in group.list %}
+  <div class="txn-card">
+    <div class="flex items-center gap-1">
+      <div class="txn-icon">
+        {% if t.category %}
+          <i class="ph ph-{{ t.category.icon }}"></i>
+        {% else %}
+          <i class="ph-bold ph-minus"></i>
+        {% endif %}
+      </div>
+
+      <div>
+        <p class="txn-desc">{{ t.description|default:"-" }}</p>
+
         {% if t.category %}
           <div class="pill txn-cat-pill">{{ t.category }}</div>
         {% endif %}
-
-        <small class="text-light">{{ t.date|date:"M d, Y" }}</small>
       </div>
     </div>
-  </div>
 
-  <div class="font-medium no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
-    {% if t.amount > 0 %}+{% endif %}{{ t.amount|floatformat:2 }} {{ user.userprofile.currency_symbol }}
+    <div class="font-medium no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
+      {% if t.amount > 0 %}+{% endif %}{{ t.amount|floatformat:2 }} {{ user.userprofile.currency_symbol }}
+    </div>
   </div>
-</div>
+  {% endfor %}
+
 {% empty %}
-<div class="text-light text-center pd-2">No transactions recorded yet.</div>
+  <div class="text-light text-center pd-2">No transactions recorded yet.</div>
 {% endfor %}
 
 {% if transactions.has_next %}
-  <button class="btn btn-outline btn-sm btn-full mt-2" hx-get="{% url 'transactions' %}?page={{ transactions.next_page_number }}" hx-target="this" hx-swap="outerHTML">
+  {% with last_txn=transactions.object_list|last %}
+  <button class="btn btn-outline btn-sm btn-full mt-2"
+    hx-get="{% url 'transactions' %}?page={{ transactions.next_page_number }}&last_date={{ last_txn.date|date:'Y-m-d' }}"
+    hx-target="this" hx-swap="outerHTML"
+  >
     Load More
   </button>
+  {% endwith %}
 {% endif %}

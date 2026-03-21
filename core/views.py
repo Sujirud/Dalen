@@ -219,10 +219,12 @@ def transactions(request):
     paginator = Paginator(txn_list, 20)
     page_number = request.GET.get('page', 1)
     transactions_page = paginator.get_page(page_number)
+    last_date = request.GET.get('last_date')
 
     context = {
         'page_title': 'Transactions | Dalen',
         'transactions': transactions_page,
+        'last_date': last_date
     }
 
     # If this is an HTMX request for pagination, return the partial template

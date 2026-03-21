@@ -730,6 +730,14 @@ dialog[open]::backdrop { opacity: 1; }
   TRANSACTIONS
 -------------------------------------------------------------------------- */
 .txn-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.txn-group-header {
+  margin-top: 1.6rem; margin-bottom: 0.2rem;
+  font-weight: 500; font-size: 1.4rem; color: var(--text-light);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.txn-group-header:first-of-type { margin-top: 0 !important; }
+
 .txn-card {
   display: flex; justify-content: space-between; align-items: center;
   padding: 0.6rem 1.4rem 0.6rem 1rem;
@@ -738,7 +746,7 @@ dialog[open]::backdrop { opacity: 1; }
 
   small { font-size: 1.2rem; }
 }
-.txn-card:hover { background: var(--hover-bg); }
+.txn-card:hover { background: var(--hover-light); }
 
 .txn-icon{
   display: flex; align-items: center; justify-content: center; flex: none;
