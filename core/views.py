@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib import messages
 from django.utils import timezone as django_timezone
-from .models import UserProfile, Goal, Transaction, RecurringItem
+from .models import UserProfile, Goal, Transaction, RecurringItem, Category
 from .services import FinancialGPS
 from datetime import timedelta, datetime
 from decimal import Decimal
@@ -197,7 +197,7 @@ def dashboard(request):
     chart_data = gps.get_chart_data(days=30)
     chart_data_json = json.dumps(chart_data) if chart_data else None
 
-    recent_transactions = Transaction.objects.filter(user=request.user).order_by('-date', '-created_at')[:5]
+    recent_transactions = Transaction.objects.filter(user=request.user).select_related('category').order_by('-date', '-created_at')[:5]
 
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
@@ -213,7 +213,7 @@ def dashboard(request):
 
 @login_required
 def transactions(request):
-    transactions = Transaction.objects.filter(user=request.user).order_by('-date', '-created_at')
+    transactions = Transaction.objects.filter(user=request.user).select_related('category').order_by('-date', '-created_at')
 
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
@@ -402,10 +402,28 @@ def settings(request):
 
 @login_required
 def add_transaction(request):
-    if request.method == 'POST':
-        today = _get_today(request.user)
+    today = _get_today(request.user)
 
-        # Handles receipt upload via 'receipt_images' input
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        # --- CATEGORY MANAGEMENT LOGIC ---
+        if action == 'add_category':
+            cat_name = request.POST.get('category_name')
+            cat_icon = request.POST.get('category_icon')
+            if cat_name and cat_icon:
+                Category.objects.create(user=request.user, name=cat_name, icon=cat_icon)
+                messages.success(request, f"Category '{cat_name}' added.")
+            return redirect('add_transaction')
+
+        elif action == 'delete_category':
+            cat_id = request.POST.get('category_id')
+            Category.objects.filter(user=request.user, id=cat_id).delete()
+            messages.success(request, "Category deleted.")
+            return redirect('add_transaction')
+
+        # --- TRANSACTION LOGIC ---
+        # Handles receipt upload
         images = request.FILES.getlist('receipt_images')
         if images:
             count = len(images)
@@ -425,6 +443,7 @@ def add_transaction(request):
             trans_type = request.POST.get('type')
             description = request.POST.get('description')
             date_val = request.POST.get('txn_date')
+            category_id = request.POST.get('category')
 
             if amount_val:
                 amount = Decimal(amount_val)
@@ -436,20 +455,29 @@ def add_transaction(request):
                 else:
                     txn_date = today
 
+                # Fetch selected category
+                category = Category.objects.filter(id=category_id, user=request.user).first() if category_id else None
+
                 Transaction.objects.create(
                     user=request.user,
                     amount=final_amount,
                     description=description,
-                    date=txn_date
+                    date=txn_date,
+                    category=category
                 )
-                return redirect('dashboard')
+                messages.success(request, "Transaction added.")
+                redirect('add_transaction')
         except Exception as e:
             print(e)
             messages.error(request, "Error adding transaction.")
 
+    categories = Category.objects.filter(user=request.user)
+
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
         'page_title': 'Transaction | Dalen',
+        'categories': categories,
+        'icon_choices': ICON_CHOICES,
     }
 
     return render(request, 'core/add_transaction.html', context)

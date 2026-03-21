@@ -42,9 +42,21 @@ class Goal(models.Model):
     def __str__(self):
         return self.name
 
+class Category(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    icon = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=19, decimal_places=2)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.CharField(max_length=200)
     date = models.DateField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -55,4 +67,27 @@ class Transaction(models.Model):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
+        # Create UserProfile
         UserProfile.objects.get_or_create(user=instance)
+
+        # Create Default Categories
+        default_categories = [
+            {'name': 'Food & Dining', 'icon': 'fork-knife'},
+            {'name': 'Transportation', 'icon': 'car'},
+            {'name': 'Housing', 'icon': 'house-line'},
+            {'name': 'Utilities', 'icon': 'lightning'},
+            {'name': 'Shopping', 'icon': 'shopping-cart-simple'},
+            {'name': 'Entertainment', 'icon': 'film-strip'},
+            {'name': 'Health & Medical', 'icon': 'first-aid'},
+            {'name': 'Education', 'icon': 'book-open'},
+            {'name': 'Personal Care', 'icon': 'sparkle'},
+            {'name': 'Bills & Fees', 'icon': 'receipt'},
+            {'name': 'Income', 'icon': 'coins'},
+            {'name': 'Salary', 'icon': 'wallet'},
+            {'name': 'Business', 'icon': 'storefront'},
+        ]
+
+        Category.objects.bulk_create([
+            Category(user=instance, name=cat['name'], icon=cat['icon'])
+            for cat in default_categories
+        ])

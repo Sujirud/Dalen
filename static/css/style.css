@@ -732,13 +732,38 @@ dialog[open]::backdrop { opacity: 1; }
 .txn-list { display: flex; flex-direction: column; gap: 0.6rem; }
 .txn-card {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 0.6rem 1.4rem;
+  padding: 0.6rem 1.4rem 0.6rem 1rem;
   border-radius: 1rem;
   transition: background 0.2s;
 
   small { font-size: 1.2rem; }
 }
 .txn-card:hover { background: var(--hover-bg); }
+
+.txn-icon{
+  display: flex; align-items: center; justify-content: center; flex: none;
+  width: 3.4rem; height: 3.4rem;
+  border-radius: 50%; background: var(--hover-light);
+  border: 1px solid rgba(0, 0, 0, 0.05); 
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  color: var(--primary); font-size: 1.8rem;
+}
+[data-theme="dark"] .txn-icon {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+.txn-desc {
+  font-weight: 500;
+  font-size: 1.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.txn-cat-pill {
+  padding: 0 0.6rem; margin-right: 0.6rem;
+  background: var(--hover-light); border: 1px solid var(--border-color);
+  font-weight: 500; color: var(--text-light);
+}
 
 /* --------------------------------------------------------------------------
   PLANNING
@@ -766,8 +791,9 @@ dialog[open]::backdrop { opacity: 1; }
 :is(.current-goal-card, .completed-goal-card, .recurring-item-card) h3 { font-size: 1.8rem; font-weight: 500; }
 
 .day-pill {
-  padding: 0.2rem 0.8rem;
+  padding: 0 0.8rem;
   background: var(--hover-light); border: 1px solid var(--border-color);
+  font-weight: 500;
 }
 
 /* --------------------------------------------------------------------------
@@ -905,6 +931,28 @@ dialog[open]::backdrop { opacity: 1; }
   cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s;
 }
 .deleteimg-btn:hover { transform: scale(1.1); }
+
+/* ---- Categories Management ---- */
+.categories-list {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  max-height: 25rem;
+  overflow-y: auto;
+
+  .categories-card {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem;
+    box-shadow: none;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+  }
+}
+
+.new-categories-btn {
+  display: flex; justify-content: center; align-items: center;
+  width: 5rem; height: 5rem;
+  padding: 0;
+  font-size: 2rem;
+}
 
 /* --------------------------------------------------------------------------
   SLIM SELECT

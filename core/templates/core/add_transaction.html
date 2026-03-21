@@ -20,7 +20,7 @@
 
     <div class="txn-amount-wrapper">
       <span class="text-light text-24">{{ user.userprofile.currency_symbol }}</span>
-      <input type="number" min="0.01" max="1000000000000" name="amount" placeholder="0.00" required>
+      <input type="number" min="0.01" step="0.01" max="1000000000000" name="amount" placeholder="0.00" required>
     </div>
 
     <div class="flex gap-2">
@@ -39,9 +39,26 @@
       </div>
     </div>
 
-    <div class="form-field">
-      <label>Date</label>
-      <input type="date" name="txn_date" id="txn_date" required>
+    <div class="form-row">
+      <div class="form-field">
+        <div class="flex justify-between items-start">
+          <label>Category</label>
+          <button type="button" class="text-primary text-12 font-medium" onclick="openModal('manageCategoriesModal')">
+            <i class="ph-bold ph-pencil-simple"></i> Manage Categories
+          </button>
+        </div>
+        <select name="category">
+          <option value="">Uncategorized</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>Date</label>
+        <input type="date" name="txn_date" id="txn_date" required>
+      </div>
     </div>
 
     <div class="form-actions">
@@ -66,7 +83,7 @@
     <div id="previewContainer" class="preview-grid mt-2 hidden"></div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-fill btn-primary btn-full">Analyze & Save</span></button>
+      <button type="submit" class="btn btn-fill btn-primary btn-full">Analyze & Save</button>
     </div>
   </form>
 
@@ -76,6 +93,105 @@
     Cancel
   </a>
 </div>
+
+<dialog id="manageCategoriesModal">
+  <div class="modal-card surface-panel">
+    <div class="modal-header">
+      <h3>Manage Categories</h3>
+      <button type="button" class="modal-close" onclick="closeModal()">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    </div>
+
+    <div class="categories-list no-scrollbar">
+      {% for cat in categories %}
+      <div class="categories-card glass-panel">
+        <div class="flex items-center gap-1">
+          <div class="txn-icon"><i class="ph ph-{{ cat.icon }}"></i></div>
+          <span class="font-medium">{{ cat.name }}</span>
+        </div>
+
+        <form method="post" action="." hx-post="." hx-target="#main-content" hx-confirm="Are you sure? Existing transactions will become Uncategorized.">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete_category">
+          <input type="hidden" name="category_id" value="{{ cat.id }}">
+          <button type="submit" class="icon-btn danger" title="Delete Category">
+            <i class="ph-bold ph-trash-simple"></i>
+          </button>
+        </form>
+      </div>
+      {% empty %}
+      <p class="text-light text-center pd-2">No categories yet. Add one below!</p>
+      {% endfor %}
+    </div>
+
+    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add_category">
+
+      <h4>Add New Category</h4>
+      <div class="flex items-end gap-2">
+        <div class="form-field flex-none">
+          <label>Icon</label>
+          <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
+            <i class="ph ph-{{ icon_choices.0.0 }}"></i>
+          </button>
+
+          <div id="iconPopover" popover class="icon-popover">
+            <div class="icon-picker-grid">
+              {% for icon_val, icon_label in icon_choices %}
+                <input type="radio" name="category_icon" id="cat_icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
+                  {% if forloop.first %}checked{% endif %}>
+                <label for="cat_icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
+                  <i class="ph ph-{{ icon_val }}"></i>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Category Name</label>
+          <div class="input-wrapper">
+            <i class="ph ph-tag input-icon"></i>
+            <input type="text" name="category_name" placeholder="e.g. Groceries" maxlength="50" required>
+          </div>
+        </div>
+
+        <button type="submit" class="new-categories-btn btn btn-fill btn-primary">
+          <i class="ph-bold ph-plus"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<script>
+  (function() {
+    const trigger = document.getElementById("iconTriggerBtn");
+    const popover = document.getElementById("iconPopover");
+    const radios = document.querySelectorAll(".icon-picker-radio");
+
+    if (trigger && popover) {
+      trigger.addEventListener("click", () => {
+        if (!CSS.supports("position-anchor: --test")) {
+          const rect = trigger.getBoundingClientRect();
+          popover.style.top = `${rect.bottom + 8}px`; // 8px gap
+          popover.style.left = `${rect.left}px`;
+        }
+      });
+
+      radios.forEach(radio => {
+        radio.addEventListener("change", (e) => {
+          if (e.target.checked) {
+            trigger.innerHTML = `<i class="ph ph-${e.target.value}"></i>`;
+            popover.hidePopover();
+          }
+        });
+      });
+    }
+  })();
+</script>
 
 <script>
   (function() {

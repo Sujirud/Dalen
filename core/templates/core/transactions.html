@@ -6,9 +6,22 @@
   <div class="card glass-panel txn-list">
     {% for t in transactions %}
     <div class="txn-card">
-      <div>
-        <p class="font-medium">{{ t.description|default:"-" }}</p>
-        <small class="text-light">{{ t.date|date:"M d, Y" }}</small>
+      <div class="flex items-center gap-1">
+        <div class="txn-icon">
+          <i class="ph ph-{{ t.category.icon|default:'receipt' }}"></i>
+        </div>
+
+        <div>
+          <p class="txn-desc">{{ t.description|default:"-" }}</p>
+
+          <div class="flex items-center">
+            {% if t.category %}
+              <div class="pill txn-cat-pill">{{ t.category }}</div>
+            {% endif %}
+
+            <small class="text-light">{{ t.date|date:"M d, Y" }}</small>
+          </div>
+        </div>
       </div>
 
       <div class="font-medium no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
