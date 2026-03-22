@@ -20,5 +20,8 @@ urlpatterns = [
     path('transactions/edit/', views.edit_transactions, name='edit_transactions'),
     path('transactions/delete/', views.delete_transactions, name='delete_transactions'),
 
+    path('recurring/add/', views.add_recurring, name='add_recurring'),
+    path('recurring/delete/', views.delete_recurring, name='delete_recurring'),
+
     path('delete-goal/', views.delete_goal, name='delete_goal'),
 ]

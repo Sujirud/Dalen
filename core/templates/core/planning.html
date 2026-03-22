@@ -130,9 +130,8 @@
               {% endif %}
             </div>
 
-            <form method="post" action="." hx-post="." hx-target="#main-content" hx-confirm="Delete {{ item.name }}? This will affect future budget calculations.">
+            <form method="post" action="{% url 'delete_recurring' %}" hx-post="{% url 'delete_recurring' %}" hx-target="#main-content" hx-confirm="Delete {{ item.name }}? This will affect future budget calculations.">
               {% csrf_token %}
-              <input type="hidden" name="action" value="delete_recurring">
               <input type="hidden" name="item_id" value="{{ item.id }}">
               <button type="submit" class="icon-btn danger" title="Delete Item">
                 <i class="ph-bold ph-trash-simple"></i>
@@ -243,9 +242,8 @@
       </button>
     </div>
 
-    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
+    <form method="post" action="{% url 'add_recurring' %}" hx-post="{% url 'add_recurring' %}" hx-target="#main-content" class="styled-form">
       {% csrf_token %}
-      <input type="hidden" name="action" value="create_recurring">
 
       <div class="form-row">
         <div class="form-field">

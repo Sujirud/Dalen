@@ -169,6 +169,58 @@ def delete_transactions(request):
     return redirect('transactions')
 
 @login_required
+@require_POST
+def add_recurring(request):
+    try:
+        rec_name = request.POST.get('rec_name')
+        rec_amount = Decimal(request.POST.get('rec_amount', 0))
+        rec_type = request.POST.get('rec_type')
+        freq_type = request.POST.get('frequency_type')
+
+        if rec_type == 'expense':
+            rec_amount = -abs(rec_amount)
+        else:
+            rec_amount = abs(rec_amount)
+
+        start_date_str = request.POST.get('start_date_custom')
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+
+        end_date_str = request.POST.get('end_date_custom')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
+
+        interval = None
+        if freq_type == 'custom':
+            interval_raw = request.POST.get('interval_days')
+            interval = int(interval_raw) if interval_raw else 0
+            if interval <= 0:
+                messages.error(request, "Interval must be at least 1 day.")
+                return redirect('planning')
+
+        RecurringItem.objects.create(
+            user=request.user,
+            name=rec_name,
+            amount=rec_amount,
+            frequency_type=freq_type,
+            start_date=start_date,
+            end_date=end_date,
+            interval_days=interval
+        )
+        messages.success(request, "Recurring item added.")
+    except Exception:
+        messages.error(request, "Invalid input format. Please check your numbers and dates.")
+        
+    return redirect('planning')
+
+@login_required
+@require_POST
+def delete_recurring(request):
+    item_id = request.POST.get('item_id')
+    item = get_object_or_404(RecurringItem, id=item_id, user=request.user)
+    item.delete()
+    messages.success(request, "Item removed.")
+    return redirect('planning')
+
+@login_required
 def planning(request):
     user = request.user
 
@@ -178,88 +230,36 @@ def planning(request):
     today = _get_today(user)
 
     if request.method == 'POST':
-        action = request.POST.get('action')
-
-        # --- RECURRING ITEM DELETE LOGIC ---
-        if action == 'delete_recurring':
-            item_id = request.POST.get('item_id')
-            item = get_object_or_404(RecurringItem, id=item_id, user=user)
-            item.delete()
-            messages.success(request, "Item removed.")
-            return redirect('planning')
-
-        # --- RECURRING ITEM CREATE LOGIC ---
-        elif action == 'create_recurring':
-            try:
-                rec_name = request.POST.get('rec_name')
-                rec_amount = Decimal(request.POST.get('rec_amount', 0))
-                rec_type = request.POST.get('rec_type')
-                freq_type = request.POST.get('frequency_type')
-
-                if rec_type == 'expense':
-                    rec_amount = -abs(rec_amount)
-                else:
-                    rec_amount = abs(rec_amount)
-
-                start_date_str = request.POST.get('start_date_custom')
-                start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-
-                end_date_str = request.POST.get('end_date_custom')
-                end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
-
-                interval = None
-                if freq_type == 'custom':
-                    interval_raw = request.POST.get('interval_days')
-                    interval = int(interval_raw) if interval_raw else 0
-                    if interval <= 0:
-                        messages.error(request, "Interval must be at least 1 day.")
-                        return redirect('planning')
-
-                RecurringItem.objects.create(
-                    user=user,
-                    name=rec_name,
-                    amount=rec_amount,
-                    frequency_type=freq_type,
-                    start_date=start_date,
-                    end_date=end_date,
-                    interval_days=interval
-                )
-                messages.success(request, "Recurring item added.")
-                return redirect('planning')
-            except Exception:
-                messages.error(request, "Error adding item.")
-
         # --- GOAL SETUP LOGIC ---
-        else: 
-            try:
-                goal_name = request.POST.get('goal_name')
-                goal_icon = request.POST.get('goal_icon')
-                target_amount = Decimal(request.POST.get('goal_amount', 0))
-                deadline_str = request.POST.get('deadline')
-                deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+        try:
+            goal_name = request.POST.get('goal_name')
+            goal_icon = request.POST.get('goal_icon')
+            target_amount = Decimal(request.POST.get('goal_amount', 0))
+            deadline_str = request.POST.get('deadline')
+            deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
 
-                if current_goal:
-                    # Update existing goal
-                    current_goal.name = goal_name
-                    current_goal.icon = goal_icon
-                    current_goal.target_amount = target_amount
-                    current_goal.deadline = deadline
-                    current_goal.save()
-                    messages.success(request, "Goal updated successfully.")
-                else:
-                    # Create new goal
-                    Goal.objects.create(
-                        user=user,
-                        name=goal_name,
-                        icon=goal_icon,
-                        target_amount=target_amount,
-                        deadline=deadline
-                    )
-                    messages.success(request, "New goal created!")
-
-                return redirect('planning')
-            except ValueError:
-                messages.error(request, "Invalid input. Please check your numbers.")
+            if current_goal:
+                # Update existing goal
+                current_goal.name = goal_name
+                current_goal.icon = goal_icon
+                current_goal.target_amount = target_amount
+                current_goal.deadline = deadline
+                current_goal.save()
+                messages.success(request, "Goal updated successfully.")
+            else:
+                # Create new goal
+                Goal.objects.create(
+                    user=user,
+                    name=goal_name,
+                    icon=goal_icon,
+                    target_amount=target_amount,
+                    deadline=deadline
+                )
+                messages.success(request, "New goal created!")
+        except ValueError:
+            messages.error(request, "Invalid input. Please check your numbers.")
+            
+        return redirect('planning')
 
     min_date = today + timedelta(days=1)
 
