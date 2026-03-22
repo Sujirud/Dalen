@@ -23,5 +23,7 @@ urlpatterns = [
     path('recurring/add/', views.add_recurring, name='add_recurring'),
     path('recurring/delete/', views.delete_recurring, name='delete_recurring'),
 
-    path('delete-goal/', views.delete_goal, name='delete_goal'),
+    path('goal/add/', views.add_goal, name='add_goal'),
+    path('goal/edit/', views.edit_goal, name='edit_goal'),
+    path('goal/delete/', views.delete_goal, name='delete_goal'),
 ]

@@ -221,6 +221,61 @@ def delete_recurring(request):
     return redirect('planning')
 
 @login_required
+@require_POST
+def add_goal(request):
+    if Goal.objects.filter(user=request.user, is_active=True).exists():
+        messages.error(request, "You already have an active financial plan.")
+        return redirect('planning')
+
+    try:
+        goal_name = request.POST.get('goal_name')
+        goal_icon = request.POST.get('goal_icon')
+        target_amount = Decimal(request.POST.get('goal_amount', 0))
+        deadline_str = request.POST.get('deadline')
+        deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+
+        Goal.objects.create(
+            user=request.user,
+            name=goal_name,
+            icon=goal_icon,
+            target_amount=target_amount,
+            deadline=deadline
+        )
+        messages.success(request, "New goal created!")
+    except (ValueError, InvalidOperation):
+        messages.error(request, "Invalid input. Please check your numbers and date.")
+
+    return redirect('planning')
+
+@login_required
+@require_POST
+def edit_goal(request):
+    try:
+        current_goal = Goal.objects.filter(user=request.user, is_active=True).first()
+
+        if not current_goal:
+            messages.error(request, "No active plan found to edit.")
+            return redirect('planning')
+
+        goal_name = request.POST.get('goal_name')
+        goal_icon = request.POST.get('goal_icon')
+        target_amount = Decimal(request.POST.get('goal_amount', 0))
+        deadline_str = request.POST.get('deadline')
+        deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+
+        current_goal.name = goal_name
+        current_goal.icon = goal_icon
+        current_goal.target_amount = target_amount
+        current_goal.deadline = deadline
+        current_goal.save(update_fields=['name', 'icon', 'target_amount', 'deadline']) 
+
+        messages.success(request, "Goal updated successfully.")
+    except (ValueError, InvalidOperation):
+        messages.error(request, "Invalid input. Please check your numbers and date.")
+
+    return redirect('planning')
+
+@login_required
 def planning(request):
     user = request.user
 
@@ -228,38 +283,6 @@ def planning(request):
     completed_goals = Goal.objects.filter(user=user, is_active=False).order_by('-deadline')
     recurring_items = RecurringItem.objects.filter(user=user).order_by('start_date')
     today = _get_today(user)
-
-    if request.method == 'POST':
-        # --- GOAL SETUP LOGIC ---
-        try:
-            goal_name = request.POST.get('goal_name')
-            goal_icon = request.POST.get('goal_icon')
-            target_amount = Decimal(request.POST.get('goal_amount', 0))
-            deadline_str = request.POST.get('deadline')
-            deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
-
-            if current_goal:
-                # Update existing goal
-                current_goal.name = goal_name
-                current_goal.icon = goal_icon
-                current_goal.target_amount = target_amount
-                current_goal.deadline = deadline
-                current_goal.save()
-                messages.success(request, "Goal updated successfully.")
-            else:
-                # Create new goal
-                Goal.objects.create(
-                    user=user,
-                    name=goal_name,
-                    icon=goal_icon,
-                    target_amount=target_amount,
-                    deadline=deadline
-                )
-                messages.success(request, "New goal created!")
-        except ValueError:
-            messages.error(request, "Invalid input. Please check your numbers.")
-            
-        return redirect('planning')
 
     min_date = today + timedelta(days=1)
 

@@ -160,7 +160,11 @@
       </button>
     </div>
 
-    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
+    <form method="post" class="styled-form"
+      action="{% if current_goal %}{% url 'edit_goal' %}{% else %}{% url 'add_goal' %}{% endif %}"
+      hx-post="{% if current_goal %}{% url 'edit_goal' %}{% else %}{% url 'add_goal' %}{% endif %}"
+      hx-target="#main-content"
+    >
       {% csrf_token %}
 
       <div class="flex gap-2">
