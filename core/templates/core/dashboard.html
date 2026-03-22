@@ -117,7 +117,7 @@
     <div class="flex justify-between items-center flex-wrap gap-1">
       <div>
         <h3>Spending Trend</h3>
-        <p class="text-light" style="font-size: 1.2rem;">Budget Limit vs. Actual Spending</p>
+        <p class="text-light text-14">Budget Limit vs. Actual Spending</p>
       </div>
 
       <div class="flex justify-between items-center flex-wrap gap-1">
@@ -268,10 +268,19 @@
 
     <div class="txn-list pd-1">
       {% for t in recent_transactions %}
-      <div class="txn-card">
-        <div>
-          <p class="font-medium">{{ t.description|default:"-" }}</p>
-          <small class="text-light">{{ t.date|date:"M d, Y" }}</small>
+      <div class="txn-item">
+        <div class="flex items-center gap-1">
+          <div class="txn-icon">
+            {% if t.category %}
+              <i class="ph ph-{{ t.category.icon }}"></i>
+            {% else %}
+              <i class="ph-bold ph-minus"></i>
+            {% endif %}
+          </div>
+          <div>
+            <p class="font-medium">{{ t.description|default:"-" }}</p>
+            <small class="text-light">{{ t.date|date:"M d, Y" }}</small>
+          </div>
         </div>
 
         <div class="font-medium no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
@@ -279,7 +288,7 @@
         </div>
       </div>
       {% empty %}
-      <div class="txn-card justify-center glass-panel text-light pd-2">No transactions recorded yet.</div>
+      <div class="txn-item justify-center glass-panel text-light pd-2">No transactions recorded yet.</div>
       {% endfor %}
     </div>
   </div>

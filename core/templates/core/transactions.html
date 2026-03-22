@@ -3,8 +3,162 @@
 <div>
   <h1 class="mb-3">All Transactions</h1>
 
-  <div class="card glass-panel txn-list">
-    {% include "core/partial/transaction_list.html" %}
+  <div id="txnActionsBar" class="glass-panel" style="display: none;">
+    <div class="flex items-center gap-2">
+      <label class="flex items-center gap-1">
+        <input type="checkbox" id="selectAllCb"/>
+        <div class="custom-cb"></div>
+
+        <span class="font-medium">Select All</span>
+      </label>
+
+      <span id="selectedCount" class="text-primary font-medium">0 selected</span>
+    </div>
+
+    <div class="flex gap-1">
+      <button type="button" class="btn btn-outline btn-sm" onclick="openModal('txnEditModal')">
+        <i class="ph-bold ph-pen"></i> Edit
+      </button>
+
+      <button type="button" class="btn btn-outline btn-danger btn-sm"
+        hx-post="{% url 'delete_transactions' %}"
+        hx-include="#txnForm"
+        hx-target="#main-content"
+        hx-disabled-elt="this"
+        hx-confirm="Are you sure you want to delete the selected transactions? This cannot be undone."
+      >
+        <i class="ph-bold ph-trash"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="card glass-panel pd-1">
+    <form id="txnForm" class="txn-list">
+      {% csrf_token %}
+
+      {% include "core/partial/transaction_list.html" %}
+    </form>
   </div>
 </div>
+
+<dialog id="txnEditModal">
+  <div class="modal-card surface-panel">
+    <div class="modal-header">
+      <h3>Edit Transactions</h3>
+      <button type="button" class="modal-close" onclick="closeModal()">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    </div>
+
+    <div class="styled-form">
+      <p class="mb-1">Fill in only the fields you want to change. Leave empty to keep the original values.</p>
+
+      <div class="form-field">
+        <label>Description</label>
+        <div class="input-wrapper">
+          <i class="ph ph-tag input-icon"></i>
+          <input type="text" name="new_description" form="txnForm" placeholder="..." autocomplete="off"/>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Amount</label>
+        <div class="input-wrapper">
+          <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
+          <input type="number" min="0.01" step="0.01" max="1000000000000" name="new_amount" form="txnForm" placeholder="e.g. -50.00 or 100.00" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Category</label>
+          <select name="new_category" form="txnForm">
+            <option value="no_change" selected>-- Don't Change --</option>
+            <option value="none">Uncategorized</option>
+            {% for cat in categories %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Date</label>
+          <input type="date" name="new_date" form="txnForm" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-fill btn-primary" onclick="closeModal()"
+          hx-post="{% url 'edit_transactions' %}"
+          hx-include="#txnForm"
+          hx-target="#main-content"
+          hx-disabled-elt="this"
+        >
+          Apply Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  (function () {
+    const txnForm = document.getElementById("txnForm");
+    const actionsBar = document.getElementById("txnActionsBar");
+    const selectedCount = document.getElementById("selectedCount");
+    const selectAllCb = document.getElementById("selectAllCb");
+
+    function updateToolbar() {
+      const itemCheckboxes = document.querySelectorAll(".item-checkbox");
+      const checkedCount = Array.from(itemCheckboxes).filter((cb) => cb.checked).length;
+
+      const groupCheckboxes = document.querySelectorAll(".group-checkbox");
+      groupCheckboxes.forEach((groupCb) => {
+        const date = groupCb.dataset.date;
+        const itemsInGroup = document.querySelectorAll(`.item-checkbox[data-date="${date}"]`);
+        
+        if (itemsInGroup.length > 0) {
+          const isAllChecked = Array.from(itemsInGroup).every(cb => cb.checked);
+          groupCb.checked = isAllChecked;
+        }
+      });
+
+      if (checkedCount > 0) {
+        actionsBar.style.display = "flex";
+        selectedCount.textContent = checkedCount + " selected";
+        selectAllCb.checked = checkedCount === itemCheckboxes.length && itemCheckboxes.length > 0;
+      } else {
+        actionsBar.style.display = "none";
+        selectAllCb.checked = false;
+      }
+    }
+
+    txnForm.addEventListener("change", function (e) {
+      if (e.target.classList.contains("item-checkbox")) {
+        updateToolbar();
+      } else if (e.target.classList.contains("group-checkbox")) {
+        const date = e.target.dataset.date;
+        const itemCheckboxes = document.querySelectorAll(`.item-checkbox[data-date="${date}"]`);
+        itemCheckboxes.forEach((cb) => (cb.checked = e.target.checked));
+        updateToolbar();
+      }
+    });
+
+    selectAllCb.addEventListener("change", function (e) {
+      const itemCheckboxes = document.querySelectorAll(".item-checkbox");
+      const groupCheckboxes = document.querySelectorAll(".group-checkbox");
+
+      itemCheckboxes.forEach((cb) => (cb.checked = e.target.checked));
+      groupCheckboxes.forEach((cb) => (cb.checked = e.target.checked));
+      updateToolbar();
+    });
+
+    document.body.addEventListener('htmx:afterSettle', function(evt) {
+      if (document.getElementById("txnForm")) updateToolbar();
+    });
+
+    updateToolbar();
+  })();
+</script>
 {% endblock %}

@@ -5,33 +5,45 @@
 {% for group in date_groups %}
 
   {% if not forloop.first or group.grouper|date:'Y-m-d' != last_date %}
-  <h6 class="txn-group-header">
-    {{ group.grouper|naturalday:"M d, Y"|capfirst }}
-  </h6>
+  <div class="txn-row txn-group-header">
+    <label class="txn-cb">
+      <input type="checkbox" class="group-checkbox" data-date="{{ group.grouper|date:'Y-m-d' }}">
+      <div class="custom-cb"></div>
+    </label>
+
+    <h6>{{ group.grouper|naturalday:"M d, Y"|capfirst }}</h6>
+  </div>
   {% endif %}
 
   {% for t in group.list %}
-  <div class="txn-card">
-    <div class="flex items-center gap-1">
-      <div class="txn-icon">
-        {% if t.category %}
-          <i class="ph ph-{{ t.category.icon }}"></i>
-        {% else %}
-          <i class="ph-bold ph-minus"></i>
-        {% endif %}
+  <div class="txn-row">
+    <label class="txn-cb">
+      <input type="checkbox" class="item-checkbox" name="txn_ids" value="{{ t.id }}" data-date="{{ t.date|date:'Y-m-d' }}">
+      <div class="custom-cb"></div>
+    </label>
+
+    <div class="txn-item">
+      <div class="flex items-center gap-1">
+        <div class="txn-icon">
+          {% if t.category %}
+            <i class="ph ph-{{ t.category.icon }}"></i>
+          {% else %}
+            <i class="ph-bold ph-minus"></i>
+          {% endif %}
+        </div>
+
+        <div>
+          <p class="txn-desc">{{ t.description|default:"-" }}</p>
+
+          {% if t.category %}
+            <div class="pill txn-cat-pill">{{ t.category }}</div>
+          {% endif %}
+        </div>
       </div>
 
-      <div>
-        <p class="txn-desc">{{ t.description|default:"-" }}</p>
-
-        {% if t.category %}
-          <div class="pill txn-cat-pill">{{ t.category }}</div>
-        {% endif %}
+      <div class="font-medium no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
+        {% if t.amount > 0 %}+{% endif %}{{ t.amount|floatformat:2 }} {{ user.userprofile.currency_symbol }}
       </div>
-    </div>
-
-    <div class="font-medium no-wrap {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
-      {% if t.amount > 0 %}+{% endif %}{{ t.amount|floatformat:2 }} {{ user.userprofile.currency_symbol }}
     </div>
   </div>
   {% endfor %}

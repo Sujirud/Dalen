@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 from .models import UserProfile, Goal, Transaction, RecurringItem, Category
 from .services import FinancialGPS
 from datetime import timedelta, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import json
 import zoneinfo
 
@@ -221,10 +221,13 @@ def transactions(request):
     transactions_page = paginator.get_page(page_number)
     last_date = request.GET.get('last_date')
 
+    categories = Category.objects.filter(user=request.user)
+
     context = {
         'page_title': 'Transactions | Dalen',
         'transactions': transactions_page,
-        'last_date': last_date
+        'last_date': last_date,
+        'categories': categories,
     }
 
     # If this is an HTMX request for pagination, return the partial template
@@ -235,6 +238,70 @@ def transactions(request):
     context['base_template'] = 'core/base_partial.html' if request.htmx else 'core/base.html'
 
     return render(request, 'core/transactions.html', context)
+
+@login_required
+def edit_transactions(request):
+    if request.method == 'POST':
+        txn_ids = request.POST.getlist('txn_ids')
+
+        if not txn_ids:
+            messages.warning(request, "No transactions selected.")
+            return redirect('transactions')
+
+        new_description = request.POST.get('new_description', '').strip()
+        new_category = request.POST.get('new_category')
+        new_date = request.POST.get('new_date')
+        new_amount = request.POST.get('new_amount')
+
+        update_kwargs = {}
+        errors = []
+
+        if new_description:
+            update_kwargs['description'] = new_description
+
+        if new_date:
+            try:
+                update_kwargs['date'] = datetime.strptime(new_date, '%Y-%m-%d').date()
+            except ValueError:
+                errors.append("Invalid date format.")
+
+        if new_amount:
+            try:
+                update_kwargs['amount'] = Decimal(new_amount)
+            except (ValueError, InvalidOperation):
+                errors.append("Invalid amount format. Please enter a valid number.")
+
+        if new_category and new_category != 'no_change':
+            if new_category == 'none':
+                update_kwargs['category'] = None
+            else:
+                if Category.objects.filter(id=new_category, user=request.user).exists():
+                    update_kwargs['category_id'] = new_category
+                else:
+                    errors.append("Selected category does not exist or access denied.")
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        elif update_kwargs:
+            updated_count = Transaction.objects.filter(id__in=txn_ids, user=request.user).update(**update_kwargs)
+            messages.success(request, f"Updated {len(update_kwargs)} field(s) for {updated_count} transactions.")
+        else:
+            messages.info(request, "No changes were made.")
+
+    return redirect('transactions')
+
+@login_required
+def delete_transactions(request):
+    if request.method == 'POST':
+        txn_ids = request.POST.getlist('txn_ids')
+        if txn_ids:
+            deleted_count, _ = Transaction.objects.filter(id__in=txn_ids, user=request.user).delete()
+            messages.success(request, f"Deleted {deleted_count} transactions.")
+        else:
+            messages.warning(request, "No transactions selected to delete.")
+
+    return redirect('transactions')
 
 @login_required
 def planning(request):
