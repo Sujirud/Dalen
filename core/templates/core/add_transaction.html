@@ -115,9 +115,8 @@
           <span class="font-medium">{{ cat.name }}</span>
         </div>
 
-        <form method="post" action="." hx-post="." hx-target="#main-content" hx-confirm="Are you sure? Existing transactions will become Uncategorized.">
+        <form method="post" action="{% url 'delete_category' %}" hx-post="{% url 'delete_category' %}" hx-target="#main-content" hx-confirm="Are you sure? Existing transactions will become Uncategorized.">
           {% csrf_token %}
-          <input type="hidden" name="action" value="delete_category">
           <input type="hidden" name="category_id" value="{{ cat.id }}">
           <button type="submit" class="icon-btn danger" title="Delete Category">
             <i class="ph-bold ph-trash-simple"></i>
@@ -129,9 +128,8 @@
       {% endfor %}
     </div>
 
-    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
+    <form method="post" action="{% url 'add_category' %}" hx-post="{% url 'add_category' %}" hx-target="#main-content" class="styled-form">
       {% csrf_token %}
-      <input type="hidden" name="action" value="add_category">
 
       <h4>Add New Category</h4>
       <div class="flex items-end gap-2">

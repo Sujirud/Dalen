@@ -6,6 +6,7 @@ from django.contrib.auth import login, update_session_auth_hash
 from django.contrib import messages
 from django.utils import timezone as django_timezone
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
 from datetime import timedelta, datetime
 from decimal import Decimal, InvalidOperation
 import json
@@ -349,24 +350,6 @@ def add_transaction(request):
     today = _get_today(request.user)
 
     if request.method == 'POST':
-        action = request.POST.get('action')
-
-        # --- CATEGORY MANAGEMENT LOGIC ---
-        if action == 'add_category':
-            cat_name = request.POST.get('category_name')
-            cat_icon = request.POST.get('category_icon')
-            if cat_name and cat_icon:
-                Category.objects.create(user=request.user, name=cat_name, icon=cat_icon)
-                messages.success(request, f"Category '{cat_name}' added.")
-            return redirect('add_transaction')
-
-        elif action == 'delete_category':
-            cat_id = request.POST.get('category_id')
-            Category.objects.filter(user=request.user, id=cat_id).delete()
-            messages.success(request, "Category deleted.")
-            return redirect('add_transaction')
-
-        # --- TRANSACTION LOGIC ---
         # Handles receipt upload
         images = request.FILES.getlist('receipt_images')
         if images:
@@ -410,7 +393,7 @@ def add_transaction(request):
                     category=category
                 )
                 messages.success(request, "Transaction added.")
-                redirect('add_transaction')
+                return redirect('add_transaction')
         except Exception as e:
             print(e)
             messages.error(request, "Error adding transaction.")
@@ -425,3 +408,21 @@ def add_transaction(request):
     }
 
     return render(request, 'core/add_transaction.html', context)
+
+@login_required
+@require_POST
+def add_category(request):
+    cat_name = request.POST.get('category_name')
+    cat_icon = request.POST.get('category_icon')
+    if cat_name and cat_icon:
+        Category.objects.create(user=request.user, name=cat_name, icon=cat_icon)
+        messages.success(request, f"Category '{cat_name}' added.")
+    return redirect('add_transaction')
+
+@login_required
+@require_POST
+def delete_category(request):
+    cat_id = request.POST.get('category_id')
+    Category.objects.filter(user=request.user, id=cat_id).delete()
+    messages.success(request, "Category deleted.")
+    return redirect('add_transaction')
