@@ -1,34 +1,40 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
-from django.contrib.auth.models import User
-from django.contrib.auth import login, update_session_auth_hash
-from django.contrib import messages
-from django.utils import timezone as django_timezone
-from django.core.paginator import Paginator
-from django.views.decorators.http import require_POST
-from datetime import timedelta, datetime
-from decimal import Decimal, InvalidOperation
 import json
 import zoneinfo
+from datetime import datetime, timedelta
+from decimal import Decimal, InvalidOperation
 
-from .models import UserProfile, Goal, Transaction, RecurringItem, Category
-from .services import FinancialGPS
+from django.contrib import messages
+from django.contrib.auth import login, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone as django_timezone
+from django.views.decorators.http import require_POST
+
 from .constants import CURRENCIES, ICON_CHOICES
+from .models import Category, Goal, RecurringItem, Transaction, UserProfile
+from .services import FinancialGPS
 
-# --- HELPERS ---
+# ==========================================
+# HELPERS
+# ==========================================
 
 def _get_today(user):
     """Returns the current date in the user's configured timezone."""
     user_tz = zoneinfo.ZoneInfo(user.userprofile.timezone)
     return django_timezone.now().astimezone(user_tz).date()
 
-# --- PUBLIC VIEWS ---
+# ==========================================
+# AUTH & PUBLIC VIEWS
+# ==========================================
 
 def landing(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     return render(request, 'core/landing.html')
+
 
 def register(request):
     if request.method == 'POST':
@@ -41,7 +47,9 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'core/register.html', {'form': form})
 
-# --- PROTECTED VIEWS ---
+# ==========================================
+# DASHBOARD VIEW
+# ==========================================
 
 @login_required
 def dashboard(request):
@@ -77,6 +85,10 @@ def dashboard(request):
 
     return render(request, 'core/dashboard.html', context)
 
+# ==========================================
+# TRANSACTIONS & CATEGORIES VIEWS
+# ==========================================
+
 @login_required
 def transactions(request):
     txn_list = Transaction.objects.filter(user=request.user).select_related('category').order_by('-date', '-created_at')
@@ -95,14 +107,71 @@ def transactions(request):
         'categories': categories,
     }
 
-    # If this is an HTMX request for pagination, return the partial template
     if request.htmx and request.GET.get('page'):
         return render(request, 'core/partial/transaction_list.html', context)
 
-    # Standard render
     context['base_template'] = 'core/base_partial.html' if request.htmx else 'core/base.html'
-
     return render(request, 'core/transactions.html', context)
+
+
+@login_required
+def add_transaction(request):
+    today = _get_today(request.user)
+
+    if request.method == 'POST':
+        # Handles receipt upload
+        images = request.FILES.getlist('receipt_images')
+        if images:
+            count = len(images)
+            total_cost = Decimal('100.00') * count * Decimal(-1)
+            Transaction.objects.create(
+                user=request.user,
+                amount=total_cost,
+                description=f"Scanned Receipt ({count} items)",
+                date=today
+            )
+            messages.success(request, f"Processed {count} receipts!")
+            return redirect('dashboard')
+
+        # Handles manual entry
+        try:
+            amount_val = request.POST.get('amount')
+            trans_type = request.POST.get('type')
+            description = request.POST.get('description')
+            date_val = request.POST.get('txn_date')
+            category_id = request.POST.get('category')
+
+            if amount_val:
+                amount = Decimal(amount_val)
+                final_amount = amount if trans_type == 'income' else -abs(amount)
+
+                txn_date = datetime.strptime(date_val, '%Y-%m-%d').date() if date_val else today
+                category = Category.objects.filter(id=category_id, user=request.user).first() if category_id else None
+
+                Transaction.objects.create(
+                    user=request.user,
+                    amount=final_amount,
+                    description=description,
+                    date=txn_date,
+                    category=category
+                )
+                messages.success(request, "Transaction added.")
+                return redirect('add_transaction')
+        except Exception as e:
+            print(e)
+            messages.error(request, "Error adding transaction.")
+
+    categories = Category.objects.filter(user=request.user)
+
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'Transaction | Dalen',
+        'categories': categories,
+        'icon_choices': ICON_CHOICES,
+    }
+
+    return render(request, 'core/add_transaction.html', context)
+
 
 @login_required
 def edit_transactions(request):
@@ -156,6 +225,7 @@ def edit_transactions(request):
 
     return redirect('transactions')
 
+
 @login_required
 def delete_transactions(request):
     if request.method == 'POST':
@@ -168,6 +238,118 @@ def delete_transactions(request):
 
     return redirect('transactions')
 
+
+@login_required
+@require_POST
+def add_category(request):
+    cat_name = request.POST.get('category_name')
+    cat_icon = request.POST.get('category_icon')
+    if cat_name and cat_icon:
+        Category.objects.create(user=request.user, name=cat_name, icon=cat_icon)
+        messages.success(request, f"Category '{cat_name}' added.")
+    return redirect('add_transaction')
+
+
+@login_required
+@require_POST
+def delete_category(request):
+    cat_id = request.POST.get('category_id')
+    Category.objects.filter(user=request.user, id=cat_id).delete()
+    messages.success(request, "Category deleted.")
+    return redirect('add_transaction')
+
+# ==========================================
+# PLANNING VIEWS (GOALS & RECURRING)
+# ==========================================
+
+@login_required
+def planning(request):
+    user = request.user
+
+    current_goal = Goal.objects.filter(user=user, is_active=True).first()
+    completed_goals = Goal.objects.filter(user=user, is_active=False).order_by('-deadline')
+    recurring_items = RecurringItem.objects.filter(user=user).order_by('start_date')
+    today = _get_today(user)
+
+    min_date = today + timedelta(days=1)
+
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'Planning | Dalen',
+        'current_goal': current_goal,
+        'completed_goals': completed_goals,
+        'recurring_items': recurring_items, 
+        'min_date': min_date,
+        'icon_choices': ICON_CHOICES
+    }
+
+    return render(request, 'core/planning.html', context)
+
+
+@login_required
+@require_POST
+def add_goal(request):
+    if Goal.objects.filter(user=request.user, is_active=True).exists():
+        messages.error(request, "You already have an active financial plan.")
+        return redirect('planning')
+
+    try:
+        goal_name = request.POST.get('goal_name')
+        goal_icon = request.POST.get('goal_icon')
+        target_amount = Decimal(request.POST.get('goal_amount', 0))
+        deadline_str = request.POST.get('deadline')
+        deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+
+        Goal.objects.create(
+            user=request.user,
+            name=goal_name,
+            icon=goal_icon,
+            target_amount=target_amount,
+            deadline=deadline
+        )
+        messages.success(request, "New goal created!")
+    except (ValueError, InvalidOperation):
+        messages.error(request, "Invalid input. Please check your numbers and date.")
+
+    return redirect('planning')
+
+
+@login_required
+@require_POST
+def edit_goal(request):
+    try:
+        current_goal = Goal.objects.filter(user=request.user, is_active=True).first()
+
+        if not current_goal:
+            messages.error(request, "No active plan found to edit.")
+            return redirect('planning')
+
+        goal_name = request.POST.get('goal_name')
+        goal_icon = request.POST.get('goal_icon')
+        target_amount = Decimal(request.POST.get('goal_amount', 0))
+        deadline_str = request.POST.get('deadline')
+        deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+
+        current_goal.name = goal_name
+        current_goal.icon = goal_icon
+        current_goal.target_amount = target_amount
+        current_goal.deadline = deadline
+        current_goal.save(update_fields=['name', 'icon', 'target_amount', 'deadline']) 
+
+        messages.success(request, "Goal updated successfully.")
+    except (ValueError, InvalidOperation):
+        messages.error(request, "Invalid input. Please check your numbers and date.")
+
+    return redirect('planning')
+
+
+@login_required
+def delete_goal(request):
+    if request.method == 'POST':
+        Goal.objects.filter(user=request.user, is_active=True).delete()
+    return redirect('planning')
+
+
 @login_required
 @require_POST
 def add_recurring(request):
@@ -177,10 +359,7 @@ def add_recurring(request):
         rec_type = request.POST.get('rec_type')
         freq_type = request.POST.get('frequency_type')
 
-        if rec_type == 'expense':
-            rec_amount = -abs(rec_amount)
-        else:
-            rec_amount = abs(rec_amount)
+        rec_amount = -abs(rec_amount) if rec_type == 'expense' else abs(rec_amount)
 
         start_date_str = request.POST.get('start_date_custom')
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
@@ -211,6 +390,7 @@ def add_recurring(request):
         
     return redirect('planning')
 
+
 @login_required
 @require_POST
 def delete_recurring(request):
@@ -220,89 +400,9 @@ def delete_recurring(request):
     messages.success(request, "Item removed.")
     return redirect('planning')
 
-@login_required
-@require_POST
-def add_goal(request):
-    if Goal.objects.filter(user=request.user, is_active=True).exists():
-        messages.error(request, "You already have an active financial plan.")
-        return redirect('planning')
-
-    try:
-        goal_name = request.POST.get('goal_name')
-        goal_icon = request.POST.get('goal_icon')
-        target_amount = Decimal(request.POST.get('goal_amount', 0))
-        deadline_str = request.POST.get('deadline')
-        deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
-
-        Goal.objects.create(
-            user=request.user,
-            name=goal_name,
-            icon=goal_icon,
-            target_amount=target_amount,
-            deadline=deadline
-        )
-        messages.success(request, "New goal created!")
-    except (ValueError, InvalidOperation):
-        messages.error(request, "Invalid input. Please check your numbers and date.")
-
-    return redirect('planning')
-
-@login_required
-@require_POST
-def edit_goal(request):
-    try:
-        current_goal = Goal.objects.filter(user=request.user, is_active=True).first()
-
-        if not current_goal:
-            messages.error(request, "No active plan found to edit.")
-            return redirect('planning')
-
-        goal_name = request.POST.get('goal_name')
-        goal_icon = request.POST.get('goal_icon')
-        target_amount = Decimal(request.POST.get('goal_amount', 0))
-        deadline_str = request.POST.get('deadline')
-        deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
-
-        current_goal.name = goal_name
-        current_goal.icon = goal_icon
-        current_goal.target_amount = target_amount
-        current_goal.deadline = deadline
-        current_goal.save(update_fields=['name', 'icon', 'target_amount', 'deadline']) 
-
-        messages.success(request, "Goal updated successfully.")
-    except (ValueError, InvalidOperation):
-        messages.error(request, "Invalid input. Please check your numbers and date.")
-
-    return redirect('planning')
-
-@login_required
-def planning(request):
-    user = request.user
-
-    current_goal = Goal.objects.filter(user=user, is_active=True).first()
-    completed_goals = Goal.objects.filter(user=user, is_active=False).order_by('-deadline')
-    recurring_items = RecurringItem.objects.filter(user=user).order_by('start_date')
-    today = _get_today(user)
-
-    min_date = today + timedelta(days=1)
-
-    context = {
-        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
-        'page_title': 'Planning | Dalen',
-        'current_goal': current_goal,
-        'completed_goals': completed_goals,
-        'recurring_items': recurring_items, 
-        'min_date': min_date,
-        'icon_choices': ICON_CHOICES
-    }
-
-    return render(request, 'core/planning.html', context)
-
-@login_required
-def delete_goal(request):
-    if request.method == 'POST':
-        Goal.objects.filter(user=request.user, is_active=True).delete()
-    return redirect('planning')
+# ==========================================
+# SETTINGS VIEW
+# ==========================================
 
 @login_required
 def settings(request):
@@ -319,15 +419,12 @@ def settings(request):
 
             if not new_username:
                 messages.error(request, "Username cannot be empty.")
-
             elif User.objects.filter(username=new_username).exclude(pk=user.pk).exists():
                 messages.error(request, "This username is already taken. Please choose another one.")
-
             else:
                 user.username = new_username
                 user.save()
                 messages.success(request, "Username updated successfully.")
-
             return redirect('settings')
 
         elif action == 'change_password':
@@ -367,85 +464,3 @@ def settings(request):
     }
 
     return render(request, 'core/settings.html', context)
-
-@login_required
-def add_transaction(request):
-    today = _get_today(request.user)
-
-    if request.method == 'POST':
-        # Handles receipt upload
-        images = request.FILES.getlist('receipt_images')
-        if images:
-            count = len(images)
-            total_cost = Decimal('100.00') * count * Decimal(-1)
-            Transaction.objects.create(
-                user=request.user,
-                amount=total_cost,
-                description=f"Scanned Receipt ({count} items)",
-                date=today
-            )
-            messages.success(request, f"Processed {count} receipts!")
-            return redirect('dashboard')
-
-        # Handles manual entry
-        try:
-            amount_val = request.POST.get('amount')
-            trans_type = request.POST.get('type')
-            description = request.POST.get('description')
-            date_val = request.POST.get('txn_date')
-            category_id = request.POST.get('category')
-
-            if amount_val:
-                amount = Decimal(amount_val)
-                final_amount = amount if trans_type == 'income' else -abs(amount)
-
-                # Parse Date or Default to Today
-                if date_val:
-                    txn_date = datetime.strptime(date_val, '%Y-%m-%d').date()
-                else:
-                    txn_date = today
-
-                # Fetch selected category
-                category = Category.objects.filter(id=category_id, user=request.user).first() if category_id else None
-
-                Transaction.objects.create(
-                    user=request.user,
-                    amount=final_amount,
-                    description=description,
-                    date=txn_date,
-                    category=category
-                )
-                messages.success(request, "Transaction added.")
-                return redirect('add_transaction')
-        except Exception as e:
-            print(e)
-            messages.error(request, "Error adding transaction.")
-
-    categories = Category.objects.filter(user=request.user)
-
-    context = {
-        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
-        'page_title': 'Transaction | Dalen',
-        'categories': categories,
-        'icon_choices': ICON_CHOICES,
-    }
-
-    return render(request, 'core/add_transaction.html', context)
-
-@login_required
-@require_POST
-def add_category(request):
-    cat_name = request.POST.get('category_name')
-    cat_icon = request.POST.get('category_icon')
-    if cat_name and cat_icon:
-        Category.objects.create(user=request.user, name=cat_name, icon=cat_icon)
-        messages.success(request, f"Category '{cat_name}' added.")
-    return redirect('add_transaction')
-
-@login_required
-@require_POST
-def delete_category(request):
-    cat_id = request.POST.get('category_id')
-    Category.objects.filter(user=request.user, id=cat_id).delete()
-    messages.success(request, "Category deleted.")
-    return redirect('add_transaction')
