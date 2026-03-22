@@ -156,7 +156,7 @@
   <div class="modal-card surface-panel">
     <div class="modal-header">
       <h3>{% if current_goal %}Edit Current Plan{% else %}New Savings Goal{% endif %}</h3>
-      <button type="button" class="modal-close" onclick="closeModal()">
+      <button type="button" class="modal-close" onclick="closeModal('goalModal')">
         <i class="ph-bold ph-x"></i>
       </button>
     </div>
@@ -225,7 +225,7 @@
       {% endif %}
 
       <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal('goalModal')">Cancel</button>
         <button type="submit" class="btn btn-fill btn-primary">
           {% if current_goal %}Save Changes{% else %}Create Plan{% endif %}
         </button>
@@ -238,7 +238,7 @@
   <div class="modal-card surface-panel">
     <div class="modal-header">
       <h3>New Recurring Item</h3>
-      <button type="button" class="modal-close" onclick="closeModal()">
+      <button type="button" class="modal-close" onclick="closeModal('recurringItemModal')">
         <i class="ph-bold ph-x"></i>
       </button>
     </div>
@@ -314,7 +314,7 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal('recurringItemModal')">Cancel</button>
         <button type="submit" class="btn btn-fill btn-primary">Save Item</button>
       </div>
     </form>

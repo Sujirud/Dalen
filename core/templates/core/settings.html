@@ -122,7 +122,7 @@
 
       <div class="modal-header">
         <h3>Confirm Logout</h3>
-        <button type="button" class="modal-close" onclick="closeModal()">
+        <button type="button" class="modal-close" onclick="closeModal('logoutModal')">
           <i class="ph-bold ph-x"></i>
         </button>
       </div>
@@ -130,7 +130,7 @@
       <p>Are you sure you want to log out?</p>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal('logoutModal')">Cancel</button>
         <button type="submit" class="btn btn-fill btn-danger">Logout</button>
       </div>
     </form>
@@ -141,7 +141,7 @@
   <div class="modal-card surface-panel">
     <div class="modal-header">
       <h3>Change Password</h3>
-      <button type="button" class="modal-close" onclick="closeModal()">
+      <button type="button" class="modal-close" onclick="closeModal('passwordModal')">
         <i class="ph-bold ph-x"></i>
       </button>
     </div>
@@ -166,7 +166,7 @@
       {% endfor %}
       
       <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal('passwordModal')">Cancel</button>
         <button type="submit" class="btn btn-fill btn-primary">Set New Password</button>
       </div>
     </form>

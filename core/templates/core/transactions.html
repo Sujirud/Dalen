@@ -45,7 +45,7 @@
   <div class="modal-card surface-panel">
     <div class="modal-header">
       <h3>Edit Transactions</h3>
-      <button type="button" class="modal-close" onclick="closeModal()">
+      <button type="button" class="modal-close" onclick="closeModal('txnEditModal')">
         <i class="ph-bold ph-x"></i>
       </button>
     </div>
@@ -96,8 +96,8 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
-        <button type="button" class="btn btn-fill btn-primary" onclick="closeModal()"
+        <button type="button" class="btn btn-outline" onclick="closeModal('txnEditModal')">Cancel</button>
+        <button type="button" class="btn btn-fill btn-primary" onclick="closeModal('txnEditModal')"
           hx-post="{% url 'edit_transactions' %}"
           hx-include="#txnForm"
           hx-target="#main-content"

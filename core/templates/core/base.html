@@ -169,9 +169,9 @@
       if (modal) modal.showModal();
     };
 
-    window.closeModal = function() {
-      const activeModal = document.querySelector('dialog[open]');
-      if (activeModal) activeModal.close();
+    window.closeModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.close();
     };
 
     document.addEventListener('click', (e) => {
