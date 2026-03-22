@@ -100,6 +100,7 @@ class FinancialGPS:
         return {
             'goal_name': self.goal.name,
             'goal_icon': self.goal.icon,
+            'goal_color': self.goal.icon_color,
             'remaining_days': remaining_days,
             'current_net_worth': round(current_net_worth, 2),
             'target_amount': round(self.goal.target_amount, 2),

@@ -22,7 +22,7 @@
         <div class="flex justify-between items-start gap-1 mb-1">
           <div class="flex items-center gap-1">
             <div class="goal-icon">
-              <i class="ph ph-{{ current_goal.icon }}"></i>
+              <i class="ph ph-{{ current_goal.icon }}" style="color: {{ current_goal.icon_color }};"></i>
             </div>
             <div>
               <div class="flex items-center gap-1">
@@ -64,7 +64,7 @@
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-2">
               <div class="goal-icon">
-                <i class="ph ph-{{ goal.icon }}"></i>
+                <i class="ph ph-{{ goal.icon }}" style="color: {{ goal.icon_color }};"></i>
               </div>
               <div>
                 <h3>{{ goal.name }}</h3>
@@ -172,20 +172,28 @@
           <label>
             <span>Goal Icon</span>
             <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
-              <i class="ph ph-{{ current_goal.icon|default:icon_choices.0.0 }}"></i>
+              <i class="ph ph-{{ current_goal.icon|default:icon_choices.0.0 }}" style="color: {{ current_goal.icon_color|default:'#2979F5' }};"></i>
             </button>
           </label>
 
           <div id="iconPopover" popover class="icon-popover">
-            <div class="icon-picker-grid">
-              {% for icon_val, icon_label in icon_choices %}
-                <input type="radio" name="goal_icon" id="icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
-                  {% if current_goal.icon == icon_val %}checked{% elif not current_goal.icon and forloop.first %}checked{% endif %}>
+            <div class="mb-1">
+              <label for="iconColorPicker">Icon Color</label>
+              <input id="iconColorPicker" type="color" name="goal_icon_color" value="{{ current_goal.icon_color|default:'#2979F5' }}">
+            </div>
 
-                <label for="icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
-                  <i class="ph ph-{{ icon_val }}"></i>
-                </label>
-              {% endfor %}
+            <div>
+              <span class="label">Icon</span>
+              <div class="icon-picker-grid">
+                {% for icon_val, icon_label in icon_choices %}
+                  <input type="radio" name="goal_icon" id="icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
+                    {% if current_goal.icon == icon_val %}checked{% elif not current_goal.icon and forloop.first %}checked{% endif %}>
+
+                  <label for="icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
+                    <i class="ph ph-{{ icon_val }}"></i>
+                  </label>
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
@@ -361,11 +369,14 @@
 <script>
   (function() {
     const trigger = document.getElementById("iconTriggerBtn");
+    const currentIcon = trigger.querySelector("i");
     const popover = document.getElementById("iconPopover");
     const radios = document.querySelectorAll(".icon-picker-radio");
+    const colorPicker = document.getElementById("iconColorPicker");
+
+    if (!trigger || !currentIcon || !popover || !colorPicker) return;
 
     const { computePosition, offset, flip, shift } = window.FloatingUIDOM;
-
     function updatePosition() {
       computePosition(trigger, popover, {
         placement: 'bottom-start',
@@ -376,20 +387,20 @@
       });
     }
 
-    if (trigger && popover) {
-      popover.addEventListener("toggle", (event) => {
-        if (event.newState === "open") updatePosition();
-      });
+    popover.addEventListener("toggle", (event) => {
+      if (event.newState === "open") updatePosition();
+    });
 
-      radios.forEach(radio => {
-        radio.addEventListener("change", (e) => {
-          if (e.target.checked) {
-            trigger.innerHTML = `<i class="ph ph-${e.target.value}"></i>`;
-            popover.hidePopover();
-          }
-        });
+    radios.forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        currentIcon.className = `ph ph-${e.target.value}`;
+        currentIcon.style.color = colorPicker.value;
       });
-    }
+    });
+
+    colorPicker.addEventListener("input", (e) => {
+      currentIcon.style.color = e.target.value;
+    });
   })();
 </script>
 {% endblock %}

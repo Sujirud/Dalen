@@ -296,6 +296,7 @@ def add_goal(request):
     try:
         goal_name = request.POST.get('goal_name')
         goal_icon = request.POST.get('goal_icon')
+        goal_icon_color = request.POST.get('goal_icon_color')
         target_amount = Decimal(request.POST.get('goal_amount', 0))
         deadline_str = request.POST.get('deadline')
         deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
@@ -304,6 +305,7 @@ def add_goal(request):
             user=request.user,
             name=goal_name,
             icon=goal_icon,
+            icon_color=goal_icon_color,
             target_amount=target_amount,
             deadline=deadline
         )
@@ -326,15 +328,17 @@ def edit_goal(request):
 
         goal_name = request.POST.get('goal_name')
         goal_icon = request.POST.get('goal_icon')
+        goal_icon_color = request.POST.get('goal_icon_color')
         target_amount = Decimal(request.POST.get('goal_amount', 0))
         deadline_str = request.POST.get('deadline')
         deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
 
         current_goal.name = goal_name
         current_goal.icon = goal_icon
+        current_goal.icon_color = goal_icon_color
         current_goal.target_amount = target_amount
         current_goal.deadline = deadline
-        current_goal.save(update_fields=['name', 'icon', 'target_amount', 'deadline']) 
+        current_goal.save(update_fields=['name', 'icon', 'icon_color', 'target_amount', 'deadline'])
 
         messages.success(request, "Goal updated successfully.")
     except (ValueError, InvalidOperation):

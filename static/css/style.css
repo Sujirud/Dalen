@@ -413,9 +413,11 @@ dialog[open]::backdrop { opacity: 1; }
 @media (max-width: 45rem) { .form-row { flex-direction: column; } }
 
 .form-field { flex: 1; }
-.form-field label:not(:has(*)), .form-field label > span:first-child {
+.form-field label:not(:has(*)),
+.form-field label > span:first-child,
+.label {
   display: block;
-  margin-bottom: 0.8rem;
+  width: fit-content; margin-bottom: 0.8rem;
   font-weight: 600; font-size: 1.3rem; color: var(--text-light);
   text-transform: uppercase; letter-spacing: 0.04em;
 }
