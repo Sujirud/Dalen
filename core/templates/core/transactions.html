@@ -54,36 +54,44 @@
       <p class="mb-1">Fill in only the fields you want to change. Leave empty to keep the original values.</p>
 
       <div class="form-field">
-        <label>Description</label>
-        <div class="input-wrapper">
-          <i class="ph ph-tag input-icon"></i>
-          <input type="text" name="new_description" form="txnForm" placeholder="..." autocomplete="off"/>
-        </div>
+        <label>
+          <span>Description</span>
+          <div class="input-wrapper">
+            <i class="ph ph-tag input-icon"></i>
+            <input type="text" name="new_description" form="txnForm" placeholder="..." autocomplete="off"/>
+          </div>
+        </label>
       </div>
 
       <div class="form-field">
-        <label>Amount</label>
-        <div class="input-wrapper">
-          <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
-          <input type="number" min="0.01" step="0.01" max="1000000000000" name="new_amount" form="txnForm" placeholder="e.g. -50.00 or 100.00" />
-        </div>
+        <label>
+          <span>Amount</span>
+          <div class="input-wrapper">
+            <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
+            <input type="number" min="0.01" step="0.01" max="1000000000000" name="new_amount" form="txnForm" placeholder="e.g. -50.00 or 100.00" />
+          </div>
+        </label>
       </div>
 
       <div class="form-row">
         <div class="form-field">
-          <label>Category</label>
-          <select name="new_category" form="txnForm">
-            <option value="no_change" selected>-- Don't Change --</option>
-            <option value="none">Uncategorized</option>
-            {% for cat in categories %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-            {% endfor %}
-          </select>
+          <label>
+            <span>Category</span>
+            <select name="new_category" form="txnForm">
+              <option value="no_change" selected>-- Don't Change --</option>
+              <option value="none">Uncategorized</option>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </label>
         </div>
 
         <div class="form-field">
-          <label>Date</label>
-          <input type="date" name="new_date" form="txnForm" />
+          <label>
+            <span>Date</span>
+            <input type="date" name="new_date" form="txnForm" />
+          </label>
         </div>
       </div>
 

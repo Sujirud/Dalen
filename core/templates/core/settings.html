@@ -9,13 +9,13 @@
   <div class="card glass-panel flex-col gap-2">
     <h3 class="text-24"><i class="ph-bold ph-user"></i><span>Account</span></h3>
 
-    <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
+    <form method="post" class="styled-form">
       {% csrf_token %}
       <input type="hidden" name="action" value="update_username">
       <h4>Username</h4>
 
       <div class="form-field row">
-        <input type="text" name="username" value="{{ user.username }}" required>
+        <input type="text" name="username" value="{{ user.username }}" autocomplete="off" required>
 
         <button type="submit" class="btn btn-outline btn-sm">Change Username</button>
       </div>
@@ -52,14 +52,16 @@
       <input type="hidden" name="action" value="update_currency-symbol">
 
       <div class="form-field">
-        <label>Currency</label>
-        <select name="currency_symbol" data-search="true" hx-post="." hx-target="#main-content">
-          {% for symbol, codes in currencies.items %}
-            <option value="{{ symbol }}" {% if profile.currency_symbol == symbol %}selected{% endif %}>
-              {{ codes|join:", " }} ({{ symbol }})
-            </option>
-          {% endfor %}
-        </select>
+        <label>
+          <span>Currency</span>
+          <select name="currency_symbol" data-search="true" hx-post="." hx-target="#main-content">
+            {% for symbol, codes in currencies.items %}
+              <option value="{{ symbol }}" {% if profile.currency_symbol == symbol %}selected{% endif %}>
+                {{ codes|join:", " }} ({{ symbol }})
+              </option>
+            {% endfor %}
+          </select>
+        </label>
       </div>
     </form>
 
@@ -69,13 +71,13 @@
 
       <div class="form-field row">
         <div>
-          <label>
-            Time Zone
-            <small class="ml-2" style="color: var(--primary);">
+          <div class="flex items-baseline gap-2">
+            <label for="timezoneSelect">Time Zone</label>
+            <span class="text-primary text-12">
               <i class="ph ph-clock"></i>
               <span id="clockDisplay"></span>
-            </small>
-          </label>
+            </span>
+          </div>
           <select name="timezone" id="timezoneSelect" data-search="true">
             {% for tz in timezones %}
             <option value="{{ tz }}" {% if profile.timezone == tz %}selected{% endif %}>{{ tz }}</option>
@@ -101,11 +103,13 @@
       <input type="hidden" name="action" value="update_theme">
 
       <div class="form-field">
-        <label>Color Theme</label>
-        <select name="theme" hx-post="." hx-target="#main-content" onchange="document.documentElement.setAttribute('data-theme', this.value)">
-          <option value="light" {% if profile.theme == 'light' %}selected{% endif %}>Light Mode</option>
-          <option value="dark" {% if profile.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
-        </select>
+        <label>
+          <span>Color Theme</span>
+          <select name="theme" hx-post="." hx-target="#main-content" onchange="document.documentElement.setAttribute('data-theme', this.value)">
+            <option value="light" {% if profile.theme == 'light' %}selected{% endif %}>Light Mode</option>
+            <option value="dark" {% if profile.theme == 'dark' %}selected{% endif %}>Dark Mode</option>
+          </select>
+        </label>
       </div>
     </form>
   </div>
@@ -148,8 +152,10 @@
 
       {% for field in password_form %}
       <div class="form-field">
-        <label>{{ field.label }}</label>
-        {{ field }}
+        <label>
+          <span>{{ field.label }}</span>
+          {{ field }}
+        </label>
         {% if field.help_text %}
         <small class="help-text">{{ field.help_text }}</small>
         {% endif %}

@@ -166,11 +166,12 @@
 
       <div class="flex gap-2">
         <div class="form-field flex-none">
-          <label>Goal Icon</label>
-  
-          <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
-            <i class="ph ph-{{ current_goal.icon|default:icon_choices.0.0 }}"></i>
-          </button>
+          <label>
+            <span>Goal Icon</span>
+            <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
+              <i class="ph ph-{{ current_goal.icon|default:icon_choices.0.0 }}"></i>
+            </button>
+          </label>
 
           <div id="iconPopover" popover class="icon-popover">
             <div class="icon-picker-grid">
@@ -187,29 +188,35 @@
         </div>
 
         <div class="form-field">
-          <label>Goal Name</label>
-          <div class="input-wrapper">
-            <i class="ph ph-pen input-icon"></i>
-            <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" required value="{{ current_goal.name|default:''|escapejs }}">
-          </div>
+          <label>
+            <span>Goal Name</span>
+            <div class="input-wrapper">
+              <i class="ph ph-pen input-icon"></i>
+              <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" autocomplete="off" required value="{{ current_goal.name|default:''|escapejs }}">
+            </div>
+          </label>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-field">
-          <label>Target Amount</label>
-          <div class="input-wrapper">
-            <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
-            <input type="number" min="1" max="1000000000000" name="goal_amount" placeholder="0.00" required value="{{ current_goal.target_amount|default:'' }}">
-          </div>
+          <label>
+            <span>Target Amount</span>
+            <div class="input-wrapper">
+              <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
+              <input type="number" min="1" max="1000000000000" name="goal_amount" placeholder="0.00" required value="{{ current_goal.target_amount|default:'' }}">
+            </div>
+          </label>
         </div>
 
         <div class="form-field">
-          <label>Deadline</label>
-          <div class="input-wrapper">
-            <i class="ph ph-calendar-blank input-icon"></i>
-            <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required value="{{ current_goal.deadline|date:'Y-m-d'|default:'' }}">
-          </div>
+          <label>
+            <span>Deadline</span>
+            <div class="input-wrapper">
+              <i class="ph ph-calendar-blank input-icon"></i>
+              <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required value="{{ current_goal.deadline|date:'Y-m-d'|default:'' }}">
+            </div>
+          </label>
         </div>
       </div>
 
@@ -242,39 +249,49 @@
 
       <div class="form-row">
         <div class="form-field">
-          <label>Name</label>
-          <input type="text" name="rec_name" placeholder="e.g. Monthly Salary or Netflix" maxlength="50" required>
+          <label>
+            <span>Name</span>
+            <input type="text" name="rec_name" placeholder="e.g. Monthly Salary or Netflix" maxlength="50" autocomplete="off" required>
+          </label>
         </div>
         <div class="form-field">
-          <label>Amount</label>
-          <div class="input-wrapper">
-            <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
-            <input type="number" min="1" max="1000000000000" name="rec_amount" placeholder="0.00" required>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-field">
-          <label>Type</label>
-          <select name="rec_type">
-            <option value="expense">Expense</option>
-            <option value="income">Income</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Frequency</label>
-          <select name="frequency_type" id="freqSelector">
-            <option value="monthly">Monthly</option>
-            <option value="custom">Custom Interval</option>
-          </select>
+          <label>
+            <span>Amount</span>
+            <div class="input-wrapper">
+              <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
+              <input type="number" min="1" max="1000000000000" name="rec_amount" placeholder="0.00" required>
+            </div>
+          </label>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-field">
-          <label>Start Date</label>
-          <input type="date" name="start_date_custom" id="startDate" required>
+          <label>
+            <span>Type</span>
+            <select name="rec_type">
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-field">
+          <label>
+            <span>Frequency</span>
+            <select name="frequency_type" id="freqSelector">
+              <option value="monthly">Monthly</option>
+              <option value="custom">Custom Interval</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>
+            <span>Start Date</span>
+            <input type="date" name="start_date_custom" id="startDate" required>
+          </label>
 
           <div id="monthlyHelptext" class="hidden">
             <small class="help-text">For monthly items, we'll repeat on this day every month.</small>
@@ -282,13 +299,17 @@
         </div>
 
         <div id="intervalInput" class="form-field hidden">
-          <label>Repeat Every (Days)</label>
-          <input type="number" name="interval_days" placeholder="e.g. 14">
+          <label>
+            <span>Repeat Every (Days)</span>
+            <input type="number" name="interval_days" placeholder="e.g. 14">
+          </label>
         </div>
 
         <div class="form-field">
-          <label>End Date (Optional)</label>
-          <input type="date" name="end_date_custom">
+          <label>
+            <span>End Date (Optional)</span>
+            <input type="date" name="end_date_custom">
+          </label>
          </div>
       </div>
 

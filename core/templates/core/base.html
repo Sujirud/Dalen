@@ -215,6 +215,24 @@
         }
       });
     });
+
+    // Make label clicks open SlimSelect dropdowns
+    document.addEventListener('click', function(e) {
+      const label = e.target.closest('label');
+      if (label) {
+        let selectEl = null;
+        selectEl = label.querySelector('select');
+
+        if (!selectEl && label.htmlFor) {
+          selectEl = document.getElementById(label.htmlFor);
+        }
+
+        if (selectEl && selectEl.slim) {
+          e.preventDefault();
+          selectEl.slim.open();
+        }
+      }
+    });
   </script>
 </body>
 </html>

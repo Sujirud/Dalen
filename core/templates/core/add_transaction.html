@@ -32,22 +32,24 @@
     </div>
 
     <div class="form-field">
-      <label>Description (optional)</label>
-      <div class="input-wrapper">
-        <i class="ph ph-tag input-icon"></i>
-        <input type="text" name="description" placeholder="e.g. Coffee" maxlength="100" autocomplete="off">
-      </div>
+      <label>
+        <span>Description (optional)</span>
+        <div class="input-wrapper">
+          <i class="ph ph-tag input-icon"></i>
+          <input type="text" name="description" placeholder="e.g. Coffee" maxlength="100" autocomplete="off">
+        </div>
+      </label>
     </div>
 
     <div class="form-row">
       <div class="form-field">
-        <div class="flex justify-between items-start">
-          <label>Category</label>
+        <div class="flex justify-between items-baseline">
+          <label for="select_txnCat">Category</label>
           <button type="button" class="text-primary text-12 font-medium" onclick="openModal('manageCategoriesModal')">
             <i class="ph-bold ph-pencil-simple"></i> Manage Categories
           </button>
         </div>
-        <select name="category">
+        <select id="select_txnCat" name="category">
           <option value="">Uncategorized</option>
           {% for cat in categories %}
             <option value="{{ cat.id }}">{{ cat.name }}</option>
@@ -56,8 +58,10 @@
       </div>
 
       <div class="form-field">
-        <label>Date</label>
-        <input type="date" name="txn_date" id="txn_date" required>
+        <label>
+          <span>Date</span>
+          <input type="date" name="txn_date" id="txn_date" required>
+        </label>
       </div>
     </div>
 
@@ -132,10 +136,12 @@
       <h4>Add New Category</h4>
       <div class="flex items-end gap-2">
         <div class="form-field flex-none">
-          <label>Icon</label>
-          <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
-            <i class="ph ph-{{ icon_choices.0.0 }}"></i>
-          </button>
+          <label>
+            <span>Icon</span>
+            <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
+              <i class="ph ph-{{ icon_choices.0.0 }}"></i>
+            </button>
+          </label>
 
           <div id="iconPopover" popover class="icon-popover">
             <div class="icon-picker-grid">
@@ -151,11 +157,13 @@
         </div>
 
         <div class="form-field">
-          <label>Category Name</label>
-          <div class="input-wrapper">
-            <i class="ph ph-tag input-icon"></i>
-            <input type="text" name="category_name" placeholder="e.g. Groceries" maxlength="50" required>
-          </div>
+          <label>
+            <span>Category Name</span>
+            <div class="input-wrapper">
+              <i class="ph ph-tag input-icon"></i>
+              <input type="text" name="category_name" placeholder="e.g. Groceries" maxlength="50" autocomplete="off" required>
+            </div>
+          </label>
         </div>
 
         <button type="submit" class="new-categories-btn btn btn-fill btn-primary">

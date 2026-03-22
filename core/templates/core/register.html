@@ -18,8 +18,10 @@
 
       {% for field in form %}
       <div class="form-field">
-        <label>{{ field.label }}</label>
-        {{ field }}
+        <label>
+          <span>{{ field.label }}</span>
+          {{ field }}
+        </label>
 
         {% if field.help_text %}
         <small class="help-text">{{ field.help_text }}</small>
