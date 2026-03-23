@@ -172,14 +172,18 @@
           <label>
             <span>Goal Icon</span>
             <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
-              <i class="ph ph-{{ current_goal.icon|default:icon_choices.0.0 }}" style="color: {{ current_goal.icon_color|default:'#2979F5' }};"></i>
+              <i class="ph ph-{{ current_goal.icon|default:icon_choices.0.0 }}" style="color: {{ current_goal.icon_color|default:'#206BFF' }};"></i>
             </button>
           </label>
 
           <div id="iconPopover" popover class="icon-popover">
             <div class="mb-1">
-              <label for="iconColorPicker">Icon Color</label>
-              <input id="iconColorPicker" type="color" name="goal_icon_color" value="{{ current_goal.icon_color|default:'#2979F5' }}">
+              <span class="label">Icon Color</span>
+              <hex-color-picker 
+                id="iconColorPicker"
+                name="goal_icon_color"
+                value="{{ current_goal.icon_color|default:'#206BFF' }}">
+              </hex-color-picker>
             </div>
 
             <div>
@@ -398,7 +402,7 @@
       });
     });
 
-    colorPicker.addEventListener("input", (e) => {
+    colorPicker.addEventListener("color-changed", (e) => {
       currentIcon.style.color = e.target.value;
     });
   })();
