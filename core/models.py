@@ -47,6 +47,7 @@ class Category(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     icon = models.CharField(max_length=50)
+    icon_color = models.CharField(max_length=7)
 
     def __str__(self):
         return self.name
@@ -73,22 +74,22 @@ def create_user_profile(sender, instance, created, **kwargs):
 
         # Create Default Categories
         default_categories = [
-            {'name': 'Food & Dining', 'icon': 'fork-knife'},
-            {'name': 'Transportation', 'icon': 'car'},
-            {'name': 'Housing', 'icon': 'house-line'},
-            {'name': 'Utilities', 'icon': 'lightning'},
-            {'name': 'Shopping', 'icon': 'shopping-cart-simple'},
-            {'name': 'Entertainment', 'icon': 'film-strip'},
-            {'name': 'Health & Medical', 'icon': 'first-aid'},
-            {'name': 'Education', 'icon': 'book-open'},
-            {'name': 'Personal Care', 'icon': 'sparkle'},
-            {'name': 'Bills & Fees', 'icon': 'receipt'},
-            {'name': 'Income', 'icon': 'coins'},
-            {'name': 'Salary', 'icon': 'wallet'},
-            {'name': 'Business', 'icon': 'storefront'},
+            {'name': 'Food & Dining', 'icon': 'fork-knife', 'color': '#DF1242'},
+            {'name': 'Transportation', 'icon': 'car', 'color': '#40AAFF'},
+            {'name': 'Housing', 'icon': 'house-line', 'color': '#FFB880'},
+            {'name': 'Utilities', 'icon': 'lightning', 'color': '#FFF231'},
+            {'name': 'Shopping', 'icon': 'shopping-cart-simple', 'color': '#FF5ED7'},
+            {'name': 'Entertainment', 'icon': 'film-strip', 'color': '#C68DFF'},
+            {'name': 'Health & Medical', 'icon': 'first-aid', 'color': '#FF1B1B'},
+            {'name': 'Education', 'icon': 'book-open', 'color': '#14C8FF'},
+            {'name': 'Personal Care', 'icon': 'sparkle', 'color': '#FFBFDB'},
+            {'name': 'Bills & Fees', 'icon': 'receipt', 'color': '#FF9440'},
+            {'name': 'Income', 'icon': 'coins', 'color': '#DFD42B'},
+            {'name': 'Salary', 'icon': 'wallet', 'color': '#6BDF58'},
+            {'name': 'Business', 'icon': 'storefront', 'color': '#5E86FF'},
         ]
 
         Category.objects.bulk_create([
-            Category(user=instance, name=cat['name'], icon=cat['icon'])
+            Category(user=instance, name=cat['name'], icon=cat['icon'], icon_color=cat['color'])
             for cat in default_categories
         ])

@@ -272,7 +272,7 @@
         <div class="flex items-center gap-1">
           <div class="txn-icon">
             {% if t.category %}
-              <i class="ph ph-{{ t.category.icon }}"></i>
+              <i class="ph ph-{{ t.category.icon }}" style="color: {{ t.category.icon_color }};"></i>
             {% else %}
               <i class="ph-bold ph-minus"></i>
             {% endif %}

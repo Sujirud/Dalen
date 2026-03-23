@@ -111,7 +111,7 @@
       {% for cat in categories %}
       <div class="categories-card glass-panel">
         <div class="flex items-center gap-1">
-          <div class="txn-icon"><i class="ph ph-{{ cat.icon }}"></i></div>
+          <div class="txn-icon"><i class="ph ph-{{ cat.icon }}" style="color: {{ cat.icon_color }};"></i></div>
           <span class="font-medium">{{ cat.name }}</span>
         </div>
 
@@ -137,19 +137,31 @@
           <label>
             <span>Icon</span>
             <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
-              <i class="ph ph-{{ icon_choices.0.0 }}"></i>
+              <i class="ph ph-{{ icon_choices.0.0 }}" style="color: #206BFF;"></i>
             </button>
           </label>
 
           <div id="iconPopover" popover class="icon-popover">
-            <div class="icon-picker-grid">
-              {% for icon_val, icon_label in icon_choices %}
-                <input type="radio" name="category_icon" id="cat_icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
-                  {% if forloop.first %}checked{% endif %}>
-                <label for="cat_icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
-                  <i class="ph ph-{{ icon_val }}"></i>
-                </label>
-              {% endfor %}
+            <div class="mb-1">
+              <span class="label">Icon Color</span>
+              <hex-color-picker
+                id="iconColorPicker"
+                name="category_icon_color"
+                value="#206BFF">
+              </hex-color-picker>
+            </div>
+
+            <div>
+              <span class="label">Icon</span>
+              <div class="icon-picker-grid">
+                {% for icon_val, icon_label in icon_choices %}
+                  <input type="radio" name="category_icon" id="cat_icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
+                    {% if forloop.first %}checked{% endif %}>
+                  <label for="cat_icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
+                    <i class="ph ph-{{ icon_val }}"></i>
+                  </label>
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
@@ -175,8 +187,12 @@
 <script>
   (function() {
     const trigger = document.getElementById("iconTriggerBtn");
+    const currentIcon = trigger.querySelector("i");
     const popover = document.getElementById("iconPopover");
     const radios = document.querySelectorAll(".icon-picker-radio");
+    const colorPicker = document.getElementById("iconColorPicker");
+
+    if (!trigger || !currentIcon || !popover || !colorPicker) return;
 
     const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
     function updatePosition() {
@@ -202,20 +218,20 @@
       });
     }
 
-    if (trigger && popover) {
-      popover.addEventListener("toggle", (event) => {
-        if (event.newState === "open") updatePosition();
-      });
+    popover.addEventListener("toggle", (event) => {
+      if (event.newState === "open") updatePosition();
+    });
 
-      radios.forEach(radio => {
-        radio.addEventListener("change", (e) => {
-          if (e.target.checked) {
-            trigger.innerHTML = `<i class="ph ph-${e.target.value}"></i>`;
-            popover.hidePopover();
-          }
-        });
+    radios.forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        currentIcon.className = `ph ph-${e.target.value}`;
+        currentIcon.style.color = colorPicker.value;
       });
-    }
+    });
+
+    colorPicker.addEventListener("color-changed", (e) => {
+      currentIcon.style.color = e.target.value;
+    });
   })();
 </script>
 

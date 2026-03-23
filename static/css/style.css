@@ -693,7 +693,7 @@ dialog[open]::backdrop { opacity: 1; }
   border-radius: 50%; background: var(--hover-light);
   border: 1px solid rgba(0, 0, 0, 0.05); 
   box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
-  color: var(--primary); font-size: 2.2rem;
+  font-size: 2.2rem;
 }
 [data-theme="dark"] .goal-icon {
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -809,7 +809,7 @@ dialog[open]::backdrop { opacity: 1; }
   border-radius: 50%; background: var(--hover-light);
   border: 1px solid rgba(0, 0, 0, 0.05); 
   box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
-  color: var(--primary); font-size: 1.8rem;
+  font-size: 1.8rem;
 }
 [data-theme="dark"] .txn-icon {
   border: 1px solid rgba(255, 255, 255, 0.1);

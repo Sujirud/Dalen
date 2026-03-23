@@ -244,8 +244,9 @@ def delete_transactions(request):
 def add_category(request):
     cat_name = request.POST.get('category_name')
     cat_icon = request.POST.get('category_icon')
+    cat_icon_color = request.POST.get('category_icon_color')
     if cat_name and cat_icon:
-        Category.objects.create(user=request.user, name=cat_name, icon=cat_icon)
+        Category.objects.create(user=request.user, name=cat_name, icon=cat_icon, icon_color=cat_icon_color)
         messages.success(request, f"Category '{cat_name}' added.")
     return redirect('add_transaction')
 
