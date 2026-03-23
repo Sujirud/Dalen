@@ -66,40 +66,35 @@ class HexColorPicker extends HTMLElement {
   render() {
     this.shadowRoot.innerHTML = `
       <style>
-        :host {
-          display: block;
-          font-family: sans-serif; font-size: 1.6rem;
-          overflow-x: auto; overflow-y: hidden;
-        }
-        .color-picker-container { display: flex; align-items: center; gap: 3rem; padding-bottom: 1rem; }
-        #color-display {
-          width: min-content; padding: 0.4rem 1rem; margin-bottom: 0.8rem;
-          border-radius: 0.4rem; font-family: monospace; font-size: 1.4rem;
-          font-weight: 500; text-align: center; transition: background-color 0.3s, color 0.3s;
-          min-width: 10rem; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        .palette-row { display: flex; justify-content: center; margin-bottom: -0.65rem; }
+        :host { display: block; overflow-x: auto; overflow-y: hidden; }
         .visually-hidden {
           position: absolute !important; width: 1px !important; height: 1px !important;
           padding: 0 !important; margin: -1px !important; overflow: hidden !important;
           clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important;
         }
-        fieldset { border: none; padding: 0; margin: 0; }
-        #shade-palette { margin-top: 0.7rem; }
-        .base-swatch, .shade-swatch { cursor: pointer; transition: transform 0.2s, outline 0.1s; }
-        .base-swatch { position: relative; display: inline-block; width: 2.2rem; height: 2.6rem; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
-        .shade-swatch { display: block; width: 2rem; height: 2rem; }
-        .base-swatch:hover, .shade-swatch:hover { transform: scale(1.15); z-index: 1; }
-        .base-swatch:has(input:focus-visible), .shade-swatch:has(input:focus-visible) {
-          transform: scale(1.15); z-index: 2;
+        #color-display {
+          width: min-content; min-width: 9rem;
+          padding: 0.2rem 0.6rem; margin-bottom: 1rem;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          border-radius: 0.4rem;
+          font-weight: 500; font-size: 1.4rem; text-align: center;
+          transition: background-color 0.3s, color 0.3s;
         }
+        .color-picker-container { display: flex; gap: 3rem; padding: 0.4rem; }
+        fieldset { border: none; padding: 0; margin: 0; }
+        #shade-palette { margin-top: 0.2rem; }
+        .palette-row { display: flex; justify-content: center; margin-bottom: -0.65rem; }
+        .base-swatch, .shade-swatch { display: block; position: relative; cursor: pointer; transition: transform 0.2s ease; }
+        .base-swatch { width: 2.2rem; height: 2.6rem; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); scale: 1.05; }
+        .shade-swatch { width: 2rem; height: 2rem; }
+        .base-swatch:hover, .shade-swatch:hover { transform: scale(1.15); }
         .base-swatch:has(input:focus-visible)::after, .shade-swatch:has(input:focus-visible)::after {
           content: "";
           position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
           width: 0.6rem; height: 0.6rem;
           background-color: #000; border-radius: 50%;
         }
-        .shade-swatch:nth-of-type(n+6):nth-of-type(-n+9):has(input:focus-visible)::after { background-color: #fff; }
+        .shade-swatch:nth-of-type(n+5):nth-of-type(-n+9):has(input:focus-visible)::after { background-color: #fff; }
       </style>
 
       <div id="color-display" aria-live="polite" aria-atomic="true"></div>
