@@ -327,11 +327,12 @@ dialog[open]::backdrop { opacity: 1; }
 .modal-close:hover { background: var(--hover-dark); color: var(--text-main); }
 
 [popover] {
-  padding: 1.6rem;
+  padding: 2rem;
   background: var(--bg-surface);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
+  overflow: auto; overscroll-behavior: none;
 
   opacity: 0;
   transition: opacity 0.15s ease-in-out, overlay 0.15s allow-discrete, display 0.15s allow-discrete;

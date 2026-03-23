@@ -178,13 +178,25 @@
     const popover = document.getElementById("iconPopover");
     const radios = document.querySelectorAll(".icon-picker-radio");
 
-    const { computePosition, offset, flip, shift } = window.FloatingUIDOM;
-
+    const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
     function updatePosition() {
       computePosition(trigger, popover, {
         placement: 'bottom-start',
         strategy: 'fixed',
-        middleware: [offset(8), flip(), shift({ padding: 8 })]
+        middleware: [
+          offset(8),
+          flip(),
+          shift({ padding: 8 }),
+          size({
+            padding: 8,
+            apply({ availableWidth, availableHeight, elements }) {
+              Object.assign(elements.floating.style, {
+                maxWidth: `${availableWidth}px`,
+                maxHeight: `${availableHeight}px`,
+              });
+            },
+          })
+        ]
       }).then(({x, y}) => {
         Object.assign(popover.style, {left: `${x}px`, top: `${y}px`});
       });
