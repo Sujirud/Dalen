@@ -33,18 +33,22 @@
             </div>
           </div>
 
-          <div class="flex">
-            <button type="button" class="icon-btn" id="editGoalBtn" title="Edit Goal">
-              <i class="ph-bold ph-pen"></i>
+          <button id="goalActionsBtn" class="icon-btn">
+            <i class="ph-fill ph-dots-three-outline-vertical"></i>
+          </button>
+
+          <dl-popover anchor-id="goalActionsBtn" placement="bottom-end" class="actions-popover">
+            <button class="btn" id="editGoalBtn" title="Edit Goal">
+              <i class="ph-bold ph-pen"></i><span>Edit</span>
             </button>
 
             <form method="post" action="{% url 'delete_goal' %}" hx-post="{% url 'delete_goal' %}" hx-target="#main-content" hx-confirm="Delete {{ current_goal.name }}? This will remove your active plan.">
               {% csrf_token %}
-              <button type="submit" class="icon-btn danger" title="Delete Goal">
-                <i class="ph-bold ph-trash-simple"></i>
+              <button type="submit" class="btn btn-danger" title="Delete Goal">
+                <i class="ph-bold ph-trash-simple"></i><span>Delete</span>
               </button>
             </form>
-          </div>
+          </dl-popover>
         </div>
 
         <div class="flex justify-between mb-1 text-14">
