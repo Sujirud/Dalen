@@ -207,6 +207,12 @@ body {
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 .hidden { display: none !important; }
+.visually-hidden {
+  position: absolute !important; width: 1px !important; height: 1px !important;
+  padding: 0 !important; margin: -1px !important; overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important; clip-path: inset(50%) !important;
+  white-space: nowrap !important; border: 0 !important;
+}
 
 .help-text { display: block; margin: 1.4rem; color: var(--text-light); }
 .error-text { display: block; margin: 1.4rem; color: var(--danger); font-weight: 600; }
@@ -328,19 +334,13 @@ dialog[open]::backdrop { opacity: 1; }
 }
 .modal-close:hover { background: var(--hover-dark); color: var(--text-main); }
 
-[popover] {
+dl-popover::part(container) {
   padding: 2rem;
   background: var(--bg-surface);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  overflow: auto; overscroll-behavior: none;
-
-  opacity: 0;
-  transition: opacity 0.15s ease-in-out, overlay 0.15s allow-discrete, display 0.15s allow-discrete;
 }
-[popover]:popover-open { opacity: 1; }
-@starting-style { [popover]:popover-open { opacity: 0; } }
 
 /* --------------------------------------------------------------------------
   LAYOUT
@@ -891,12 +891,6 @@ dialog[open]::backdrop { opacity: 1; }
 /* --------------------------------------------------------------------------
   ADD TRANSACTION
 -------------------------------------------------------------------------- */
-.hidden-radio {
-  opacity: 0 !important;
-  position: fixed !important;
-  pointer-events: none !important;
-}
-
 .tabs-container {
   display: flex; gap: 0.5rem;
   padding: 0.5rem;
@@ -1186,7 +1180,7 @@ dialog[open]::backdrop { opacity: 1; }
   box-shadow: 0 0 3px 3px rgba(var(--primary-rgb), 0.2);
 }
 
-.icon-popover { width: 50rem; max-width: 80vw; }
+.icon-popover::part(container) { width: 50rem; }
 
 .icon-picker-grid {
   display: grid;

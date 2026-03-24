@@ -171,16 +171,16 @@
         <div class="form-field flex-none">
           <label>
             <span>Goal Icon</span>
-            <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
+            <button type="button" id="goalIconBtn" class="icon-picker-trigger">
               <i class="ph ph-{{ current_goal.icon|default:icon_choices.0.0 }}" style="color: {{ current_goal.icon_color|default:'#206BFF' }};"></i>
             </button>
           </label>
 
-          <div id="iconPopover" popover class="icon-popover">
+          <dl-popover anchor-id="goalIconBtn" placement="bottom-start" class="icon-popover">
             <div class="mb-1">
               <span class="label">Icon Color</span>
-              <hex-color-picker 
-                id="iconColorPicker"
+              <hex-color-picker
+                id="goalColorPicker"
                 name="goal_icon_color"
                 value="{{ current_goal.icon_color|default:'#206BFF' }}">
               </hex-color-picker>
@@ -190,7 +190,7 @@
               <span class="label">Icon</span>
               <div class="icon-picker-grid">
                 {% for icon_val, icon_label in icon_choices %}
-                  <input type="radio" name="goal_icon" id="icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
+                  <input type="radio" name="goal_icon" id="icon_{{ icon_val }}" value="{{ icon_val }}" class="visually-hidden icon-picker-radio" 
                     {% if current_goal.icon == icon_val %}checked{% elif not current_goal.icon and forloop.first %}checked{% endif %}>
 
                   <label for="icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
@@ -199,7 +199,7 @@
                 {% endfor %}
               </div>
             </div>
-          </div>
+          </dl-popover>
         </div>
 
         <div class="form-field">
@@ -372,41 +372,11 @@
 
 <script>
   (function() {
-    const trigger = document.getElementById("iconTriggerBtn");
-    const currentIcon = trigger.querySelector("i");
-    const popover = document.getElementById("iconPopover");
+    const currentIcon = document.getElementById("goalIconBtn").querySelector("i");
+    const colorPicker = document.getElementById("goalColorPicker");
     const radios = document.querySelectorAll(".icon-picker-radio");
-    const colorPicker = document.getElementById("iconColorPicker");
 
-    if (!trigger || !currentIcon || !popover || !colorPicker) return;
-
-    const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
-    function updatePosition() {
-      computePosition(trigger, popover, {
-        placement: 'bottom-start',
-        strategy: 'fixed',
-        middleware: [
-          offset(8),
-          flip(),
-          shift({ padding: 8 }),
-          size({
-            padding: 8,
-            apply({ availableWidth, availableHeight, elements }) {
-              Object.assign(elements.floating.style, {
-                maxWidth: `${availableWidth}px`,
-                maxHeight: `${availableHeight}px`,
-              });
-            },
-          })
-        ]
-      }).then(({x, y}) => {
-        Object.assign(popover.style, {left: `${x}px`, top: `${y}px`});
-      });
-    }
-
-    popover.addEventListener("toggle", (event) => {
-      if (event.newState === "open") updatePosition();
-    });
+    if (!currentIcon || !colorPicker) return;
 
     radios.forEach(radio => {
       radio.addEventListener("change", (e) => {

@@ -3,8 +3,8 @@
 <div class="glass-panel card pd-4">
   <h2><i class="ph-bold ph-receipt"></i><span>Add Transaction</span></h2>
 
-  <input type="radio" name="tab_control" class="hidden-radio" id="tab_manual" checked>
-  <input type="radio" name="tab_control" class="hidden-radio" id="tab_scan">
+  <input type="radio" name="tab_control" class="visually-hidden" id="tab_manual" checked>
+  <input type="radio" name="tab_control" class="visually-hidden" id="tab_scan">
 
   <div class="tabs-container mb-1">
     <label for="tab_manual" class="tab-label">
@@ -24,10 +24,10 @@
     </div>
 
     <div class="flex gap-2">
-      <input type="radio" class="hidden-radio" name="type" id="type_expense" value="expense" checked>
+      <input type="radio" class="visually-hidden" name="type" id="type_expense" value="expense" checked>
       <label for="type_expense" class="toggle-btn toggle-expense">Expense</label>
 
-      <input type="radio" class="hidden-radio" name="type" id="type_income" value="income">
+      <input type="radio" class="visually-hidden" name="type" id="type_income" value="income">
       <label for="type_income" class="toggle-btn toggle-income">Income</label>
     </div>
 
@@ -136,16 +136,16 @@
         <div class="form-field flex-none">
           <label>
             <span>Icon</span>
-            <button type="button" id="iconTriggerBtn" class="icon-picker-trigger" popovertarget="iconPopover">
+            <button type="button" id="catIconBtn" class="icon-picker-trigger">
               <i class="ph ph-{{ icon_choices.0.0 }}" style="color: #206BFF;"></i>
             </button>
           </label>
 
-          <div id="iconPopover" popover class="icon-popover">
+          <dl-popover anchor-id="catIconBtn" placement="bottom-start" class="icon-popover">
             <div class="mb-1">
               <span class="label">Icon Color</span>
               <hex-color-picker
-                id="iconColorPicker"
+                id="catColorPicker"
                 name="category_icon_color"
                 value="#206BFF">
               </hex-color-picker>
@@ -155,7 +155,7 @@
               <span class="label">Icon</span>
               <div class="icon-picker-grid">
                 {% for icon_val, icon_label in icon_choices %}
-                  <input type="radio" name="category_icon" id="cat_icon_{{ icon_val }}" value="{{ icon_val }}" class="hidden-radio icon-picker-radio" 
+                  <input type="radio" name="category_icon" id="cat_icon_{{ icon_val }}" value="{{ icon_val }}" class="visually-hidden icon-picker-radio" 
                     {% if forloop.first %}checked{% endif %}>
                   <label for="cat_icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
                     <i class="ph ph-{{ icon_val }}"></i>
@@ -163,7 +163,7 @@
                 {% endfor %}
               </div>
             </div>
-          </div>
+          </dl-popover>
         </div>
 
         <div class="form-field">
@@ -186,41 +186,11 @@
 
 <script>
   (function() {
-    const trigger = document.getElementById("iconTriggerBtn");
-    const currentIcon = trigger.querySelector("i");
-    const popover = document.getElementById("iconPopover");
+    const currentIcon = document.getElementById("catIconBtn").querySelector("i");
+    const colorPicker = document.getElementById("catColorPicker");
     const radios = document.querySelectorAll(".icon-picker-radio");
-    const colorPicker = document.getElementById("iconColorPicker");
 
-    if (!trigger || !currentIcon || !popover || !colorPicker) return;
-
-    const { computePosition, offset, flip, shift, size } = window.FloatingUIDOM;
-    function updatePosition() {
-      computePosition(trigger, popover, {
-        placement: 'bottom-start',
-        strategy: 'fixed',
-        middleware: [
-          offset(8),
-          flip(),
-          shift({ padding: 8 }),
-          size({
-            padding: 8,
-            apply({ availableWidth, availableHeight, elements }) {
-              Object.assign(elements.floating.style, {
-                maxWidth: `${availableWidth}px`,
-                maxHeight: `${availableHeight}px`,
-              });
-            },
-          })
-        ]
-      }).then(({x, y}) => {
-        Object.assign(popover.style, {left: `${x}px`, top: `${y}px`});
-      });
-    }
-
-    popover.addEventListener("toggle", (event) => {
-      if (event.newState === "open") updatePosition();
-    });
+    if (!currentIcon || !colorPicker) return;
 
     radios.forEach(radio => {
       radio.addEventListener("change", (e) => {
