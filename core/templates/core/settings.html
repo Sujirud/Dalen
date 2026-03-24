@@ -9,38 +9,36 @@
   <div class="card glass-panel flex-col gap-2">
     <h3 class="text-24"><i class="ph-bold ph-user"></i><span>Account</span></h3>
 
-    <form method="post" class="styled-form">
+    <form method="post">
       {% csrf_token %}
       <input type="hidden" name="action" value="update_username">
-      <h4>Username</h4>
 
-      <div class="form-field row">
-        <input type="text" name="username" value="{{ user.username }}" autocomplete="off" required>
+      <div class="form-field">
+        <h4>Username</h4>
 
-        <button type="submit" class="btn btn-outline btn-sm">Change Username</button>
+        <div class="settings-section">
+          <input type="text" name="username" value="{{ user.username }}" autocomplete="off" required>
+          <button type="submit" class="btn btn-outline btn-sm">Change Username</button>
+        </div>
       </div>
     </form>
 
-    <div class="styled-form">
-      <div class="form-field row">
-        <div>
-          <h4>Password</h4>
-          <p>Change your account password</p>
-        </div>
-        <button id="changePasswordBtn" class="btn btn-outline btn-sm">Change Password</button>
+    <div class="form-field settings-section">
+      <div>
+        <h4>Password</h4>
+        <p>Change your account password</p>
       </div>
+      <button id="changePasswordBtn" class="btn btn-outline btn-sm">Change Password</button>
     </div>
 
-    <div class="styled-form">
-      <div class="form-field row">
-        <div>
-          <h4>Log Out</h4>
-          <p>Sign out of your account on this device</p>
-        </div>
-        <button id="logoutBtn" class="btn btn-outline btn-danger btn-sm">
-          <i class="ph-bold ph-sign-out"></i><span>Log Out</span>
-        </button>
+    <div class="form-field settings-section">
+      <div>
+        <h4>Log Out</h4>
+        <p>Sign out of your account on this device</p>
       </div>
+      <button id="logoutBtn" class="btn btn-outline btn-danger btn-sm">
+        <i class="ph-bold ph-sign-out"></i><span>Log Out</span>
+      </button>
     </div>
   </div>
 
@@ -69,7 +67,7 @@
       {% csrf_token %}
       <input type="hidden" name="action" value="update_timezone">
 
-      <div class="form-field row">
+      <div class="form-field settings-section">
         <div>
           <div class="flex items-baseline gap-2">
             <label for="timezoneSelect">Time Zone</label>
@@ -85,7 +83,7 @@
           </select>
         </div>
 
-        <div class="flex-col">
+        <div class="timezone-actions">
           <button type="button" id="detectTimezoneBtn" class="btn btn-outline btn-sm" title="Detect my location">
             <i class="ph-bold ph-navigation-arrow"></i><span>Auto</span>
           </button>

@@ -82,7 +82,9 @@
   GLOBAL RESET & BASE
 -------------------------------------------------------------------------- */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 62.5%; }
+
+html { font-size: 50%; }
+@media (min-width: 55rem) { html { font-size: 62.5%; } }
 
 h1 { font-size: 3.8rem; }
 h2 { font-size: 3.2rem; }
@@ -209,8 +211,8 @@ body {
 .help-text { display: block; margin: 1.4rem; color: var(--text-light); }
 .error-text { display: block; margin: 1.4rem; color: var(--danger); font-weight: 600; }
 .error-text::before {
-  content: "\f06a";
-  font-family: "Font Awesome 6 Free"; font-weight: 900;
+  content: "\e4e2";
+  font-family: "Phosphor-Fill";
   margin-right: 0.4em;
 }
 
@@ -343,15 +345,22 @@ dialog[open]::backdrop { opacity: 1; }
 /* --------------------------------------------------------------------------
   LAYOUT
 -------------------------------------------------------------------------- */
-.app-wrapper { width: 100%; height: 100vh; overflow-y: auto; }
+.app-wrapper {
+  position: fixed; inset: 0;
+  width: 100%;
+  height: 100vh; height: 100dvh;
+  overflow-y: auto;
+}
 
 #main-content {
   max-width: 1024px;
   margin: 0 auto;
-  padding: 4rem 3.8rem 6rem;
+  padding: 2.4rem 2.4rem 9rem;
 }
-@media (max-width: 55rem) {
-  #main-content { padding: 2.4rem 2.4rem 9rem; }
+
+@media (min-width: 55rem) {
+  .app-wrapper { position: static; inset: auto; }
+  #main-content { padding: 4rem 3.8rem 6rem; }
 }
 
 #main-content:not(.htmx-settling) { transition: opacity 0.3s ease-out, transform 0.3s ease-out; }
@@ -414,6 +423,12 @@ dialog[open]::backdrop { opacity: 1; }
 @media (max-width: 45rem) { .form-row { flex-direction: column; } }
 
 .form-field { flex: 1; }
+
+/*
+1. label using for attribute
+2. label by wrapping the input
+3. not linking to any input, just a section label (e.g. for checkbox/radio groups)
+*/
 .form-field label:not(:has(*)),
 .form-field label > span:first-child,
 .label {
@@ -422,7 +437,6 @@ dialog[open]::backdrop { opacity: 1; }
   font-weight: 600; font-size: 1.3rem; color: var(--text-light);
   text-transform: uppercase; letter-spacing: 0.04em;
 }
-.form-field label:has(> span:first-child) { margin-bottom: 0; }
 
 .form-field input {
   width: 100%; height: 5rem;
@@ -439,12 +453,6 @@ dialog[open]::backdrop { opacity: 1; }
   border-color: var(--primary);
   box-shadow: 0 0 3px 3px rgba(var(--primary-rgb), 0.2);
 }
-
-.form-field.row {
-  display: grid; grid-template-columns: 1fr auto; gap: 3rem;
-}
-.form-field.row h4 { margin-bottom: 0.5rem; }
-.form-field.row button { margin: auto 0; }
 
 .input-wrapper {
   position: relative;
@@ -860,6 +868,27 @@ dialog[open]::backdrop { opacity: 1; }
 }
 
 /* --------------------------------------------------------------------------
+  SETTING
+-------------------------------------------------------------------------- */
+.form-field h4 { margin-bottom: 0.8rem; }
+
+.settings-section {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2.4rem;
+}
+
+.timezone-actions { display: flex; flex-direction: column; gap: 0.4rem; }
+
+@media (max-width: 30rem) {
+  .settings-section {
+    grid-template-columns: 1fr; gap: 0.8rem;
+
+    button { width: fit-content; }
+  }
+
+  .timezone-actions { flex-direction: row; gap: 1rem; }
+}
+
+/* --------------------------------------------------------------------------
   ADD TRANSACTION
 -------------------------------------------------------------------------- */
 .hidden-radio {
@@ -873,15 +902,18 @@ dialog[open]::backdrop { opacity: 1; }
   padding: 0.5rem;
   background: var(--input-bg); box-shadow: var(--shadow-inner);
   border-radius: 1.2rem;
+}
 
-  .tab-label {
-    display: flex; align-items: center; justify-content: center; gap: 0.6rem; flex: 1;
-    padding: 1rem; border-radius: 0.8rem;
-    font-size: 1.6rem; font-weight: 600; color: var(--text-light); text-align: center;
-    cursor: pointer; transition: color 0.4s, background 0.4s;
+.tab-label {
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.6rem; flex: 1;
+  padding: 1rem; border-radius: 0.8rem;
+  font-size: 1.6rem; font-weight: 600; color: var(--text-light); text-align: center;
+  cursor: pointer; transition: color 0.4s, background 0.4s;
 
-    &:hover { background: var(--hover-light); color: var(--text-main); }
-  }
+  &:hover { background: var(--hover-light); color: var(--text-main); }
+}
+@media (min-width: 55rem) {
+  .tab-label { flex-direction: row; }
 }
 
 .tab-content { display: none; animation: slideUp 0.3s ease-out; }
@@ -908,7 +940,7 @@ dialog[open]::backdrop { opacity: 1; }
   margin: 2rem;
 
   input[type="number"] {
-    max-width: 30rem;
+    min-width: 0; max-width: 30rem;
     background: transparent; border: none; outline: none;
     font-size: 4.4rem; font-weight: 700; color: var(--text-main);
     text-align: center;
