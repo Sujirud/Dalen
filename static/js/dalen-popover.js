@@ -41,7 +41,7 @@ class DlPopover extends HTMLElement {
           pointer-events: auto;
         }
       </style>
-      <div class="popover-container" part="container">
+      <div class="popover-container" part="container" tabindex="-1">
         <slot></slot>
       </div>
     `;
@@ -58,20 +58,34 @@ class DlPopover extends HTMLElement {
     this.close = this.close.bind(this);
     this.updatePosition = this.updatePosition.bind(this);
     this._handleOutsideClick = this._handleOutsideClick.bind(this);
+    this._handleKeyDown = this._handleKeyDown.bind(this);
   }
 
   connectedCallback() {
     const anchorId = this.getAttribute('anchor-id');
-    if (anchorId) {
-      requestAnimationFrame(() => {
-        this._anchor = document.getElementById(anchorId);
-        if (this._anchor) {
-          this._anchor.addEventListener('click', this.toggle);
-        } else {
-          console.warn(`Anchor with id "${anchorId}" not found.`);
+    if (!anchorId) return;
+
+    requestAnimationFrame(() => {
+      this._anchor = document.getElementById(anchorId);
+      if (this._anchor) {
+        this._anchor.addEventListener('click', this.toggle);
+
+        this._anchor.setAttribute('aria-haspopup', 'menu');
+        this._anchor.setAttribute('aria-expanded', 'false');
+
+        if (!this.id) {
+          this.id = `dl-popover-${Math.random().toString(36).substring(2, 9)}`;
         }
-      });
-    }
+        this._anchor.setAttribute('aria-controls', this.id);
+
+        const label = this.getAttribute('aria-label') || 'Popover content';
+        this.setAttribute('aria-label', label);
+
+        this.setAttribute('role', 'menu');
+      } else {
+        console.warn(`Anchor with id "${anchorId}" not found.`);
+      }
+    });
   }
 
   disconnectedCallback() {
@@ -96,6 +110,7 @@ class DlPopover extends HTMLElement {
     this._isInitialUpdate = true;
 
     this._popover.classList.add('open');
+    this._anchor.setAttribute('aria-expanded', 'true');
 
     // Start autoUpdate. This immediately calls updatePosition once, then listens to scroll/resize.
     this._cleanupAutoUpdate = autoUpdate(
@@ -105,13 +120,17 @@ class DlPopover extends HTMLElement {
     );
 
     document.addEventListener('mousedown', this._handleOutsideClick);
+    document.addEventListener('keydown', this._handleKeyDown);
+
+    setTimeout(() => { this._popover.focus(); }, 50);
   }
 
   close() {
-    if (!this._isOpen) return;
+    if (!this._isOpen || !this._anchor) return;
     this._isOpen = false;
 
     this._popover.classList.remove('open');
+    this._anchor.setAttribute('aria-expanded', 'false');
 
     if (this._cleanupAutoUpdate) {
       this._cleanupAutoUpdate();
@@ -119,6 +138,7 @@ class DlPopover extends HTMLElement {
     }
 
     document.removeEventListener('mousedown', this._handleOutsideClick);
+    document.removeEventListener('keydown', this._handleKeyDown);
   }
 
   async updatePosition() {
@@ -167,6 +187,15 @@ class DlPopover extends HTMLElement {
     const composedPath = event.composedPath();
     if (!composedPath.includes(this) && !composedPath.includes(this._anchor)) {
       this.close();
+    }
+  }
+
+  _handleKeyDown(event) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.close();
+
+      if (this._anchor) this._anchor.focus();
     }
   }
 }
