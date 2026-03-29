@@ -103,6 +103,10 @@ def dashboard(request):
 def transactions(request):
     txn_list = Transaction.objects.filter(user=request.user).select_related('category').order_by('-date', '-created_at')
 
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        txn_list = txn_list.filter(description__icontains=search_query)
+
     paginator = Paginator(txn_list, 20)
     page_number = request.GET.get('page', 1)
     transactions_page = paginator.get_page(page_number)
@@ -115,9 +119,13 @@ def transactions(request):
         'transactions': transactions_page,
         'last_date': last_date,
         'categories': categories,
+        'search_query': search_query,
     }
 
-    if request.htmx and request.GET.get('page'):
+    is_search = request.htmx and request.headers.get('HX-Target') == 'txnListContainer'
+    is_pagination = request.htmx and request.GET.get('page')
+
+    if is_search or is_pagination:
         return render(request, 'core/partial/transaction_list.html', context)
 
     context['base_template'] = 'core/base_partial.html' if request.htmx else 'core/base.html'

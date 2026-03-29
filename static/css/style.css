@@ -89,11 +89,12 @@ h2 { font-size: 3.2rem; }
 h3 { font-size: 2.2rem; }
 h4 { font-size: 1.8rem; }
 
-ul { padding-left: 10px; }
+ul { padding-left: 1.2rem; }
 
 a { color: var(--text-main); }
 
 label { cursor: pointer; }
+input { font-family: inherit; }
 
 button {
   display: block;
@@ -103,6 +104,8 @@ button {
   font-family: inherit;
   color: inherit;
   letter-spacing: inherit;
+  white-space: nowrap;
+  flex-shrink: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -112,12 +115,56 @@ button {
 i { vertical-align: -0.06em; }
 i:has(+ span) { margin-right: 0.3em; }
 
-input { font-family: inherit; }
-
+/* Number Input */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
 }
+
+/* Custom Checkbox */
+input[type="checkbox"] {
+  opacity: 0 !important;
+  position: fixed !important;
+  pointer-events: none !important;
+}
+
+.custom-cb {
+  display: flex; justify-content: center; align-items: center;
+  width: 1.6rem; height: 1.6rem;
+  background: var(--input-bg);
+  border: 1px solid var(--border-dark);
+  border-radius: 0.4rem;
+  transition: all 0.2s;
+}
+input[type="checkbox"]:checked + .custom-cb::after {
+  content: "\e182";
+  font-family: 'Phosphor-bold';
+  font-size: 1.2rem;
+  color: white;
+}
+
+input[type="checkbox"]:hover + .custom-cb { border-color: var(--text-light); box-shadow: 0 0 0 1px var(--text-light); }
+input[type="checkbox"]:checked + .custom-cb { background: var(--primary); border-color: var(--primary); }
+input[type="checkbox"]:focus-visible + .custom-cb { border-color: var(--text-main); box-shadow: 0 0 0 1px var(--text-main); }
+
+/* Custom Search Clear Button */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+  width: 2.2rem; height: 1.2rem;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path d='m1 1 6 6m0-6L1 7' stroke='gray' stroke-linecap='round' fill='none'/></svg>");
+  background-position: right;
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+input[type="search"]::-webkit-search-cancel-button:hover { opacity: 0.7; }
 
 body {
   height: 100vh;
@@ -245,31 +292,6 @@ body {
   0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
   100% { transform: rotate(360deg); filter: hue-rotate(360deg); }
 }
-
-input[type="checkbox"] {
-  opacity: 0 !important;
-  position: fixed !important;
-  pointer-events: none !important;
-}
-
-.custom-cb {
-  display: flex; justify-content: center; align-items: center;
-  width: 1.6rem; height: 1.6rem;
-  background: var(--input-bg);
-  border: 1px solid var(--border-dark);
-  border-radius: 0.4rem;
-  transition: all 0.2s;
-}
-input[type="checkbox"]:checked + .custom-cb::after {
-  content: "\e182";
-  font-family: 'Phosphor-bold';
-  font-size: 1.2rem;
-  color: white;
-}
-
-input[type="checkbox"]:hover + .custom-cb { border-color: var(--text-light); box-shadow: 0 0 0 1px var(--text-light); }
-input[type="checkbox"]:checked + .custom-cb { background: var(--primary); border-color: var(--primary); }
-input[type="checkbox"]:focus-visible + .custom-cb { border-color: var(--text-main); box-shadow: 0 0 0 1px var(--text-main); }
 
 /* --------------------------------------------------------------------------
   DIALOG & POPOVER
@@ -529,7 +551,7 @@ dl-popover::part(container) {
   display: none; grid-template-rows: auto 1fr auto; gap: 2rem;
   flex: none;
   overflow-y: auto;
-  width: 26rem; height: 100vh; padding: 2rem 2rem 3rem;
+  width: 24rem; height: 100vh; padding: 2rem 2rem 3rem;
   border-width: 0 1px 0 0 !important;
 
   .nav-btn {
