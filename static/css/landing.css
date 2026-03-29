@@ -308,28 +308,6 @@ section {
 .hero-signup:hover::before { opacity: 1; }
 .hero-signup:hover svg { transform: translateX(0.4rem); }
 
-/* Hero scroll indicator */
-.hero-scroll {
-  display: flex; flex-direction: column; align-items: center; gap: 0.8rem;
-  position: absolute; bottom: 4rem; left: 50%; transform: translateX(-50%); z-index: 2;
-  opacity: 0;
-  animation: hero-reveal 1s ease 3s forwards;
-}
-.hero-scroll span {
-  font-size: 1rem; color: var(--grey-400);
-  letter-spacing: 0.2em; text-transform: uppercase;
-}
-.scroll-line {
-  width: 0.1rem; height: 4.8rem;
-  background: linear-gradient(to bottom, var(--blue-glow), transparent);
-  animation: scroll-pulse 2s ease-in-out infinite;
-}
-
-@keyframes scroll-pulse {
-  0%, 100% { opacity: 0.3; transform: scaleY(1); }
-  50% { opacity: 1; transform: scaleY(1.1); }
-}
-
 @keyframes hero-reveal {
   to { opacity: 1; transform: translateY(0); }
 }
