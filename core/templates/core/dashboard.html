@@ -44,7 +44,7 @@
     <div class="bg-decor-accent"></div>
     <div class="bg-decor-primary"></div>
     <div class="bg-icon">
-      <i class="ph-fill ph-{{ data.goal_icon }}"></i>
+      <i class="ph-fill ph-{{ data.goal.icon }}"></i>
     </div>
 
     <div class="flex-col gap-1">
@@ -57,14 +57,14 @@
       </div>
 
       <div class="flex items-center gap-1">
-        <div class="goal-icon"><i class="ph ph-{{ data.goal_icon }}" style="color: {{ data.goal_color }};"></i></div>
-        <h3 class="text-30">{{ data.goal_name }}</h3>
+        <div class="goal-icon"><i class="ph ph-{{ data.goal.icon }}" style="color: {{ data.goal.icon_color }};"></i></div>
+        <h3 class="text-30">{{ data.goal.name }}</h3>
       </div>
 
       <div class="flex justify-between items-end">
         <div class="flex items-baseline gap-1">
-          <span class="text-26 font-bold" id="goal-saved">{{ user.userprofile.currency_symbol }}{{ data.current_net_worth }}</span>
-          <span class="text-14 font-bold text-light">/ <span id="goal-target">{{ user.userprofile.currency_symbol }}{{ data.target_amount }}</span></span>
+          <span class="text-26 font-bold" id="goal-saved">{{ user.userprofile.currency_symbol }}{{ data.net_worth }}</span>
+          <span class="text-14 font-bold text-light">/ <span id="goal-target">{{ user.userprofile.currency_symbol }}{{ data.goal.target_amount }}</span></span>
         </div>
         <p class="text-14 font-bold text-success">{{ data.progress_percent }}%</p>
       </div>

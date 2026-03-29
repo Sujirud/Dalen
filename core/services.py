@@ -10,12 +10,10 @@ class FinancialGPS:
     def __init__(self, user):
         self.user = user
         self.goal = Goal.objects.filter(user=user, is_active=True).first()
-        self.user_tz = zoneinfo.ZoneInfo(self.user.userprofile.timezone)
         self.recurring_items = list(RecurringItem.objects.filter(user=user))
 
-    def get_today(self):
-        """Returns the current date in the user's local timezone."""
-        return timezone.now().astimezone(self.user_tz).date()
+        user_tz = zoneinfo.ZoneInfo(self.user.userprofile.timezone)
+        self.today = timezone.now().astimezone(user_tz).date()
 
     def _calculate_future_recurring(self, start_date, end_date):
         """
@@ -62,27 +60,26 @@ class FinancialGPS:
         if not self.goal:
             return None
 
-        today = self.get_today()
         deadline = self.goal.deadline
 
         # 1. Timeline
-        remaining_days = (deadline - today).days
+        remaining_days = (deadline - self.today).days
         remaining_days_safe = max(remaining_days, 1)
 
         # 2. Current Net Worth
         current_net_worth = Transaction.objects.filter(
             user=self.user,
-            date__lte=today
+            date__lte=self.today
         ).aggregate(Sum('amount'))['amount__sum'] or Decimal(0)
 
         # 3. Today's Spend
-        todays_transactions = Transaction.objects.filter(user=self.user, date=today)
+        todays_transactions = Transaction.objects.filter(user=self.user, date=self.today)
         spent_today = sum(abs(t.amount) for t in todays_transactions if t.amount < 0)
 
         start_of_day_net_worth = current_net_worth + spent_today
 
         # 4. Future Cashflow
-        future_recurring_sum = self._calculate_future_recurring(today, deadline)
+        future_recurring_sum = self._calculate_future_recurring(self.today, deadline)
 
         # 5. Safe-to-Spend Calculation
         # Formula: (Current Money + Future Money - Target Goal) / Days Left
@@ -90,24 +87,18 @@ class FinancialGPS:
         safe_pool = total_pool_available - self.goal.target_amount
 
         base_daily_budget = safe_pool / Decimal(remaining_days_safe)
-        remaining_today_actual = base_daily_budget - spent_today
+        remaining_today = base_daily_budget - spent_today
 
         # 6. Progress
-        progress = 0
-        if self.goal.target_amount > 0:
-            progress = (current_net_worth / self.goal.target_amount) * 100
+        progress = int(max(0, min(100, (current_net_worth / self.goal.target_amount) * 100)))
 
         return {
-            'goal_name': self.goal.name,
-            'goal_icon': self.goal.icon,
-            'goal_color': self.goal.icon_color,
+            'goal': self.goal,
             'remaining_days': remaining_days,
-            'current_net_worth': round(current_net_worth, 2),
-            'target_amount': round(self.goal.target_amount, 2),
-            'progress_percent': int(max(0, min(100, progress))),
+            'net_worth': round(current_net_worth, 2),
+            'progress_percent': progress,
             'base_budget': round(base_daily_budget, 2),
-            'spent_today': round(spent_today, 2),
-            'remaining_today': round(remaining_today_actual, 2)
+            'remaining_today': round(remaining_today, 2)
         }
 
     def get_chart_data(self, days):
@@ -117,12 +108,10 @@ class FinancialGPS:
         if not self.goal:
             return None
 
-        today = self.get_today()
-
         goal_start_date = self.goal.created_at.date()
-        requested_start = today - timedelta(days=days)
+        requested_start = self.today - timedelta(days=days)
         start_date = max(requested_start, goal_start_date)
-        days_to_process = (today - start_date).days
+        days_to_process = (self.today - start_date).days
 
         if days_to_process < 3:
             return None
@@ -131,7 +120,7 @@ class FinancialGPS:
         all_txns = Transaction.objects.filter(
             user=self.user, 
             date__gte=start_date, 
-            date__lte=today
+            date__lte=self.today
         ).values('date', 'amount')
 
         # Initial Net Worth (Prior to the chart window)
