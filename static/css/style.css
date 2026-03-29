@@ -10,18 +10,15 @@
   --primary-dark: rgb(10, 68, 153);
   --primary-light: rgb(230, 240, 255);
 
-  --accent-hue: 280;
-  --accent: hsl(var(--accent-hue), 80%, 60%);
-
   --success-rgb: 45, 165, 107;
   --success: rgb(var(--success-rgb));
   --warning: #eab308;
   --danger-rgb: 239, 68, 68;
   --danger: rgb(var(--danger-rgb));
 
-  --bg-main: #f0f2f4;
-  --bg-surface: #ffffff;
-  --bg-table-row: rgba(0, 0, 0, 0.02);
+  --bg-main: #e8eaed;
+
+  --bg-surface: #fafafa;
 
   --glass-surface: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.5);
@@ -33,13 +30,14 @@
 
   --border-color: #cbd5e1;
   --border-dark: #98a0aa;
+  --border-light: #e1e6ed;
 
-  /* --- Spacing & Depth --- */
-  --radius-sm: 0.8rem;
-  --radius-md: 1.6rem;
-  --radius-lg: 2.4rem;
+  /* --- Border radius --- */
+  --radius-sm: 0.6rem;
+  --radius-md: 1.2rem;
+  --radius-lg: 1.8rem;
 
-  /* 3D Shadows */
+  /* Shadows */
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
   --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
@@ -52,20 +50,20 @@
 }
 
 [data-theme="dark"] {
-  --bg-main: #080d1a;
-  --bg-surface: #1b1f26;
-  --bg-table-row: rgba(255, 255, 255, 0.03);
-
   --success-rgb: 16, 185, 114;
   --success: rgb(var(--success-rgb));
 
-  --glass-surface: rgba(23, 31, 46, 0.7);
+  --bg-main: #141313;
+
+  --bg-surface: #1e1f22;
+
+  --glass-surface: rgba(27, 30, 37, 0.7);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-highlight: rgba(255, 255, 255, 0.05);
 
   --text-main: #f8fafc;
   --text-light: #94a3b8;
-  --input-bg: rgba(15, 23, 42, 0.6);
+  --input-bg: rgba(18, 22, 33, 0.6);
 
   --border-color: #334155;
   --border-dark: #4c5867;
@@ -81,7 +79,7 @@
 /* --------------------------------------------------------------------------
   GLOBAL RESET & BASE
 -------------------------------------------------------------------------- */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { font-size: 50%; }
 @media (min-width: 55rem) { html { font-size: 62.5%; } }
@@ -189,10 +187,6 @@ body {
 .text-light { color: var(--text-light); }
 .text-danger { color: var(--danger); }
 .text-success { color: var(--success); }
-.text-gradient {
-  background: linear-gradient(to right, var(--primary), var(--accent));
-  background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
 
 .letter-spacing-5 { letter-spacing: 0.05em; }
 
@@ -212,14 +206,6 @@ body {
   padding: 0 !important; margin: -1px !important; overflow: hidden !important;
   clip: rect(0, 0, 0, 0) !important; clip-path: inset(50%) !important;
   white-space: nowrap !important; border: 0 !important;
-}
-
-.help-text { display: block; margin: 1.4rem; color: var(--text-light); }
-.error-text { display: block; margin: 1.4rem; color: var(--danger); font-weight: 600; }
-.error-text::before {
-  content: "\e4e2";
-  font-family: "Phosphor-Fill";
-  margin-right: 0.4em;
 }
 
 .alert {
@@ -242,13 +228,9 @@ body {
   font-weight: 800; font-size: 2.4rem;
   color: var(--text-main);
   letter-spacing: 0.04em;
+
+  img { width: 4.2rem; height: 4.2rem; }
 }
-.brand-icon {
-  width: 4.2rem; height: 4.2rem; padding: 0.4rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb), 0.3);
-}
-[data-theme="dark"] .brand-icon { background: var(--primary-light); }
 
 .throbber {
   display: inline-block; position: relative;
@@ -293,25 +275,23 @@ input[type="checkbox"]:focus-visible + .custom-cb { border-color: var(--text-mai
   DIALOG & POPOVER
 -------------------------------------------------------------------------- */
 dialog {
-  display: none; justify-content: center; align-items: center;
-  position: fixed; inset: 0;
+  display: flex; justify-content: center; align-items: center;
+  position: fixed;
   width: 100%; height: 100%; max-width: 100%; max-height: 100%;
   padding: 20px;
   background: none; border: none;
   color: var(--text-main);
-  opacity: 0; transform: scale(96%);
-  transition: all 0.3s ease-out, overlay 0.3s allow-discrete, display 0.3s allow-discrete;
+  visibility: hidden; opacity: 0; transform: scale(97%);
+  transition: all 0.3s ease-out, overlay 0.3s allow-discrete;
 }
 dialog::backdrop {
   background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); opacity: 0;
-  transition: all 0.3s ease-out, overlay 0.3s allow-discrete, display 0.3s allow-discrete;
+  transition: opacity 0.3s ease-out;
 }
 
-dialog[open] { display: flex; opacity: 1; transform: none; }
+dialog[open] { visibility: visible; opacity: 1; transform: none; }
 dialog[open]::backdrop { opacity: 1; }
-
 @starting-style {
-  dialog[open] { opacity: 0; transform: scale(96%); }
   dialog[open]::backdrop { opacity: 0; }
 }
 
@@ -338,9 +318,10 @@ dl-popover::part(container) {
   padding: 2rem;
   background: var(--bg-surface);
   box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
 }
+[data-theme="light"] dl-popover::part(container) { border-color: var(--border-light); }
 
 /* --------------------------------------------------------------------------
   LAYOUT
@@ -467,6 +448,14 @@ dl-popover::part(container) {
 
 .form-actions { display: flex; justify-content: end; gap: 1.6rem; margin-top: 1rem; }
 
+.help-text { display: block; margin: 1.4rem; color: var(--text-light); }
+.error-text { display: block; margin: 1.4rem; color: var(--danger); font-weight: 600; }
+.error-text::before {
+  content: "\e4e2";
+  font-family: "Phosphor-Fill";
+  margin-right: 0.4em;
+}
+
 /* --------------------------------------------------------------------------
   COMPONENT: BUTTONS
 -------------------------------------------------------------------------- */
@@ -534,28 +523,6 @@ dl-popover::part(container) {
 .icon-btn.danger:hover { background: rgba(var(--danger-rgb), 0.2); color: var(--danger); }
 
 /* --------------------------------------------------------------------------
-  LANDING
--------------------------------------------------------------------------- */
-.landing-card {
-  display: flex; flex-direction: column; align-items: center; gap: 1rem;
-  max-width: 80rem; width: 100%; padding: 6rem 4rem;
-  border-radius: 3.2rem;
-  text-align: center;
-}
-
-.logo-circle {
-  width: 12rem; height: 12rem; padding: 1rem;
-  background: linear-gradient(135deg, var(--primary-light), white);
-  border-radius: 50%;
-  box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.15);
-}
-[data-theme="dark"] .logo-circle { background: linear-gradient(135deg, var(--primary-dark), #1e293b); }
-
-.landing-title { font-size: 4.8rem; font-weight: 800; }
-.landing-tagline { font-size: 2.4rem; font-weight: 600; }
-.landing-desc { font-size: 1.8rem; color: var(--text-light); max-width: 50rem; margin-bottom: 3rem; }
-
-/* --------------------------------------------------------------------------
   NAVIGATION
 -------------------------------------------------------------------------- */
 .desktop-nav {
@@ -592,7 +559,7 @@ dl-popover::part(container) {
 .mobile-header {
   display: flex; justify-content: space-between; align-items: center;
   position: sticky; top: 0; z-index: 20;
-  padding: 1.2rem 2rem; border-bottom: 1px solid var(--border-color);
+  padding: 1.2rem 2rem; border-width: 0 0 1px 0;
 
   .brand-wrapper { font-size: 2rem; }
   .brand-icon { width: 3.4rem; height: 3.4rem; padding: 0.3rem; border-radius: 0.8rem; }
@@ -633,7 +600,7 @@ dl-popover::part(container) {
   border-radius: var(--radius-lg);
   padding: 2.4rem;
   overflow: hidden;
-  background: linear-gradient(to bottom right, #ffffff, #f8fafc);
+  background: var(--glass-surface);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border-color);
   transition: all 0.3s;
@@ -670,11 +637,6 @@ dl-popover::part(container) {
   }
 
   [data-theme="dark"] & {
-    background: linear-gradient(to bottom right, #0f172a, #131c2f, #0B1120);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(51, 65, 85, 0.5);
-    color: white;
-
     .bg-icon { opacity: 0.3; }
     .bg-decor-primary, .bg-decor-accent { opacity: 0.1; }
   }
@@ -758,10 +720,13 @@ dl-popover::part(container) {
   text-align: center;
 
   & > i {
-    width: 8rem; height: 8rem;
     padding: 2rem;
+    background: linear-gradient(135deg, var(--primary-light), white);
+    box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.15);
+    border-radius: 50%;
     font-size: 4rem; color: var(--primary);
   }
+  [data-theme="dark"] & > i { background: linear-gradient(135deg, var(--primary-dark), #1e293b); }
 
   h2 { font-size: 2.8rem; }
   p { max-width: 50rem; font-size: 1.8rem; color: var(--text-light); }

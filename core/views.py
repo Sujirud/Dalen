@@ -33,7 +33,17 @@ def _get_today(user):
 def landing(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
-    return render(request, 'core/landing.html')
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('dashboard')
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'core/landing.html', {'form': form})
 
 
 def register(request):

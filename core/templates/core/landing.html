@@ -1,21 +1,443 @@
-{% extends 'core/base.html' %}
 {% load static %}
-{% block content %}
-<div class="center-stage">
-  <div class="landing-card glass-panel">
-    <div class="logo-circle">
-      <img src="{% static 'img/logo.svg' %}" alt="Logo">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dalen — Your Daily Spending Compass</title>
+  <link rel="icon" href="{% static 'img/favicon.svg' %}">
+
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- ----- NAVIGATION ----- -->
+  <nav id="navbar">
+    <div class="brand">
+      <img src="{% static 'img/logo.svg' %}" alt="">
+      <p><span>D</span>alen</p>
+    </div>
+    <div class="nav-links">
+      <a href="#narrative">Features</a>
+      <a href="#benefit">Benefits</a>
     </div>
 
-    <h1 class="landing-title text-gradient">Dalen</h1>
+    <div class="nav-actions">
+      <a href="{% url 'login' %}" class="nav-login">Log In</a>
+      <a href="{% url 'register' %}" class="nav-cta">Register</a>
+    </div>
 
-    <p class="landing-tagline">Your Daily Spending Compass.</p>
-    <p class="landing-desc">Simply set a savings goal, and we'll calculate exactly what is safe to spend today. No complex spreadsheets required.</p>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
 
-    <div class="flex flex-wrap gap-2">
-      <a href="{% url 'login' %}" class="btn btn-fill btn-primary btn-lg flex-1 no-wrap">Log In</a>
-      <a href="{% url 'register' %}" class="btn btn-outline btn-lg flex-1 no-wrap">Get Started</a>
+  <!-- ----- MOBILE MENU ----- -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#narrative">Features</a>
+    <a href="#benefit">Benefits</a>
+    <a href="{% url 'login' %}">Log In</a>
+    <a href="{% url 'register' %}">Register</a>
+  </div>
+
+  <!-- ----- HERO SECTION ----- -->
+  <section id="hero">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-bg-grid"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">Personal Finance, Reimagined</div>
+      <h1 class="hero-headline">
+        Know Exactly What's<br>
+        <em>Safe to Spend.</em><br>
+        Every Day.
+      </h1>
+      <p class="hero-sub">
+        Dalen is the personal finance app that calculates a smart daily spending limit—automatically—based on your savings goals, recurring bills, and real net worth.
+      </p>
+      <div class="hero-actions">
+        <a href="#register" class="hero-signup">
+          Sign Up For Free
+          <svg viewBox="0 0 24 26" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ----- MARQUEE ----- -->
+  <div class="marquee-band" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Daily Spending Limit</span><span class="dot">·</span>
+      <span>Goal Tracking</span><span class="dot">·</span>
+      <span>Budget Analytics</span><span class="dot">·</span>
+      <span>Receipt Scanning</span><span class="dot">·</span>
+      <span>Recurring Cashflow</span><span class="dot">·</span>
+      <span>Net Worth Overview</span><span class="dot">·</span>
+      <span>Custom Categories</span><span class="dot">·</span>
+      <span>Smart Budgeting</span><span class="dot">·</span>
+      <!-- Second copy for seamless loop -->
+      <span>Daily Spending Limit</span><span class="dot">·</span>
+      <span>Goal Tracking</span><span class="dot">·</span>
+      <span>Budget Analytics</span><span class="dot">·</span>
+      <span>Receipt Scanning</span><span class="dot">·</span>
+      <span>Recurring Cashflow</span><span class="dot">·</span>
+      <span>Net Worth Overview</span><span class="dot">·</span>
+      <span>Custom Categories</span><span class="dot">·</span>
+      <span>Smart Budgeting</span><span class="dot">·</span>
     </div>
   </div>
-</div>
-{% endblock %}
+
+  <!-- ----- NARRATIVE / FEATURES SECTION ----- -->
+  <section id="narrative">
+    <div class="container">
+
+      <div class="narrative-intro reveal">
+        <div class="section-label">The Platform</div>
+        <h2>Precision-built tools for <em>effortless money management.</em></h2>
+        <p>From your first login to your hundredth transaction, every tool in Dalen is designed to reduce friction and increase clarity. Here's what's under the hood.</p>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-copy reveal-left">
+          <div class="feature-label">01 — Safe to Spend</div>
+          <h3 class="feature-headline">
+            Your daily limit, <br><em>dynamically calculated.</em>
+          </h3>
+          <p class="feature-body">
+            Dalen's core algorithm factors in your current net worth, upcoming recurring cash flows, and active savings goals to calculate exactly how much you can spend today. No rigid monthly caps—just a living, breathing daily number that keeps you on track.
+          </p>
+          <div class="feature-tags">
+            <span class="tag">Dynamic Algorithm</span>
+            <span class="tag">Goal-Aware</span>
+            <span class="tag">Recalculates Daily</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal-right">
+          <img src="" alt="">
+          <div class="feature-visual-overlay"></div>
+        </div>
+      </div>
+
+      <div class="feature-row reverse">
+        <div class="feature-copy reveal-right">
+          <div class="feature-label">02 — Goal Setting</div>
+          <h3 class="feature-headline">
+            Define a target.<br><em>We'll map the route.</em>
+          </h3>
+          <p class="feature-body">
+            Create savings plans with a specific amount and deadline, and Dalen automatically works backwards to factor that goal into every daily calculation. Watch your progress update in real time as you log transactions and hit milestones.
+          </p>
+          <div class="feature-tags">
+            <span class="tag">Target Amounts</span>
+            <span class="tag">Deadline Tracking</span>
+            <span class="tag">Progress Visualization</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal-left">
+          <img src="" alt="">
+          <div class="feature-visual-overlay"></div>
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-copy reveal-left">
+          <div class="feature-label">03 — Transaction Tracking</div>
+          <h3 class="feature-headline">
+            Log spending in<br><em>seconds, not minutes.</em>
+          </h3>
+          <p class="feature-body">
+            Add transactions manually, or upload a receipt image and let Dalen read it for you. Assign expenses to fully customizable categories—each with its own icon and color—so your spending history is always organized and meaningful.
+          </p>
+          <div class="feature-tags">
+            <span class="tag">Income & Expenses</span>
+            <span class="tag">Custom Categories</span>
+            <span class="tag">Receipt Upload</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal-right">
+          <img src="" alt="">
+          <div class="feature-visual-overlay"></div>
+        </div>
+      </div>
+
+      <div class="feature-row reverse">
+        <div class="feature-copy reveal-right">
+          <div class="feature-label">04 — Recurring Cashflow</div>
+          <h3 class="feature-headline">
+            Bills and income,<br><em>always accounted for.</em>
+          </h3>
+          <p class="feature-body">
+            Add your rent, subscriptions, salary, or any recurring cashflow at monthly or custom intervals. Dalen factors every future payment into your spending limit ahead of time—so you're never caught off guard.
+          </p>
+          <div class="feature-tags">
+            <span class="tag">Monthly & Custom Intervals</span>
+            <span class="tag">Future Projections</span>
+            <span class="tag">Set & Forget</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal-left">
+          <img src="" alt="">
+          <div class="feature-visual-overlay"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ----- BENEFITS ----- -->
+  <section id="benefit">
+    <div class="benefit-bg"></div>
+    <div class="benefit-bg-grid"></div>
+
+    <div class="container benefit-container">
+      <div class="benefit-header reveal">
+        <div class="section-label">Why Dalen</div>
+        <h2>The finance app built for real life, not spreadsheets.</h2>
+        <p>Six principles that guide every feature we build—from the algorithm to the interface.</p>
+      </div>
+
+      <div class="benefit-grid">
+
+        <div class="benefit-card reveal delay-1">
+          <div class="benefit-number">01</div>
+          <svg class="benefit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21.5 2v6h-6"/>
+            <path d="M2.5 22v-6h6"/>
+            <path d="M2 11.5a10 10 0 0 1 18.8-4.3"/>
+            <path d="M22 12.5a10 10 0 0 1-18.8 4.2"/>
+          </svg>
+          <h4 class="benefit-title">Truly Dynamic Budgeting</h4>
+          <p class="benefit-desc">Unlike static monthly budgets, your daily limit recalculates every morning based on what you actually have and what's coming up—so the number is always honest.</p>
+        </div>
+
+        <div class="benefit-card reveal delay-2">
+          <div class="benefit-number">02</div>
+          <svg class="benefit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <circle cx="12" cy="12" r="6"/>
+            <circle cx="12" cy="12" r="2"/>
+          </svg>
+          <h4 class="benefit-title">Goal-First Architecture</h4>
+          <p class="benefit-desc">Your savings goal isn't a side feature—it's the engine. Every spending limit, every forecast, every nudge is calculated with your goal deadline at its core.</p>
+        </div>
+
+        <div class="benefit-card reveal delay-3">
+          <div class="benefit-number">03</div>
+          <svg class="benefit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/>
+            <path d="M16 8H8M16 12H8M12 16H8"/>
+          </svg>
+          <h4 class="benefit-title">Effortless Logging</h4>
+          <p class="benefit-desc">Receipt scanning and one-tap transaction entry mean logging your spending takes less time than the purchase itself. No friction, no backlog.</p>
+        </div>
+
+        <div class="benefit-card reveal delay-1">
+          <div class="benefit-number">04</div>
+          <svg class="benefit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <h4 class="benefit-title">Privacy by Default</h4>
+          <p class="benefit-desc">Your financial data never leaves your control. No ads, no selling your habits to third parties. Dalen earns your trust with every feature we don't include.</p>
+        </div>
+
+        <div class="benefit-card reveal delay-2">
+          <div class="benefit-number">05</div>
+          <svg class="benefit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+            <line x1="2" y1="20" x2="22" y2="20"/>
+          </svg>
+          <h4 class="benefit-title">Insightful Analytics</h4>
+          <p class="benefit-desc">The dashboard gives you a real-time net worth overview and an interactive chart comparing your daily budget limit against actual spending.</p>
+        </div>
+
+        <div class="benefit-card reveal delay-3">
+          <div class="benefit-number">06</div>
+          <svg class="benefit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          <h4 class="benefit-title">Built to Start in Minutes</h4>
+          <p class="benefit-desc">No bank connections, no complicated setup, no sync errors. Add your balance, set a goal, and your first daily limit is ready before your morning coffee cools.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ----- QUOTE / TESTIMONIAL ----- -->
+  <section id="quote">
+    <div class="container quote-container reveal">
+      <span class="quote-mark">"</span>
+      <blockquote>
+        Every number purposeful. Every decision informed. Dalen gives you the real-time clarity—and the algorithm—to spend freely today without sacrificing tomorrow.
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ----- REGISTRATION FORM ----- -->
+  <section id="register">
+    <div class="container register-container">
+      <!-- Copy side -->
+      <div class="register-copy reveal-left">
+        <div class="section-label">Get Started</div>
+        <h2>Your finances, finally under control.</h2>
+        <p>
+          Dalen is free to use and takes less than two minutes to set up. No bank links, no credit card, no commitment — just a smarter way to manage what you spend every day.
+        </p>
+        <ul class="register-perks">
+          <li>Your personalised daily spending limit, from day one</li>
+          <li>Savings goals that actually shape your budget</li>
+          <li>A real-time net worth overview, always up to date</li>
+          <li>Full control over your data — private by design</li>
+        </ul>
+      </div>
+
+      <!-- Form side -->
+      <div class="form-card reveal-right">
+        <form method="post" action="{% url 'landing' %}">
+          {% csrf_token %}
+  
+          <div class="form-title">Create Your Account</div>
+          <div class="form-subtitle">Free forever — no credit card required.</div>
+
+          {% for field in form %}
+          <div class="form-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+
+            {% if field.errors %}
+              <ul class="error-list">
+                {% for error in field.errors %}
+                  <li class="error-item">{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+          {% endfor %}
+
+          <button type="submit" class="form-submit">
+            Create My Account
+          </button>
+
+          <p class="form-note">
+            By signing up you agree to our Terms of Service and Privacy Policy.<br>
+            We will never share your data with third parties.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ----- FOOTER ----- -->
+  <footer>
+    <div class="container footer-container">
+      <div class="footer-logo"><span>D</span>alen</div>
+      <ul class="footer-links">
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Pricing</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li>
+      </ul>
+      <div class="footer-copy">© 2025 Dalen Inc. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    /* --------------------------------------------------------------------------
+      NAVBAR SCROLL BEHAVIOR
+    -------------------------------------------------------------------------- */
+    const navbar = document.getElementById('navbar');
+
+    navbar && window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    /* --------------------------------------------------------------------------
+      MOBILE MENU TOGGLE
+    -------------------------------------------------------------------------- */
+    const hamburger = document.getElementById('hamburger');
+    const bars = hamburger.querySelectorAll('span');
+    const mobileMenu = document.getElementById('mobileMenu');
+    let menuOpen = false;
+
+    function toggleMobileMenu(isOpen) {
+      menuOpen = isOpen;
+      mobileMenu.classList.toggle('open', menuOpen);
+      if (menuOpen) {
+        bars[0].style.transform = 'translateY(0.6rem) rotate(45deg)';
+        bars[1].style.opacity = '0';
+        bars[2].style.transform = 'translateY(-0.6rem) rotate(-45deg)';
+      } else {
+        bars.forEach(b => { b.style.transform = ''; b.style.opacity = ''; });
+      }
+    }
+
+    hamburger.addEventListener('click', () => {
+      toggleMobileMenu(!menuOpen);
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        toggleMobileMenu(false);
+      });
+    });
+
+    /* ----------------------------------------------------------
+      PARALLAX EFFECTS
+    ---------------------------------------------------------- */
+    const heroBg = document.getElementById('heroBg');
+
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          heroBg.style.transform = `translateY(${window.scrollY * 0.4}px)`;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    /* --------------------------------------------------------------------------
+      SCROLL-TRIGGERED REVEAL ANIMATIONS
+    -------------------------------------------------------------------------- */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -40% 0px' });
+
+    const revealEl = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+    revealEl.forEach(el => revealObserver.observe(el));
+
+    /* --------------------------------------------------------------------------
+      ANCHOR SCROLL
+    -------------------------------------------------------------------------- */
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

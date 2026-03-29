@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" data-theme="{{ user.userprofile.theme|default:'light' }}">
+<html lang="en" data-theme="{{ user.userprofile.theme|default:'dark' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -46,9 +46,7 @@
     {% comment %} Desktop Navigation {% endcomment %}
     <nav class="desktop-nav glass-panel">
       <div class="brand-wrapper mb-2">
-        <div class="brand-icon">
-          <img src="{% static 'img/logo.svg' %}" alt="Logo">
-        </div>
+        <img src="{% static 'img/logo.svg' %}" alt="Logo">
         <span>Dalen</span>
       </div>
 
@@ -123,9 +121,7 @@
       {% if user.is_authenticated %}
       <header class="mobile-header glass-panel">
         <div class="brand-wrapper">
-          <div class="brand-icon">
-            <img src="{% static 'img/logo.svg' %}" alt="Logo">
-          </div>
+          <img src="{% static 'img/logo.svg' %}" alt="Logo">
           <span>Dalen</span>
         </div>
 
