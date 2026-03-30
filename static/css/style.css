@@ -443,7 +443,7 @@ dl-popover::part(container) {
 
 .form-field input {
   width: 100%; height: 5rem;
-  padding: 1.2rem 1.6rem;
+  padding: 0 1.6rem;
   background: var(--input-bg);
   box-shadow: var(--shadow-inner);
   border: 1px solid var(--border-color);
@@ -791,7 +791,7 @@ dl-popover::part(container) {
 .txn-item {
   display: flex; justify-content: space-between; align-items: center;
   padding: 0.4rem 1.2rem 0.8rem 0.8rem;
-  border-radius: 1rem;
+  border-radius: var(--radius-md);
   transition: background 0.2s;
 
   small { font-size: 1.2rem; }
@@ -947,13 +947,12 @@ dl-popover::part(container) {
 }
 
 .toggle-btn {
-  flex: 1;
-  height: 5rem; padding: 1.2rem 1.6rem;
+  display: flex; justify-content: center; align-items: center; flex: 1;
+  height: 5rem; padding: 0 1.6rem;
   background: var(--input-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   font-size: 1.6rem; font-weight: 600; color: var(--text-light);
-  text-align: center; vertical-align: auto;
   cursor: pointer; transition: all 0.2s;
 
   &:hover { background: var(--hover-light); color: var(--text-main); }
@@ -1049,9 +1048,11 @@ dl-popover::part(container) {
 /* --------------------------------------------------------------------------
   SLIM SELECT
 -------------------------------------------------------------------------- */
+select { display: none; }
+
 .ss-main {
-  display: flex !important; align-items: center;
-  height: 5rem; padding: 1.2rem 1.6rem;
+  display: flex !important; align-items: center; gap: 1rem;
+  min-height: 5rem; padding: 1rem 1.6rem;
   background: var(--input-bg);
   box-shadow: var(--shadow-inner);
   border: 1px solid var(--border-color);
@@ -1070,29 +1071,12 @@ dl-popover::part(container) {
 }
 [data-theme="dark"] .ss-main:focus-visible { box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.2); }
 
-.ss-single-selected {
-  height: 100%;
-  padding: 0 1.6rem;
-  font-size: 1.6rem;
-  font-family: inherit;
-  color: var(--text-main);
-  border: none;
-  display: flex;
-  align-items: center;
-}
-
 /* Placeholder Text */
-.ss-placeholder {
-  color: var(--text-light);
-  font-weight: normal;
-}
+.ss-placeholder { color: var(--text-light); line-height: inherit; }
 
 /* Arrow Icon */
 .ss-arrow { width: 1.6rem; height: 1.6rem; }
-.ss-arrow path {
-  stroke: var(--text-main);
-  stroke-width: 1.2rem;
-}
+.ss-arrow path { stroke: var(--text-main); stroke-width: 1.2rem; }
 
 /* Dropdown Menu */
 .ss-content {
@@ -1159,6 +1143,28 @@ dl-popover::part(container) {
   background: var(--primary);
   color: white;
   font-weight: 600;
+}
+
+/* Multiple */
+.ss-values {
+  gap: 0.5rem;
+
+  .ss-value {
+    padding-left: 1rem;
+    background: var(--primary);
+    border-radius: 0.4rem;
+
+    .ss-value-text { font-size: 1.4rem; white-space: nowrap; }
+    .ss-value-delete {
+      width: 2.8rem; height: 2.8rem;
+      padding: 1rem;
+      border: none;
+
+      svg { width: 0.8rem; height: 0.8rem; }
+
+      &:hover { opacity: 0.7; }
+    }
+  }
 }
 
 /* --------------------------------------------------------------------------

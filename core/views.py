@@ -112,6 +112,10 @@ def transactions(request):
     if search_query:
         txn_list = txn_list.filter(description__icontains=search_query)
 
+    category_ids = request.GET.getlist('categories')
+    if category_ids:
+        txn_list = txn_list.filter(category__id__in=category_ids)
+
     paginator = Paginator(txn_list, 20)
     page_number = request.GET.get('page', 1)
     transactions_page = paginator.get_page(page_number)
@@ -125,12 +129,13 @@ def transactions(request):
         'last_date': last_date,
         'categories': categories,
         'search_query': search_query,
+        'selected_category_ids': category_ids,
     }
 
-    is_search = request.htmx and request.headers.get('HX-Target') == 'txnListContainer'
+    is_partial = request.htmx and request.headers.get('HX-Target') == 'txnListContainer'
     is_pagination = request.htmx and request.GET.get('page')
 
-    if is_search or is_pagination:
+    if is_partial or is_pagination:
         return render(request, 'core/partial/transaction_list.html', context)
 
     context['base_template'] = 'core/base_partial.html' if request.htmx else 'core/base.html'

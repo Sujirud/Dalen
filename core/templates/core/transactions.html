@@ -4,15 +4,36 @@
   <h1 class="mb-4">All Transactions</h1>
 
   <div class="card glass-panel mb-4">
-    <div class="form-field">
-      <div class="input-wrapper">
-        <i class="ph ph-magnifying-glass input-icon"></i>
-        <input type="search" name="search" value="{{ search_query }}" placeholder="Search descriptions..." 
-          hx-get="{% url 'transactions' %}" 
-          hx-target="#txnListContainer" 
-          hx-trigger="input changed delay:500ms, search" 
-          autocomplete="off">
+    <div id="txnFilters" class="form-row">
+
+      <div class="form-field">
+        <div class="input-wrapper">
+          <i class="ph ph-magnifying-glass input-icon"></i>
+          <input type="search" name="search" placeholder="Search descriptions..." autocomplete="off"
+            hx-get="{% url 'transactions' %}"
+            hx-target="#txnListContainer"
+            hx-trigger="input changed delay:500ms, search"
+            hx-include="#txnFilters">
+        </div>
       </div>
+
+      <div class="form-field">
+        <div class="input-wrapper">
+          <select id="categoryFilter" name="categories" multiple
+            data-placeholder="Filter by category..."
+            hx-get="{% url 'transactions' %}"
+            hx-target="#txnListContainer"
+            hx-trigger="change"
+            hx-include="#txnFilters">
+            {% for cat in categories %}
+              <option value="{{ cat.id }}">
+                {{ cat.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
     </div>
   </div>
 

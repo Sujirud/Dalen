@@ -50,8 +50,8 @@
 
 {% empty %}
   <div class="text-light text-center pd-2">
-    {% if search_query %}
-      No transactions found matching "{{ search_query }}".
+    {% if search_query or selected_category_ids %}
+      No transactions match the current filters.
     {% else %}
       No transactions recorded yet.
     {% endif %}
@@ -61,7 +61,7 @@
 {% if transactions.has_next %}
   {% with last_txn=transactions.object_list|last %}
   <button class="btn btn-outline btn-sm btn-full mt-2"
-    hx-get="{% url 'transactions' %}?page={{ transactions.next_page_number }}&last_date={{ last_txn.date|date:'Y-m-d' }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}"
+    hx-get="{% url 'transactions' %}?page={{ transactions.next_page_number }}&last_date={{ last_txn.date|date:'Y-m-d' }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% for cat_id in selected_category_ids %}&categories={{ cat_id }}{% endfor %}"
     hx-target="this" hx-swap="outerHTML"
   >
     Load More

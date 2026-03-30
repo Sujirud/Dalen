@@ -186,18 +186,21 @@
 
       const selects = Array.from(container.querySelectorAll('select'));
       selects.forEach(select => {
-        if (!select.slim) {
-          const enableSearch = select.dataset.search === 'true';
-          const isInDialog = select.closest('dialog') !== null;
+        if (select.slim) return;
 
-          select.slim = new SlimSelect({
-            select: select,
-            settings: {
-              showSearch: enableSearch,
-              ...(isInDialog && { contentLocation: select.parentElement }) 
-            }
-          });
-        }
+        const enableSearch = select.dataset.search === 'true';
+        const placeholder = select.dataset.placeholder;
+
+        const isInDialog = select.closest('dialog') !== null;
+
+        select.slim = new SlimSelect({
+          select: select,
+          settings: {
+            showSearch: enableSearch,
+            ...(placeholder && { placeholderText: placeholder }),
+            ...(isInDialog && { contentLocation: select.parentElement })
+          }
+        });
       });
     });
 
