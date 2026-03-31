@@ -1,10 +1,4 @@
-import {
-  computePosition,
-  autoUpdate,
-  flip,
-  offset,
-  size
-} from 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.3/+esm';
+import { computePosition, autoUpdate, flip, offset, size } from '../vendor/floating-ui/floating-ui.bundle.js';
 
 class DlPopover extends HTMLElement {
   constructor() {

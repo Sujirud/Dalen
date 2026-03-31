@@ -12,18 +12,15 @@
   <script type="module" src="{% static 'js/dalen-popover.js' %}"></script>
   <script src="{% static 'js/hex-color-picker.js' %}"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'vendor/phosphor/regular/style.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/phosphor/bold/style.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/phosphor/fill/style.css' %}">
 
-  <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
-  <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
-  <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+  <script src="{% static 'vendor/slimselect/slimselect.min.js' %}"></script>
 
-  <script src="{% static 'js/slimselect.min.js' %}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
 
-  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
   <script>
     document.addEventListener('htmx:configRequest', (event) => {
       const csrfToken = document.cookie
