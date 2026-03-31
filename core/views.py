@@ -2,6 +2,7 @@ import json
 import zoneinfo
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth import login, update_session_auth_hash
@@ -10,6 +11,7 @@ from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone as django_timezone
 from django.views.decorators.http import require_POST
 
@@ -107,29 +109,62 @@ def dashboard(request):
 @login_required
 def transactions(request):
     txn_list = Transaction.objects.filter(user=request.user).select_related('category').order_by('-date', '-created_at')
+    categories = Category.objects.filter(user=request.user)
 
+    # Filtering
     search_query = request.GET.get('search', '').strip()
+    category_ids = request.GET.getlist('categories')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
     if search_query:
         txn_list = txn_list.filter(description__icontains=search_query)
-
-    category_ids = request.GET.getlist('categories')
     if category_ids:
         txn_list = txn_list.filter(category__id__in=category_ids)
+    if start_date:
+        txn_list = txn_list.filter(date__gte=start_date)
+    if end_date:
+        txn_list = txn_list.filter(date__lte=end_date)
 
+    # Determine if any filters are applied for UI purposes
+    filters_applied = any([search_query, category_ids, start_date, end_date])
+
+    # Pagination
     paginator = Paginator(txn_list, 20)
     page_number = request.GET.get('page', 1)
     transactions_page = paginator.get_page(page_number)
     last_date = request.GET.get('last_date')
 
-    categories = Category.objects.filter(user=request.user)
+    # Construct load more URL for HTMX
+    load_more_url = None
+    if transactions_page.has_next():
+        last_txn = list(transactions_page.object_list)[-1]
+
+        query_params = {
+            'page': transactions_page.next_page_number(),
+            'last_date': last_txn.date.strftime('%Y-%m-%d'),
+        }
+
+        if search_query:
+            query_params['search'] = search_query
+        if category_ids:
+            query_params['categories'] = category_ids 
+        if start_date:
+            query_params['start_date'] = start_date
+        if end_date:
+            query_params['end_date'] = end_date
+
+        base_url = reverse('transactions')
+        query_string = urlencode(query_params, doseq=True)
+        load_more_url = f"{base_url}?{query_string}"
 
     context = {
         'page_title': 'Transactions | Dalen',
         'transactions': transactions_page,
         'last_date': last_date,
         'categories': categories,
-        'search_query': search_query,
-        'selected_category_ids': category_ids,
+        'load_more_url': load_more_url,
+        'filters_applied': filters_applied
     }
 
     is_partial = request.htmx and request.headers.get('HX-Target') == 'txnListContainer'

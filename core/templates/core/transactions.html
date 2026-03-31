@@ -3,13 +3,12 @@
 <div id="transactionsContainer">
   <h1 class="mb-4">Transactions</h1>
 
-  <div class="card glass-panel mb-2">
-    <div id="txnFilters" class="form-row">
-
+  <div id="txnFilters" class="card glass-panel mb-2">
+    <div class="form-row">
       <div class="form-field">
         <div class="input-wrapper">
           <i class="ph ph-magnifying-glass input-icon"></i>
-          <input type="search" name="search" placeholder="Search descriptions..." autocomplete="off"
+          <input type="search" name="search" placeholder="Search descriptions..." autocomplete="off" title="Search transactions by description"
             hx-get="{% url 'transactions' %}"
             hx-target="#txnListContainer"
             hx-trigger="input changed delay:500ms, search"
@@ -33,7 +32,30 @@
           </select>
         </div>
       </div>
+    </div>
 
+    <div class="flex gap-2">
+      <div class="form-field">
+        <div class="input-wrapper">
+          <i class="ph ph-calendar-blank input-icon"></i>
+          <input type="date" name="start_date" title="Filter transactions from this date"
+            hx-get="{% url 'transactions' %}"
+            hx-target="#txnListContainer"
+            hx-trigger="change"
+            hx-include="#txnFilters">
+        </div>
+      </div>
+
+      <div class="form-field">
+        <div class="input-wrapper">
+          <i class="ph ph-calendar-blank input-icon"></i>
+          <input type="date" name="end_date" title="Filter transactions up to this date"
+            hx-get="{% url 'transactions' %}"
+            hx-target="#txnListContainer"
+            hx-trigger="change"
+            hx-include="#txnFilters">
+        </div>
+      </div>
     </div>
   </div>
 
