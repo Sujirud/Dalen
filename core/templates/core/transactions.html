@@ -1,9 +1,9 @@
 {% extends base_template %}
 {% block content %}
-<div>
-  <h1 class="mb-4">All Transactions</h1>
+<div id="transactionsContainer">
+  <h1 class="mb-4">Transactions</h1>
 
-  <div class="card glass-panel mb-4">
+  <div class="card glass-panel mb-2">
     <div id="txnFilters" class="form-row">
 
       <div class="form-field">
@@ -37,7 +37,18 @@
     </div>
   </div>
 
-  <div id="txnActionsBar" class="glass-panel" style="display: none;">
+  <div class="flex justify-end items-baseline gap-2 pd-2">
+    <button id="editModeToggle" class="text-primary font-medium">
+      <i class="ph-bold ph-pencil-simple text-14"></i><span>Edit mode</span>
+    </button>
+
+    <a class="text-primary font-medium no-underline" href="{% url 'add_transaction' %}" title="Add Transaction"
+      hx-get="{% url 'add_transaction' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true">
+      <i class="ph-bold ph-plus"></i><span>New Transaction</span>
+    </a>
+  </div>
+
+  <div id="txnActionsBar" class="glass-panel">
     <div class="flex items-center gap-2">
       <label class="flex items-center gap-1">
         <input type="checkbox" id="selectAllCb"/>
@@ -69,7 +80,7 @@
   <div class="card glass-panel pd-1">
     <form id="txnForm">
       {% csrf_token %}
-      
+
       <div id="txnListContainer" class="txn-list">
         {% include "core/partial/transaction_list.html" %}
       </div>
@@ -147,58 +158,55 @@
 </dialog>
 
 <script>
-  (function () {
+  (() => {
+    const container = document.getElementById("transactionsContainer");
+    const editToggle = document.getElementById("editModeToggle");
     const txnForm = document.getElementById("txnForm");
-    const actionsBar = document.getElementById("txnActionsBar");
     const selectedCount = document.getElementById("selectedCount");
     const selectAllCb = document.getElementById("selectAllCb");
 
-    function updateToolbar() {
-      const itemCheckboxes = document.querySelectorAll(".item-checkbox");
-      const checkedCount = Array.from(itemCheckboxes).filter((cb) => cb.checked).length;
+    const updateToolbar = () => {
+      const items = [...document.querySelectorAll(".item-checkbox")];
+      const checkedCount = items.filter(cb => cb.checked).length;
 
-      const groupCheckboxes = document.querySelectorAll(".group-checkbox");
-      groupCheckboxes.forEach((groupCb) => {
-        const date = groupCb.dataset.date;
-        const itemsInGroup = document.querySelectorAll(`.item-checkbox[data-date="${date}"]`);
-        
-        if (itemsInGroup.length > 0) {
-          const isAllChecked = Array.from(itemsInGroup).every(cb => cb.checked);
-          groupCb.checked = isAllChecked;
-        }
+      document.querySelectorAll(".group-checkbox").forEach(group => {
+        const groupItems = items.filter(cb => cb.dataset.date === group.dataset.date);
+        group.checked = groupItems.length > 0 && groupItems.every(cb => cb.checked);
       });
 
-      if (checkedCount > 0) {
-        actionsBar.style.display = "flex";
-        selectedCount.textContent = checkedCount + " selected";
-        selectAllCb.checked = checkedCount === itemCheckboxes.length && itemCheckboxes.length > 0;
-      } else {
-        actionsBar.style.display = "none";
-        selectAllCb.checked = false;
-      }
-    }
+      selectedCount.textContent = checkedCount + " selected";
+      selectAllCb.checked = items.length > 0 && checkedCount === items.length;
+    };
 
-    txnForm.addEventListener("change", function (e) {
-      if (e.target.classList.contains("item-checkbox")) {
-        updateToolbar();
-      } else if (e.target.classList.contains("group-checkbox")) {
-        const date = e.target.dataset.date;
-        const itemCheckboxes = document.querySelectorAll(`.item-checkbox[data-date="${date}"]`);
-        itemCheckboxes.forEach((cb) => (cb.checked = e.target.checked));
+    editToggle.addEventListener("click", () => {
+      const isEdit = container.classList.toggle("edit-mode-active");
+
+      editToggle.innerHTML = isEdit
+        ? '<i class="ph-bold ph-x"></i><span>Cancel Edit</span>'
+        : '<i class="ph-bold ph-pencil-simple text-14"></i><span>Edit mode</span>';
+
+      if (!isEdit) {
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
         updateToolbar();
       }
     });
 
-    selectAllCb.addEventListener("change", function (e) {
-      const itemCheckboxes = document.querySelectorAll(".item-checkbox");
-      const groupCheckboxes = document.querySelectorAll(".group-checkbox");
+    txnForm.addEventListener("change", (e) => {
+      const target = e.target;
 
-      itemCheckboxes.forEach((cb) => (cb.checked = e.target.checked));
-      groupCheckboxes.forEach((cb) => (cb.checked = e.target.checked));
+      if (target.matches(".group-checkbox")) {
+        document.querySelectorAll(`.item-checkbox[data-date="${target.dataset.date}"]`).forEach(cb => cb.checked = target.checked);
+      }
+
+      if (target.matches('input[type="checkbox"]')) updateToolbar();
+    });
+
+    selectAllCb.addEventListener("change", (e) => {
+      document.querySelectorAll(".item-checkbox, .group-checkbox").forEach(cb => cb.checked = e.target.checked);
       updateToolbar();
     });
 
-    document.body.addEventListener('htmx:afterSettle', function(evt) {
+    document.body.addEventListener("htmx:afterSettle", () => {
       if (document.getElementById("txnForm")) updateToolbar();
     });
 
