@@ -2,7 +2,7 @@
 {% block content %}
 <div class="flex-col gap-3">
   <div class="mb-1">
-    <h4 class="text-light">{{ today_date }}</h4>
+    <h4 class="text-light">{{ today|date:"l, F d" }}</h4>
     <h1>{{ greeting }}, {{ user.username }}</h1>
   </div>
 
@@ -279,7 +279,13 @@
           </div>
           <div>
             <p class="font-medium">{{ t.description|default:"-" }}</p>
-            <small class="text-light">{{ t.date|date:"M d, Y" }}</small>
+            <small class="text-light">
+              {% if t.date == today %}
+                Today
+              {% else %}
+                {{ t.date|date:"M d, Y" }}
+              {% endif %}
+            </small>
           </div>
         </div>
 

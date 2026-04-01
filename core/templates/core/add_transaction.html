@@ -60,7 +60,7 @@
       <div class="form-field">
         <label>
           <span>Date</span>
-          <input type="date" name="txn_date" id="txn_date" required>
+          <input type="date" name="txn_date" value="{{ today|date:'Y-m-d' }}" required>
         </label>
       </div>
     </div>
@@ -207,11 +207,6 @@
 
 <script>
   (function() {
-    // 1. Set Date Defaults
-    const dateInput = document.getElementById('txn_date');
-    if (dateInput) dateInput.valueAsDate = new Date();
-
-    // 2. Receipt Upload Logic
     const fileInput = document.getElementById('fileInput');
     const uploadZone = document.getElementById('upload-zone');
     const previewContainer = document.getElementById('previewContainer');

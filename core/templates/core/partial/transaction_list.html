@@ -11,7 +11,15 @@
       <div class="custom-cb"></div>
     </label>
 
-    <h6>{{ group.grouper|naturalday:"M d, Y"|capfirst }}</h6>
+    <h6>
+      {% if group.grouper == today %}
+        Today
+      {% elif group.grouper == yesterday %}
+        Yesterday
+      {% else %}
+        {{ group.grouper|date:"M d, Y" }}
+      {% endif %}
+    </h6>
   </div>
   {% endif %}
 

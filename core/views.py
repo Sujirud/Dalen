@@ -70,7 +70,7 @@ def register(request):
 
 @login_required
 def dashboard(request):
-    today_date = _get_today(request.user).strftime("%A, %B %d")
+    today = _get_today(request.user)
 
     user_tz = zoneinfo.ZoneInfo(request.user.userprofile.timezone)
     local_hour = django_timezone.now().astimezone(user_tz).hour
@@ -93,7 +93,7 @@ def dashboard(request):
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
         'page_title': 'Dashboard | Dalen',
-        'today_date': today_date,
+        'today': today,
         'greeting': greeting,
         'data': data,
         'chart_data': chart_data_json,
@@ -110,6 +110,8 @@ def dashboard(request):
 def transactions(request):
     txn_list = Transaction.objects.filter(user=request.user).select_related('category').order_by('-date', '-created_at')
     categories = Category.objects.filter(user=request.user)
+    today = _get_today(request.user)
+    yesterday = today - timedelta(days=1)
 
     # Filtering
     search_query = request.GET.get('search', '').strip()
@@ -160,6 +162,8 @@ def transactions(request):
 
     context = {
         'page_title': 'Transactions | Dalen',
+        'today': today,
+        'yesterday': yesterday,
         'transactions': transactions_page,
         'last_date': last_date,
         'categories': categories,
@@ -229,6 +233,7 @@ def add_transaction(request):
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
         'page_title': 'Transaction | Dalen',
+        'today': today,
         'categories': categories,
         'icon_choices': ICON_CHOICES,
     }
@@ -329,17 +334,18 @@ def delete_category(request):
 @login_required
 def planning(request):
     user = request.user
+    today = _get_today(user)
 
     current_goal = Goal.objects.filter(user=user, is_active=True).first()
     completed_goals = Goal.objects.filter(user=user, is_active=False).order_by('-deadline')
     recurring_items = RecurringItem.objects.filter(user=user).order_by('start_date')
-    today = _get_today(user)
 
     min_date = today + timedelta(days=1)
 
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
         'page_title': 'Planning | Dalen',
+        'today': today,
         'current_goal': current_goal,
         'completed_goals': completed_goals,
         'recurring_items': recurring_items, 

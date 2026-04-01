@@ -305,7 +305,7 @@
         <div class="form-field">
           <label>
             <span>Start Date</span>
-            <input type="date" name="start_date_custom" id="startDate" required>
+            <input type="date" name="start_date_custom" value="{{ today|date:'Y-m-d' }}" required>
           </label>
 
           <div id="monthlyHelptext" class="hidden">
@@ -356,9 +356,6 @@
 
     freqSelector.addEventListener('change', toggleOptions);
     toggleOptions();
-
-    // Set default start date to today
-    document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
   })();
 </script>
 
