@@ -26,7 +26,7 @@ class FinancialGPS:
             target_day_of_month = item.start_date.day
 
             # 1. Fast forward to the simulation window (start_date)
-            while current_check_date <= start_date:
+            while current_check_date < start_date:
                 if item.frequency_type == 'monthly':
                     next_month = current_check_date + relativedelta(months=1)
                     max_day = (next_month + relativedelta(day=31)).day
@@ -76,21 +76,22 @@ class FinancialGPS:
         todays_transactions = Transaction.objects.filter(user=self.user, date=self.today)
         spent_today = sum(abs(t.amount) for t in todays_transactions if t.amount < 0)
 
-        start_of_day_net_worth = current_net_worth + spent_today
-
         # 4. Future Cashflow
         future_recurring_sum = self._calculate_future_recurring(self.today, deadline)
 
         # 5. Safe-to-Spend Calculation
         # Formula: (Current Money + Future Money - Target Goal) / Days Left
-        total_pool_available = start_of_day_net_worth + future_recurring_sum
+        total_pool_available = (current_net_worth + spent_today) + future_recurring_sum
         safe_pool = total_pool_available - self.goal.target_amount
 
         base_daily_budget = safe_pool / Decimal(remaining_days_safe)
         remaining_today = base_daily_budget - spent_today
 
         # 6. Progress
-        progress = int(max(0, min(100, (current_net_worth / self.goal.target_amount) * 100)))
+        if self.goal.target_amount > 0:
+            progress = int(max(0, min(100, (current_net_worth / self.goal.target_amount) * 100)))
+        else:
+            progress = 0
 
         return {
             'goal': self.goal,
