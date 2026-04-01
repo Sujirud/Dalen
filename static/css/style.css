@@ -38,8 +38,8 @@
   --bg-surface: #fafafa;
 
   --glass-surface: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --glass-highlight: rgba(255, 255, 255, 0.8);
+
+  --modal-border: rgba(255, 255, 255, 0.5);
 
   --text-main: #1e293b;
   --text-light: #64748b;
@@ -75,8 +75,7 @@
   --bg-surface: #1e1f22;
 
   --glass-surface: rgba(27, 30, 37, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.05);
+  --modal-border: rgba(255, 255, 255, 0.08);
 
   --text-main: #f8fafc;
   --text-light: #94a3b8;
@@ -183,6 +182,10 @@ input[type="search"]::-webkit-search-cancel-button {
   cursor: pointer;
 }
 input[type="search"]::-webkit-search-cancel-button:hover { opacity: 0.7; }
+
+/* Date Input */
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; }
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
 
 body {
   height: 100vh;
@@ -357,7 +360,7 @@ dl-popover::part(container) {
   padding: 2rem;
   background: var(--bg-surface);
   box-shadow: var(--shadow-lg);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--modal-border);
   border-radius: var(--radius-md);
 }
 [data-theme="light"] dl-popover::part(container) { border-color: var(--border-light); }
@@ -396,15 +399,13 @@ dl-popover::part(container) {
 -------------------------------------------------------------------------- */
 .surface-panel {
   background: var(--bg-surface) !important;
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--modal-border);
   box-shadow: var(--shadow-md);
 }
 
 .glass-panel {
   background: var(--glass-surface) !important;
   backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  border-top: 1px solid var(--glass-highlight);
   box-shadow: var(--shadow-md);
 }
 
@@ -636,14 +637,13 @@ dl-popover::part(container) {
 /* Goal Card */
 .goal-card { 
   position: relative;
-  border-radius: var(--radius-lg);
   padding: 2.4rem;
-  overflow: hidden;
   background: var(--glass-surface);
   box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-color);
-  transition: all 0.3s;
+  border-radius: var(--radius-lg);
   color: var(--text-main);
+  overflow: hidden;
+  transition: all 0.3s;
 
   .bg-icon {
     position: absolute; right: 0; top: 50%; transform: translateY(-50%);
@@ -781,10 +781,11 @@ dl-popover::part(container) {
 
 .txn-list { display: flex; flex-direction: column; }
 
-.txn-row { display: flex; margin: 0 1.4rem; }
+.txn-row { display: flex; margin: 0 1.8rem; }
 
 .txn-row.txn-group-header {
-  margin: 1.6rem 1.4rem 0.8rem;
+  margin-top: 1.8rem;
+  margin-bottom: 1.2rem;
 
   h6 {
     font-weight: 500; font-size: 1.3rem; color: var(--text-light);
@@ -794,12 +795,12 @@ dl-popover::part(container) {
 
 .txn-cb {
   display: none; align-items: center;
-  padding-left: 0.5rem; padding-right: 2.5rem;
+  margin-right: 2.5rem;
 }
 
 .txn-item {
   flex: 1; display: flex; justify-content: space-between; align-items: center;
-  padding: 0.6rem 1.2rem 1rem 1rem;
+  padding: 0.6rem 1.2rem 1rem 1rem; margin: 0 0.4rem;
   border-radius: var(--radius-md);
   transition: background 0.2s;
 
@@ -1064,7 +1065,7 @@ dl-popover::part(container) {
 select { display: none; }
 
 .ss-main {
-  display: flex !important; align-items: center; gap: 1rem;
+  display: flex !important; align-items: center; gap: 1.4rem;
   min-height: 5rem; padding: 1rem 1.6rem;
   background: var(--input-bg);
   box-shadow: var(--shadow-inner);

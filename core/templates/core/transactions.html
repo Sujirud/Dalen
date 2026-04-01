@@ -36,25 +36,27 @@
 
     <div class="flex gap-2">
       <div class="form-field">
-        <div class="input-wrapper">
-          <i class="ph ph-calendar-blank input-icon"></i>
+        <label>
+          <span>Start Date</span>
+
           <input type="date" name="start_date" title="Filter transactions from this date"
             hx-get="{% url 'transactions' %}"
             hx-target="#txnListContainer"
             hx-trigger="change"
             hx-include="#txnFilters">
-        </div>
+        </label>
       </div>
 
       <div class="form-field">
-        <div class="input-wrapper">
-          <i class="ph ph-calendar-blank input-icon"></i>
+        <label>
+          <span>End Date</span>
+
           <input type="date" name="end_date" title="Filter transactions up to this date"
             hx-get="{% url 'transactions' %}"
             hx-target="#txnListContainer"
             hx-trigger="change"
             hx-include="#txnFilters">
-        </div>
+        </label>
       </div>
     </div>
   </div>

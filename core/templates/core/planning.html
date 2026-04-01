@@ -231,10 +231,7 @@
         <div class="form-field">
           <label>
             <span>Deadline</span>
-            <div class="input-wrapper">
-              <i class="ph ph-calendar-blank input-icon"></i>
-              <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required value="{{ current_goal.deadline|date:'Y-m-d'|default:'' }}">
-            </div>
+            <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required value="{{ current_goal.deadline|date:'Y-m-d'|default:'' }}">
           </label>
         </div>
       </div>
