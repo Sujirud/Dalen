@@ -358,30 +358,41 @@ def planning(request):
 
 
 @login_required
-@require_POST
-def add_goal(request):
-    try:
-        goal_name = request.POST.get('goal_name')
-        goal_icon = request.POST.get('goal_icon')
-        goal_icon_color = request.POST.get('goal_icon_color')
-        target_amount = Decimal(request.POST.get('goal_amount'))
-        deadline_str = request.POST.get('deadline')
-        deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+def add_goal(request, type=None):
+    if request.method == 'POST':
+        try:
+            goal_name = request.POST.get('goal_name')
+            goal_icon = request.POST.get('goal_icon')
+            goal_icon_color = request.POST.get('goal_icon_color')
+            target_amount = Decimal(request.POST.get('goal_amount'))
+            deadline_str = request.POST.get('deadline')
+            deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
 
-        Goal.objects.create(
-            user=request.user,
-            name=goal_name,
-            icon=goal_icon,
-            icon_color=goal_icon_color,
-            target_amount=target_amount,
-            deadline=deadline
-        )
-        messages.success(request, "New goal created!")
+            Goal.objects.create(
+                user=request.user,
+                name=goal_name,
+                icon=goal_icon,
+                icon_color=goal_icon_color,
+                target_amount=target_amount,
+                deadline=deadline
+            )
+            messages.success(request, "New goal created!")
 
-    except (ValueError, InvalidOperation):
-        messages.error(request, "Invalid input. Please check your numbers and date.")
+        except (ValueError, InvalidOperation):
+            messages.error(request, "Invalid input. Please check your numbers and date.")
 
-    return redirect('planning')
+        return redirect('planning')
+
+    min_date = _get_today(request.user) + timedelta(days=1)
+
+    context = {
+        'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
+        'page_title': 'New Goal | Dalen',
+        'min_date': min_date,
+        'icon_choices': ICON_CHOICES,
+        'type': type,
+    }
+    return render(request, 'core/add_goal.html', context)
 
 
 @login_required

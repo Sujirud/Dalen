@@ -240,12 +240,12 @@ body {
 .gap-2 { gap: 2rem !important; }
 .gap-3 { gap: 3rem !important; }
 
-.text-12 { font-size: 1.2rem; }
-.text-14 { font-size: 1.4rem; }
-.text-20 { font-size: 2.0rem; }
-.text-24 { font-size: 2.4rem; }
-.text-26 { font-size: 2.6rem; }
-.text-30 { font-size: 3.0rem; }
+.text-12 { font-size: 1.2rem !important; }
+.text-14 { font-size: 1.4rem !important; }
+.text-20 { font-size: 2.0rem !important; }
+.text-24 { font-size: 2.4rem !important; }
+.text-26 { font-size: 2.6rem !important; }
+.text-30 { font-size: 3.0rem !important; }
 
 .font-medium { font-weight: 500; }
 .font-bold { font-weight: 700; }
@@ -883,6 +883,38 @@ dl-popover::part(container) {
 
 .actions-popover .btn.btn-danger { color: var(--danger); }
 .actions-popover .btn.btn-danger:hover { background: rgba(var(--danger-rgb), 0.1); }
+
+/* --------------------------------------------------------------------------
+  GOAL CREATION
+-------------------------------------------------------------------------- */
+.goal-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2.4rem;
+}
+
+.goal-type-card {
+  padding: 2rem 2.4rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease-out;
+
+  i {
+    display: inline-block;
+    padding: 1.4rem;
+    background: rgba(var(--primary-rgb), 0.1);
+    border-radius: 50%;
+    font-size: 2.8rem; color: var(--primary);
+  }
+  h3 { font-size: 2rem; font-weight: 600; margin: 1.8rem 0 1rem; }
+  p { font-size: 1.5rem; color: var(--text-light); line-height: 1.4; }
+
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(var(--primary-rgb), 0.4);
+    transform: translateY(-3px);
+  }
+}
 
 /* --------------------------------------------------------------------------
   SETTING

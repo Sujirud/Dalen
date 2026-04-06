@@ -1,0 +1,117 @@
+{% extends base_template %}
+{% block content %}
+
+{% if not type %}
+<div class="mb-3">
+  <h1>Create New Goal</h1>
+  <p>Choose the type of financial goal you want to create.</p>
+</div>
+
+<div class="goal-type-grid">
+  <a class="no-underline goal-type-card glass-panel" href="{% url 'add_goal_by_type' type='saving' %}" hx-get="{% url 'add_goal_by_type' type='saving' %}" hx-target="#main-content" hx-push-url="true">
+    <i class="ph-bold ph-piggy-bank"></i>
+    <h3>Saving Goal</h3>
+    <p>Set a target amount and deadline to save up for something special. Track your funding progress.</p>
+  </a>
+</div>
+
+{% elif type == "saving" %}
+<div class="flex items-center gap-2 mb-3">
+  <button class="icon-btn text-20" hx-get="{% url 'add_goal' %}" hx-target="#main-content" hx-push-url="true" title="Back to Goal Types">
+    <i class="ph-bold ph-arrow-left"></i>
+  </button>
+  <h1>New Saving Goal</h1>
+</div>
+
+<p class="text-light mb-3">Set a target amount and a firm deadline. We'll help you track your progress over time to ensure you reach your goal.</p>
+
+<div class="card surface-panel" id="newGoal-{{ type }}">
+  <form method="post" class="styled-form" action="{% url 'add_goal' %}" hx-post="{% url 'add_goal' %}" hx-target="#main-content">
+    {% csrf_token %}
+    <div class="flex gap-2">
+      <div class="form-field flex-none">
+        <label>
+          <span>Goal Icon</span>
+          <button type="button" id="newGoalIconBtn" class="icon-picker-trigger">
+            <i class="ph ph-{{ icon_choices.0.0 }}" style="color: #206BFF;"></i>
+          </button>
+        </label>
+
+        <dl-popover anchor-id="newGoalIconBtn" placement="bottom-start" class="icon-popover">
+          <div class="mb-1">
+            <span class="label">Icon Color</span>
+            <hex-color-picker id="newGoalColorPicker" name="goal_icon_color" value="#206BFF"></hex-color-picker>
+          </div>
+          <div>
+            <span class="label">Icon</span>
+            <div class="icon-picker-grid">
+              {% for icon_val, icon_label in icon_choices %}
+                <input type="radio" name="goal_icon" id="new_icon_{{ icon_val }}" value="{{ icon_val }}" class="visually-hidden icon-picker-radio" {% if forloop.first %}checked{% endif %}>
+                <label for="new_icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}"><i class="ph ph-{{ icon_val }}"></i></label>
+              {% endfor %}
+            </div>
+          </div>
+        </dl-popover>
+      </div>
+
+      <div class="form-field">
+        <label>
+          <span>Goal Name</span>
+          <div class="input-wrapper">
+            <i class="ph ph-pen input-icon"></i>
+            <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" autocomplete="off" required>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label>
+          <span>Target Amount</span>
+          <div class="input-wrapper">
+            <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
+            <input type="number" min="1" max="1000000000000" name="goal_amount" placeholder="0.00" required>
+          </div>
+        </label>
+      </div>
+      <div class="form-field">
+        <label>
+          <span>Deadline</span>
+          <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-fill btn-primary">Create Goal</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<script>
+  (function() {
+    const container = document.getElementById("newGoal-{{ type }}");
+    if (!container) return;
+
+    const currentIcon = container.querySelector(".icon-picker-trigger i");
+    const colorPicker = container.querySelector("hex-color-picker");
+    const radios = container.querySelectorAll(".icon-picker-radio");
+
+    if (currentIcon && colorPicker) {
+      radios.forEach(radio => {
+        radio.addEventListener("change", (e) => {
+          currentIcon.className = `ph ph-${e.target.value}`;
+          currentIcon.style.color = colorPicker.value;
+        });
+      });
+
+      colorPicker.addEventListener("color-changed", (e) => {
+        currentIcon.style.color = e.target.value;
+      });
+    }
+  })();
+</script>
+
+{% endblock %}

@@ -9,7 +9,9 @@
         <i class="ph-bold ph-flag-banner text-primary"></i><span>Savings Goals</span>
       </h2>
 
-      <button id="newGoalBtn" class="text-primary text-14 font-medium" onclick="openModal('newGoalModal')">
+      <button class="text-primary text-14 font-medium"
+        hx-get="{% url 'add_goal' %}" hx-target="#main-content" hx-push-url="true"
+      >
         <i class="ph-bold ph-plus"></i><span>New Goal</span>
       </button>
     </div>
@@ -155,77 +157,6 @@
     {% endif %}
   </div>
 </div>
-
-<dialog id="newGoalModal">
-  <div class="modal-card surface-panel">
-    <div class="modal-header">
-      <h3>New Savings Goal</h3>
-      <button type="button" class="modal-close" onclick="closeModal('newGoalModal')">
-        <i class="ph-bold ph-x"></i>
-      </button>
-    </div>
-
-    <form method="post" class="styled-form" action="{% url 'add_goal' %}" hx-post="{% url 'add_goal' %}" hx-target="#main-content">
-      {% csrf_token %}
-      <div class="flex gap-2">
-        <div class="form-field flex-none">
-          <label>
-            <span>Goal Icon</span>
-            <button type="button" id="newGoalIconBtn" class="icon-picker-trigger">
-              <i class="ph ph-{{ icon_choices.0.0 }}" style="color: #206BFF;"></i>
-            </button>
-          </label>
-          <dl-popover anchor-id="newGoalIconBtn" placement="bottom-start" class="icon-popover">
-            <div class="mb-1">
-              <span class="label">Icon Color</span>
-              <hex-color-picker id="newGoalColorPicker" name="goal_icon_color" value="#206BFF"></hex-color-picker>
-            </div>
-            <div>
-              <span class="label">Icon</span>
-              <div class="icon-picker-grid">
-                {% for icon_val, icon_label in icon_choices %}
-                  <input type="radio" name="goal_icon" id="new_icon_{{ icon_val }}" value="{{ icon_val }}" class="visually-hidden icon-picker-radio" {% if forloop.first %}checked{% endif %}>
-                  <label for="new_icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}"><i class="ph ph-{{ icon_val }}"></i></label>
-                {% endfor %}
-              </div>
-            </div>
-          </dl-popover>
-        </div>
-        <div class="form-field">
-          <label>
-            <span>Goal Name</span>
-            <div class="input-wrapper">
-              <i class="ph ph-pen input-icon"></i>
-              <input type="text" name="goal_name" placeholder="e.g. Europe Trip" maxlength="50" autocomplete="off" required>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-field">
-          <label>
-            <span>Target Amount</span>
-            <div class="input-wrapper">
-              <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
-              <input type="number" min="1" max="1000000000000" name="goal_amount" placeholder="0.00" required>
-            </div>
-          </label>
-        </div>
-        <div class="form-field">
-          <label>
-            <span>Deadline</span>
-            <input type="date" name="deadline" min="{{ min_date|date:'Y-m-d' }}" required>
-          </label>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn btn-outline" onclick="closeModal('newGoalModal')">Cancel</button>
-        <button type="submit" class="btn btn-fill btn-primary">Create Plan</button>
-      </div>
-    </form>
-  </div>
-</dialog>
 
 {% for goal in active_goals %}
 <dialog id="editGoalModal-{{ goal.id }}">
@@ -423,7 +354,6 @@
 </script>
 
 <script>
-  // Icon and Color Picker Initialization for Multiple Modals
   (function() {
     function setupIconPicker(containerId) {
       const container = document.getElementById(containerId);
@@ -447,10 +377,6 @@
       }
     }
 
-    // Initialize New Goal form
-    setupIconPicker("newGoalModal");
-
-    // Initialize all dynamic Edit Goal forms
     {% for goal in active_goals %}
       setupIconPicker("editGoalModal-{{ goal.id }}");
     {% endfor %}
