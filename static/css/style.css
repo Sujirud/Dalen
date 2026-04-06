@@ -647,7 +647,7 @@ dl-popover::part(container) {
 
   .bg-icon {
     position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-    font-size: 20rem; color: var(--hover-light); opacity: 0.5;
+    font-size: 14rem; color: var(--hover-light); opacity: 0.5;
     pointer-events: none; transition: all 0.7s;
   }
 
@@ -687,7 +687,7 @@ dl-popover::part(container) {
 
 .pill {
   width: min-content; height: min-content;
-  padding: 0.4rem 1.2rem;
+  padding: 0.3rem 0.8rem;
   border-radius: 9999px;
   font-size: 1.2rem; font-weight: 700; white-space: nowrap;
 }

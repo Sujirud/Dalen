@@ -336,7 +336,7 @@ def planning(request):
     user = request.user
     today = _get_today(user)
 
-    current_goal = Goal.objects.filter(user=user, is_active=True).first()
+    active_goals = Goal.objects.filter(user=user, is_active=True).order_by('deadline')
     completed_goals = Goal.objects.filter(user=user, is_active=False).order_by('-deadline')
     recurring_items = RecurringItem.objects.filter(user=user).order_by('start_date')
 
@@ -346,7 +346,7 @@ def planning(request):
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
         'page_title': 'Planning | Dalen',
         'today': today,
-        'current_goal': current_goal,
+        'active_goals': active_goals,
         'completed_goals': completed_goals,
         'recurring_items': recurring_items, 
         'min_date': min_date,
@@ -359,15 +359,11 @@ def planning(request):
 @login_required
 @require_POST
 def add_goal(request):
-    if Goal.objects.filter(user=request.user, is_active=True).exists():
-        messages.error(request, "You already have an active financial plan.")
-        return redirect('planning')
-
     try:
         goal_name = request.POST.get('goal_name')
         goal_icon = request.POST.get('goal_icon')
         goal_icon_color = request.POST.get('goal_icon_color')
-        target_amount = Decimal(request.POST.get('goal_amount', 0))
+        target_amount = Decimal(request.POST.get('goal_amount'))
         deadline_str = request.POST.get('deadline')
         deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
 
@@ -380,6 +376,7 @@ def add_goal(request):
             deadline=deadline
         )
         messages.success(request, "New goal created!")
+
     except (ValueError, InvalidOperation):
         messages.error(request, "Invalid input. Please check your numbers and date.")
 
@@ -390,10 +387,11 @@ def add_goal(request):
 @require_POST
 def edit_goal(request):
     try:
-        current_goal = Goal.objects.filter(user=request.user, is_active=True).first()
+        goal_id = request.POST.get('goal_id')
+        goal = Goal.objects.get(id=goal_id, user=request.user, is_active=True)
 
-        if not current_goal:
-            messages.error(request, "No active plan found to edit.")
+        if not goal:
+            messages.error(request, "Goal not found or cannot be edited.")
             return redirect('planning')
 
         goal_name = request.POST.get('goal_name')
@@ -403,14 +401,15 @@ def edit_goal(request):
         deadline_str = request.POST.get('deadline')
         deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
 
-        current_goal.name = goal_name
-        current_goal.icon = goal_icon
-        current_goal.icon_color = goal_icon_color
-        current_goal.target_amount = target_amount
-        current_goal.deadline = deadline
-        current_goal.save(update_fields=['name', 'icon', 'icon_color', 'target_amount', 'deadline'])
+        goal.name = goal_name
+        goal.icon = goal_icon
+        goal.icon_color = goal_icon_color
+        goal.target_amount = target_amount
+        goal.deadline = deadline
+        goal.save(update_fields=['name', 'icon', 'icon_color', 'target_amount', 'deadline'])
 
         messages.success(request, "Goal updated successfully.")
+
     except (ValueError, InvalidOperation):
         messages.error(request, "Invalid input. Please check your numbers and date.")
 
@@ -418,9 +417,19 @@ def edit_goal(request):
 
 
 @login_required
+@require_POST
 def delete_goal(request):
-    if request.method == 'POST':
-        Goal.objects.filter(user=request.user, is_active=True).delete()
+    goal_id = request.POST.get('goal_id')
+
+    if goal_id:
+        deleted_count, _ = Goal.objects.filter(id=goal_id, user=request.user).delete()
+        if deleted_count > 0:
+            messages.success(request, "Goal deleted successfully.")
+        else:
+            messages.error(request, "Goal could not be found.")
+    else:
+        messages.error(request, "No goal selected for deletion.")
+
     return redirect('planning')
 
 
