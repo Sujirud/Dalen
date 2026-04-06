@@ -17,7 +17,7 @@
     <div class="flex-col gap-2">
       {% if active_goals %}
         {% for goal in active_goals %}
-        <div class="current-goal-card glass-panel">
+        <div class="current-goal-card glass-panel waterfall-planning-goal" data-target="{{ goal.target_amount }}">
           <div class="flex justify-between items-start gap-1 mb-1">
             <div class="flex items-center gap-1">
               <div class="goal-icon">
@@ -51,13 +51,13 @@
             </dl-popover>
           </div>
 
-          <div class="flex justify-between mb-1 text-14">
-            <span>Target Amount</span>
+          <div class="flex justify-between text-14 font-medium">
+            <span class="dynamic-saved"></span>
             <span class="text-light">{{ user.userprofile.currency_symbol }}{{ goal.target_amount }}</span>
           </div>
 
-          <div class="progress-track" style="height: 0.6rem;">
-            <div class="progress-fill" style="width: 0%;"></div>
+          <div class="progress-track" style="height: 0.6rem; margin-top: 0.6rem;">
+            <div class="progress-fill dynamic-progress-fill" style="width: 0%;"></div>
           </div>
         </div>
         {% endfor %}
@@ -454,6 +454,25 @@
     {% for goal in active_goals %}
       setupIconPicker("editGoalModal-{{ goal.id }}");
     {% endfor %}
+  })();
+</script>
+
+<script>
+  (function() {
+    let netWorth = parseFloat("{{ net_worth }}".replace(/,/g, '')) || 0;
+
+    document.querySelectorAll('.waterfall-planning-goal').forEach(card => {
+      const target = parseFloat(card.getAttribute('data-target')) || 1;
+
+      let allocated = Math.min(Math.max(0, netWorth), target);
+      let allocatedStr = allocated.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      let goalPercent = Math.floor((allocated / target) * 100);
+
+      card.querySelector('.dynamic-saved').innerText = "{{ user.userprofile.currency_symbol }}" + allocatedStr + " saved";
+      card.querySelector('.dynamic-progress-fill').style.width = goalPercent + "%";
+
+      netWorth -= target;
+    });
   })();
 </script>
 {% endblock %}

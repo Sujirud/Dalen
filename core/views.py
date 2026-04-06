@@ -350,7 +350,8 @@ def planning(request):
         'completed_goals': completed_goals,
         'recurring_items': recurring_items, 
         'min_date': min_date,
-        'icon_choices': ICON_CHOICES
+        'icon_choices': ICON_CHOICES,
+        'net_worth': FinancialGPS(user).get_status().get('net_worth', 0)
     }
 
     return render(request, 'core/planning.html', context)
