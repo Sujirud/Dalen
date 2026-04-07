@@ -3,13 +3,13 @@ from decimal import Decimal
 from django.db.models import Sum
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
-from .models import Goal, Transaction, RecurringItem
+from .models import SavingGoal, Transaction, RecurringItem
 import zoneinfo
 
 class FinancialGPS:
     def __init__(self, user):
         self.user = user
-        self.goals = list(Goal.objects.filter(user=user, is_active=True).order_by('deadline'))
+        self.goals = list(SavingGoal.objects.filter(user=user, is_active=True).order_by('deadline'))
         self.recurring_items = list(RecurringItem.objects.filter(user=user))
 
         user_tz = zoneinfo.ZoneInfo(self.user.userprofile.timezone)

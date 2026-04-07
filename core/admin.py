@@ -1,12 +1,12 @@
 from django.contrib import admin
-from .models import Goal, Transaction, RecurringItem, Category
+from .models import SavingGoal, Transaction, RecurringItem, Category
 
 @admin.register(RecurringItem)
 class RecurringItemAdmin(admin.ModelAdmin):
     list_display = ('user', 'name', 'amount', 'frequency_type', 'start_date', 'interval_days', 'end_date')
     list_filter = ('frequency_type', 'user')
 
-@admin.register(Goal)
+@admin.register(SavingGoal)
 class GoalAdmin(admin.ModelAdmin):
     list_display = ('user', 'name', 'target_amount', 'created_at', 'deadline', 'is_active')
 

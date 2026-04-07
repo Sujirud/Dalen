@@ -30,14 +30,19 @@ class RecurringItem(models.Model):
     def __str__(self):
         return f"{self.name} ({self.get_frequency_type_display()})"
 
-class Goal(models.Model):
+class BaseObjective(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
+class SavingGoal(BaseObjective):
     name = models.CharField(max_length=100)
     icon = models.CharField(max_length=50)
     icon_color = models.CharField(max_length=7)
     target_amount = models.DecimalField(max_digits=19, decimal_places=2)
     deadline = models.DateField()
-    created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

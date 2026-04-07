@@ -16,7 +16,7 @@ from django.utils import timezone as django_timezone
 from django.views.decorators.http import require_POST
 
 from .constants import CURRENCIES, ICON_CHOICES
-from .models import Category, Goal, RecurringItem, Transaction, UserProfile
+from .models import Category, SavingGoal, RecurringItem, Transaction, UserProfile
 from .services import FinancialGPS
 
 # ==========================================
@@ -336,8 +336,8 @@ def planning(request):
     user = request.user
     today = _get_today(user)
 
-    active_goals = Goal.objects.filter(user=user, is_active=True).order_by('deadline')
-    completed_goals = Goal.objects.filter(user=user, is_active=False).order_by('-deadline')
+    active_goals = SavingGoal.objects.filter(user=user, is_active=True).order_by('deadline')
+    completed_goals = SavingGoal.objects.filter(user=user, is_active=False).order_by('-deadline')
     recurring_items = RecurringItem.objects.filter(user=user).order_by('start_date')
 
     min_date = today + timedelta(days=1)
@@ -368,7 +368,7 @@ def add_goal(request, type=None):
             deadline_str = request.POST.get('deadline')
             deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
 
-            Goal.objects.create(
+            SavingGoal.objects.create(
                 user=request.user,
                 name=goal_name,
                 icon=goal_icon,
@@ -400,7 +400,7 @@ def add_goal(request, type=None):
 def edit_goal(request):
     try:
         goal_id = request.POST.get('goal_id')
-        goal = Goal.objects.get(id=goal_id, user=request.user, is_active=True)
+        goal = SavingGoal.objects.get(id=goal_id, user=request.user, is_active=True)
 
         if not goal:
             messages.error(request, "Goal not found or cannot be edited.")
@@ -434,7 +434,7 @@ def delete_goal(request):
     goal_id = request.POST.get('goal_id')
 
     if goal_id:
-        deleted_count, _ = Goal.objects.filter(id=goal_id, user=request.user).delete()
+        deleted_count, _ = SavingGoal.objects.filter(id=goal_id, user=request.user).delete()
         if deleted_count > 0:
             messages.success(request, "Goal deleted successfully.")
         else:
