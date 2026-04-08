@@ -3,10 +3,11 @@
 <h1 class="mb-3">My Financial Plan</h1>
 
 <div class="grid-2">
+  {# Goals #}
   <div>
     <div class="flex justify-between items-center flex-wrap gap-1 mb-2">
-      <h2 class="text-20">
-        <i class="ph-bold ph-flag-banner text-primary"></i><span>Savings Goals</span>
+      <h2 class="text-24">
+        <i class="ph-bold ph-flag-banner text-primary"></i><span>Goals</span>
       </h2>
 
       <button class="text-primary text-14 font-medium"
@@ -16,15 +17,16 @@
       </button>
     </div>
 
-    <div class="flex-col gap-2">
-      {% if active_goals %}
-        {% for goal in active_goals %}
+    <div class="flex-col gap-1">
+      {% if active_saving_goals or completed_saving_goals %}
+        <h4 class="goal-section-title">Saving Goals</h4>
+      {% endif %}
+
+      {% for goal in active_saving_goals %}
         <div class="current-goal-card glass-panel waterfall-planning-goal" data-target="{{ goal.target_amount }}">
           <div class="flex justify-between items-start gap-1 mb-1">
             <div class="flex items-center gap-1">
-              <div class="goal-icon">
-                <i class="ph ph-{{ goal.icon }}" style="color: {{ goal.icon_color }};"></i>
-              </div>
+              <i class="icon-badge ph ph-{{ goal.icon }}" style="color: {{ goal.icon_color }};"></i>
               <div>
                 <div class="flex items-center gap-1">
                   <h3>{{ goal.name }}</h3>
@@ -45,6 +47,7 @@
 
               <form method="post" action="{% url 'delete_goal' %}" hx-post="{% url 'delete_goal' %}" hx-target="#main-content" hx-confirm="Delete {{ goal.name }}?">
                 {% csrf_token %}
+                <input type="hidden" name="goal_type" value="saving_goal">
                 <input type="hidden" name="goal_id" value="{{ goal.id }}">
                 <button type="submit" class="btn btn-danger" title="Delete Goal">
                   <i class="ph-bold ph-trash-simple"></i><span>Delete</span>
@@ -53,26 +56,15 @@
             </dl-popover>
           </div>
 
-          <div class="flex justify-between text-14 font-medium">
-            <span class="dynamic-saved"></span>
-            <span class="text-light">{{ user.userprofile.currency_symbol }}{{ goal.target_amount }}</span>
-          </div>
-
-          <div class="progress-track" style="height: 0.6rem; margin-top: 0.6rem;">
-            <div class="progress-fill dynamic-progress-fill" style="width: 0%;"></div>
-          </div>
+          <span class="text-14 font-medium text-light">Amount: {{ user.userprofile.currency_symbol }}{{ goal.target_amount }}</span>
         </div>
-        {% endfor %}
-      {% endif %}
+      {% endfor %}
 
-      {% if completed_goals %}
-        {% for goal in completed_goals %}
+      {% for goal in completed_saving_goals %}
         <div class="completed-goal-card glass-panel">
           <div class="flex justify-between items-center">
-            <div class="flex items-center gap-2">
-              <div class="goal-icon">
-                <i class="ph ph-{{ goal.icon }}" style="color: {{ goal.icon_color }};"></i>
-              </div>
+            <div class="flex items-center gap-1">
+              <i class="icon-badge ph ph-{{ goal.icon }}" style="color: {{ goal.icon_color }};"></i>
               <div>
                 <h3>{{ goal.name }}</h3>
                 <p class="text-12 text-light">Ended: {{ goal.deadline|date:'M d, Y' }}</p>
@@ -81,21 +73,56 @@
             <i class="ph-fill ph-check-circle text-success text-20"></i>
           </div>
         </div>
-        {% endfor %}
+      {% endfor %}
+
+      {% if category_limits_goals %}
+        <h4 class="goal-section-title">Category Limits</h4>
       {% endif %}
 
-      {% if not active_goals and not completed_goals %}
-      <div class="empty-card">
-        <p>No financial plan set.</p>
-        <small>You don't have any active or completed savings goals yet. Click "New Goal" above to create your first plan and get started.</small>
-      </div>
+      {% for limit in category_limits_goals %}
+        <div class="category-limit-card glass-panel">
+          <div class="flex justify-between items-start gap-1 mb-1">
+            <div class="flex items-center gap-1">
+              <i class="icon-badge ph ph-{{ limit.category.icon }}" style="color: {{ limit.category.icon_color }};"></i>
+              <h3>{{ limit.category.name }}</h3>
+            </div>
+
+            <button id="limitActionsBtn-{{ limit.id }}" class="icon-btn">
+              <i class="ph-fill ph-dots-three-outline-vertical"></i>
+            </button>
+
+            <dl-popover anchor-id="limitActionsBtn-{{ limit.id }}" placement="bottom-end" class="actions-popover">
+              <button class="btn" onclick="openModal('editLimitModal-{{ limit.id }}')" title="Edit Limit">
+                <i class="ph-bold ph-pen"></i><span>Edit</span>
+              </button>
+              <form method="post" action="{% url 'delete_goal' %}" hx-post="{% url 'delete_goal' %}" hx-target="#main-content" hx-confirm="Remove spending limit for {{ limit.category.name }}?">
+                {% csrf_token %}
+                <input type="hidden" name="goal_type" value="category_limit">
+                <input type="hidden" name="goal_id" value="{{ limit.id }}">
+                <button type="submit" class="btn btn-danger" title="Delete Limit">
+                  <i class="ph-bold ph-trash-simple"></i><span>Delete</span>
+                </button>
+              </form>
+            </dl-popover>
+          </div>
+
+          <p class="text-14 text-light">Monthly cap: {{ user.userprofile.currency_symbol }}{{ limit.limit_amount }}</p>
+        </div>
+      {% endfor %}
+
+      {% if not active_saving_goals and not completed_saving_goals and not category_limits_goals %}
+        <div class="empty-card">
+          <p>No financial plan set.</p>
+          <small>You don't have any active or completed savings goals yet. Click "New Goal" above to create your first plan and get started.</small>
+        </div>
       {% endif %}
     </div>
   </div>
 
+  {# Recurring Items #}
   <div>
     <div class="flex justify-between items-center gap-1 flex-wrap mb-2">
-      <h2 class="text-20">
+      <h2 class="text-24">
         <i class="ph-bold ph-repeat text-primary"></i><span>Recurring Bills & Income</span>
       </h2>
 
@@ -158,11 +185,11 @@
   </div>
 </div>
 
-{% for goal in active_goals %}
+{% for goal in active_saving_goals %}
 <dialog id="editGoalModal-{{ goal.id }}">
   <div class="modal-card surface-panel">
     <div class="modal-header">
-      <h3>Edit {{ goal.name }}</h3>
+      <h3>Edit Saving Goal - {{ goal.name }}</h3>
       <button type="button" class="modal-close" onclick="closeModal('editGoalModal-{{ goal.id }}')">
         <i class="ph-bold ph-x"></i>
       </button>
@@ -170,6 +197,7 @@
 
     <form method="post" class="styled-form" action="{% url 'edit_goal' %}" hx-post="{% url 'edit_goal' %}" hx-target="#main-content">
       {% csrf_token %}
+      <input type="hidden" name="goal_type" value="saving_goal">
       <input type="hidden" name="goal_id" value="{{ goal.id }}">
 
       <div class="flex gap-2">
@@ -237,6 +265,40 @@
 
       <div class="form-actions">
         <button type="button" class="btn btn-outline" onclick="closeModal('editGoalModal-{{ goal.id }}')">Cancel</button>
+        <button type="submit" class="btn btn-fill btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+{% endfor %}
+
+{% for limit in category_limits_goals %}
+<dialog id="editLimitModal-{{ limit.id }}">
+  <div class="modal-card surface-panel">
+    <div class="modal-header">
+      <h3>Edit Limit - {{ limit.category.name }}</h3>
+      <button type="button" class="modal-close" onclick="closeModal('editLimitModal-{{ limit.id }}')">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    </div>
+
+    <form method="post" class="styled-form" action="{% url 'edit_goal' %}" hx-post="{% url 'edit_goal' %}" hx-target="#main-content">
+      {% csrf_token %}
+      <input type="hidden" name="goal_type" value="category_limit">
+      <input type="hidden" name="goal_id" value="{{ limit.id }}">
+
+      <div class="form-field">
+        <label>
+          <span>Monthly Limit</span>
+          <div class="input-wrapper">
+            <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
+            <input type="number" min="1" max="1000000000000" name="limit_amount" placeholder="0" required value="{{ limit.limit_amount }}">
+          </div>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal('editLimitModal-{{ limit.id }}')">Cancel</button>
         <button type="submit" class="btn btn-fill btn-primary">Save Changes</button>
       </div>
     </form>
@@ -377,28 +439,9 @@
       }
     }
 
-    {% for goal in active_goals %}
+    {% for goal in active_saving_goals %}
       setupIconPicker("editGoalModal-{{ goal.id }}");
     {% endfor %}
-  })();
-</script>
-
-<script>
-  (function() {
-    let netWorth = parseFloat("{{ net_worth }}".replace(/,/g, '')) || 0;
-
-    document.querySelectorAll('.waterfall-planning-goal').forEach(card => {
-      const target = parseFloat(card.getAttribute('data-target')) || 1;
-
-      let allocated = Math.min(Math.max(0, netWorth), target);
-      let allocatedStr = allocated.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-      let goalPercent = Math.floor((allocated / target) * 100);
-
-      card.querySelector('.dynamic-saved').innerText = "{{ user.userprofile.currency_symbol }}" + allocatedStr + " saved";
-      card.querySelector('.dynamic-progress-fill').style.width = goalPercent + "%";
-
-      netWorth -= target;
-    });
   })();
 </script>
 {% endblock %}

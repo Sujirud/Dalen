@@ -10,13 +10,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone as django_timezone
 from django.views.decorators.http import require_POST
 
 from .constants import CURRENCIES, ICON_CHOICES
-from .models import Category, SavingGoal, RecurringItem, Transaction, UserProfile
+from .models import Category, SavingGoal, CategoryLimit, RecurringItem, Transaction, UserProfile
 from .services import FinancialGPS
 
 # ==========================================
@@ -24,9 +25,43 @@ from .services import FinancialGPS
 # ==========================================
 
 def _get_today(user):
-    """Returns the current date in the user's configured timezone."""
+    """
+    Returns the current date in the user's configured timezone.
+    """
     user_tz = zoneinfo.ZoneInfo(user.userprofile.timezone)
     return django_timezone.now().astimezone(user_tz).date()
+
+
+def _get_category_limits_data(user, today):
+    """
+    Returns a list of dicts, one per CategoryLimit, with monthly spend totals calculated for the current calendar month.
+    """
+    limits = CategoryLimit.objects.filter(user=user).select_related('category')
+    result = []
+
+    for limit in limits:
+        monthly_spend = Transaction.objects.filter(
+            user=user,
+            category=limit.category,
+            date__year=today.year,
+            date__month=today.month,
+            amount__lt=0,
+        ).aggregate(total=Sum('amount'))
+
+        spent = abs(monthly_spend['total'] or Decimal('0'))
+        percent = min(int((spent / limit.limit_amount) * 100), 100) if limit.limit_amount else 0
+        remaining = limit.limit_amount - spent
+
+        result.append({
+            'id': limit.id,
+            'category': limit.category,
+            'limit_amount': limit.limit_amount,
+            'spent': spent,
+            'percent': percent,
+            'remaining': remaining,
+            'over_limit': spent > limit.limit_amount,
+        })
+    return result
 
 # ==========================================
 # AUTH & PUBLIC VIEWS
@@ -85,6 +120,8 @@ def dashboard(request):
     gps = FinancialGPS(request.user)
     data = gps.get_status()
 
+    category_limits_goals = _get_category_limits_data(request.user, today)
+
     chart_data = gps.get_chart_data(days=30)
     chart_data_json = json.dumps(chart_data) if chart_data else None
 
@@ -96,6 +133,7 @@ def dashboard(request):
         'today': today,
         'greeting': greeting,
         'data': data,
+        'category_limits_goals': category_limits_goals,
         'chart_data': chart_data_json,
         'recent_transactions': recent_transactions,
     }
@@ -336,8 +374,9 @@ def planning(request):
     user = request.user
     today = _get_today(user)
 
-    active_goals = SavingGoal.objects.filter(user=user, is_active=True).order_by('deadline')
-    completed_goals = SavingGoal.objects.filter(user=user, is_active=False).order_by('-deadline')
+    active_saving_goals = SavingGoal.objects.filter(user=user, is_active=True).order_by('deadline')
+    completed_saving_goals = SavingGoal.objects.filter(user=user, is_active=False).order_by('-deadline')
+    category_limits_goals = CategoryLimit.objects.filter(user=user).select_related('category')
     recurring_items = RecurringItem.objects.filter(user=user).order_by('start_date')
 
     min_date = today + timedelta(days=1)
@@ -346,12 +385,12 @@ def planning(request):
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
         'page_title': 'Planning | Dalen',
         'today': today,
-        'active_goals': active_goals,
-        'completed_goals': completed_goals,
-        'recurring_items': recurring_items, 
         'min_date': min_date,
         'icon_choices': ICON_CHOICES,
-        'net_worth': FinancialGPS(user).get_status().get('net_worth', 0)
+        'active_saving_goals': active_saving_goals,
+        'completed_saving_goals': completed_saving_goals,
+        'category_limits_goals': category_limits_goals,
+        'recurring_items': recurring_items,
     }
 
     return render(request, 'core/planning.html', context)
@@ -360,30 +399,61 @@ def planning(request):
 @login_required
 def add_goal(request, type=None):
     if request.method == 'POST':
-        try:
-            goal_name = request.POST.get('goal_name')
-            goal_icon = request.POST.get('goal_icon')
-            goal_icon_color = request.POST.get('goal_icon_color')
-            target_amount = Decimal(request.POST.get('goal_amount'))
-            deadline_str = request.POST.get('deadline')
-            deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+        goal_type = request.POST.get('goal_type')
 
-            SavingGoal.objects.create(
-                user=request.user,
-                name=goal_name,
-                icon=goal_icon,
-                icon_color=goal_icon_color,
-                target_amount=target_amount,
-                deadline=deadline
-            )
-            messages.success(request, "New goal created!")
+        if goal_type == 'saving_goal':
+            try:
+                goal_name = request.POST.get('goal_name')
+                goal_icon = request.POST.get('goal_icon')
+                goal_icon_color = request.POST.get('goal_icon_color')
+                target_amount = Decimal(request.POST.get('goal_amount'))
+                deadline_str = request.POST.get('deadline')
+                deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
 
-        except (ValueError, InvalidOperation):
-            messages.error(request, "Invalid input. Please check your numbers and date.")
+                SavingGoal.objects.create(
+                    user=request.user,
+                    name=goal_name,
+                    icon=goal_icon,
+                    icon_color=goal_icon_color,
+                    target_amount=target_amount,
+                    deadline=deadline
+                )
+                messages.success(request, "New goal created!")
+
+            except (ValueError, InvalidOperation):
+                messages.error(request, "Invalid input. Please check your numbers and date.")
+
+        elif goal_type == 'category_limit':
+            try:
+                category_id = request.POST.get('limit_category')
+                limit_amount = Decimal(request.POST.get('limit_amount', 0))
+
+                if limit_amount <= 0:
+                    messages.error(request, "Limit amount must be greater than zero.")
+                    return redirect('planning')
+
+                category = get_object_or_404(Category, id=category_id, user=request.user)
+
+                if CategoryLimit.objects.filter(user=request.user, category=category).exists():
+                    messages.error(request, f"A category limit for '{category.name}' already exists.")
+                    return redirect('planning')
+
+                CategoryLimit.objects.create(
+                    user=request.user,
+                    category=category,
+                    limit_amount=limit_amount,
+                )
+                messages.success(request, f"Category limit for '{category.name}' created.")
+
+            except (ValueError, InvalidOperation):
+                messages.error(request, "Invalid amount. Please enter a valid number.")
 
         return redirect('planning')
 
     min_date = _get_today(request.user) + timedelta(days=1)
+
+    limited_category_ids = CategoryLimit.objects.filter(user=request.user).values_list('category_id', flat=True)
+    available_categories = Category.objects.filter(user=request.user).exclude(id__in=limited_category_ids)
 
     context = {
         'base_template': 'core/base_partial.html' if request.htmx else 'core/base.html',
@@ -391,39 +461,59 @@ def add_goal(request, type=None):
         'min_date': min_date,
         'icon_choices': ICON_CHOICES,
         'type': type,
+        'available_categories': available_categories,
     }
+
     return render(request, 'core/add_goal.html', context)
 
 
 @login_required
 @require_POST
 def edit_goal(request):
-    try:
-        goal_id = request.POST.get('goal_id')
-        goal = SavingGoal.objects.get(id=goal_id, user=request.user, is_active=True)
+    goal_id = request.POST.get('goal_id')
+    goal_type = request.POST.get('goal_type')
 
-        if not goal:
-            messages.error(request, "Goal not found or cannot be edited.")
-            return redirect('planning')
+    if not goal_id:
+        messages.error(request, "No goal selected for editing.")
+        return redirect('planning')
 
-        goal_name = request.POST.get('goal_name')
-        goal_icon = request.POST.get('goal_icon')
-        goal_icon_color = request.POST.get('goal_icon_color')
-        target_amount = Decimal(request.POST.get('goal_amount', 0))
-        deadline_str = request.POST.get('deadline')
-        deadline = datetime.strptime(deadline_str, '%Y-%m-%d').date()
+    if goal_type == 'saving_goal':
+        try:
+            goal = get_object_or_404(SavingGoal, id=goal_id, user=request.user)
 
-        goal.name = goal_name
-        goal.icon = goal_icon
-        goal.icon_color = goal_icon_color
-        goal.target_amount = target_amount
-        goal.deadline = deadline
-        goal.save(update_fields=['name', 'icon', 'icon_color', 'target_amount', 'deadline'])
+            goal_name = request.POST.get('goal_name')
+            goal_icon = request.POST.get('goal_icon')
+            goal_icon_color = request.POST.get('goal_icon_color')
+            target_amount = Decimal(request.POST.get('goal_amount', 0))
+            deadline = datetime.strptime(request.POST.get('deadline'), '%Y-%m-%d').date()
 
-        messages.success(request, "Goal updated successfully.")
+            goal.name = goal_name
+            goal.icon = goal_icon
+            goal.icon_color = goal_icon_color
+            goal.target_amount = target_amount
+            goal.deadline = deadline
+            goal.save(update_fields=['name', 'icon', 'icon_color', 'target_amount', 'deadline'])
 
-    except (ValueError, InvalidOperation):
-        messages.error(request, "Invalid input. Please check your numbers and date.")
+            messages.success(request, "Goal updated successfully.")
+
+        except (ValueError, InvalidOperation):
+            messages.error(request, "Invalid input. Please check your numbers and date.")
+
+    elif goal_type == 'category_limit':
+        try:
+            limit = get_object_or_404(CategoryLimit, id=goal_id, user=request.user)
+            new_amount = Decimal(request.POST.get('limit_amount', 0))
+
+            if new_amount <= 0:
+                messages.error(request, "Limit amount must be greater than zero.")
+                return redirect('planning')
+
+            limit.limit_amount = new_amount
+            limit.save(update_fields=['limit_amount'])
+            messages.success(request, f"Limit for '{limit.category.name}' updated.")
+
+        except (ValueError, InvalidOperation):
+            messages.error(request, "Invalid amount.")
 
     return redirect('planning')
 
@@ -432,15 +522,25 @@ def edit_goal(request):
 @require_POST
 def delete_goal(request):
     goal_id = request.POST.get('goal_id')
+    goal_type = request.POST.get('goal_type')
 
-    if goal_id:
+    if not goal_id:
+        messages.error(request, "No goal selected for deletion.")
+        return redirect('planning')
+
+    if goal_type == 'saving_goal':
         deleted_count, _ = SavingGoal.objects.filter(id=goal_id, user=request.user).delete()
         if deleted_count > 0:
-            messages.success(request, "Goal deleted successfully.")
+            messages.success(request, "Saving goal deleted successfully.")
         else:
-            messages.error(request, "Goal could not be found.")
-    else:
-        messages.error(request, "No goal selected for deletion.")
+            messages.error(request, "Saving goal could not be found.")
+
+    elif goal_type == 'category_limit':
+        deleted_count, _ = CategoryLimit.objects.filter(id=goal_id, user=request.user).delete()
+        if deleted_count > 0:
+            messages.success(request, "Category limit deleted successfully.")
+        else:
+            messages.error(request, "Category limit could not be found.")
 
     return redirect('planning')
 

@@ -8,10 +8,16 @@
 </div>
 
 <div class="goal-type-grid">
-  <a class="no-underline goal-type-card glass-panel" href="{% url 'add_goal_by_type' type='saving' %}" hx-get="{% url 'add_goal_by_type' type='saving' %}" hx-target="#main-content" hx-push-url="true">
+  <a class="goal-type-card glass-panel" href="{% url 'add_goal_by_type' type='saving' %}" hx-get="{% url 'add_goal_by_type' type='saving' %}" hx-target="#main-content" hx-push-url="true">
     <i class="ph-bold ph-piggy-bank"></i>
     <h3>Saving Goal</h3>
     <p>Set a target amount and deadline to save up for something special. Track your funding progress.</p>
+  </a>
+
+  <a class="goal-type-card glass-panel" href="{% url 'add_goal_by_type' type='limit' %}" hx-get="{% url 'add_goal_by_type' type='limit' %}" hx-target="#main-content" hx-push-url="true">
+    <i class="ph-bold ph-chart-bar"></i>
+    <h3>Category Limit</h3>
+    <p>Cap your monthly spending in a specific category. Get a live progress bar so you never overshoot.</p>
   </a>
 </div>
 
@@ -28,6 +34,8 @@
 <div class="card surface-panel" id="newGoal-{{ type }}">
   <form method="post" class="styled-form" action="{% url 'add_goal' %}" hx-post="{% url 'add_goal' %}" hx-target="#main-content">
     {% csrf_token %}
+    <input type="hidden" name="goal_type" value="saving_goal">
+
     <div class="flex gap-2">
       <div class="form-field flex-none">
         <label>
@@ -87,6 +95,58 @@
       <button type="submit" class="btn btn-fill btn-primary">Create Goal</button>
     </div>
   </form>
+</div>
+
+{% elif type == "limit" %}
+<div class="flex items-center gap-2 mb-3">
+  <button class="icon-btn text-20" hx-get="{% url 'add_goal' %}" hx-target="#main-content" hx-push-url="true" title="Back to Goal Types">
+    <i class="ph-bold ph-arrow-left"></i>
+  </button>
+  <h1>New Category Limit</h1>
+</div>
+
+<p class="text-light mb-3">Choose a category and set a monthly cap. Your dashboard will show a live progress bar as spending accumulates throughout the month.</p>
+
+<div class="card surface-panel">
+  {% if available_categories %}
+  <form method="post" class="styled-form" action="{% url 'add_goal' %}" hx-post="{% url 'add_goal' %}" hx-target="#main-content">
+    {% csrf_token %}
+    <input type="hidden" name="goal_type" value="category_limit">
+
+    <div class="form-row">
+      <div class="form-field">
+        <label>
+          <span>Category</span>
+          <select name="limit_category" required>
+            <option value="" disabled selected>Select a category…</option>
+            {% for cat in available_categories %}
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+
+      <div class="form-field">
+        <label>
+          <span>Monthly Limit</span>
+          <div class="input-wrapper">
+            <span class="input-icon">{{ user.userprofile.currency_symbol }}</span>
+            <input type="number" min="1" max="1000000000000" name="limit_amount" placeholder="0" required>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-fill btn-primary">Create Limit</button>
+    </div>
+  </form>
+  {% else %}
+  <div class="empty-card">
+    <p>All categories have a spending limit.</p>
+    <small>Every category already has a monthly spending limit assigned. Delete an existing limit from the Planning page to free up a category slot.</small>
+  </div>
+  {% endif %}
 </div>
 {% endif %}
 

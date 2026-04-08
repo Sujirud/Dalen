@@ -1,13 +1,13 @@
 {% extends base_template %}
 {% block content %}
-<div class="flex-col gap-3">
-  <div class="mb-1">
+<div class="flex-col gap-2">
+  <div class="mb-2">
     <h4 class="text-light">{{ today|date:"l, F d" }}</h4>
     <h1>{{ greeting }}, {{ user.username }}</h1>
   </div>
 
   {% if data %}
-  <div class="flex justify-center mb-1">
+  <div class="flex justify-center mb-2">
     <div class="ring-container">
       <svg class="ring-svg" viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" class="ring-track" />
@@ -63,7 +63,7 @@
       <div class="flex-col gap-1">
         <div class="flex justify-between">
           <div class="flex items-center gap-1">
-            <div class="goal-icon"><i class="ph ph-{{ goal.icon }}" style="color: {{ goal.icon_color }};"></i></div>
+            <i class="icon-badge ph ph-{{ goal.icon }}" style="color: {{ goal.icon_color }};"></i>
             <h3 class="text-30">{{ goal.name }}</h3>
           </div>
 
@@ -151,6 +151,66 @@
       });
     })();
   </script>
+
+  {% else %}
+  <div class="glass-panel dashboard-empty">
+    <i class="ph-fill ph-compass"></i>
+
+    <h2>Let's set a course.</h2>
+    <p>You don't have an active savings plan. Tell us your goal, and we'll calculate your daily safe-to-spend limit automatically.</p>
+
+    <a title="Create New Goal" class="btn btn-fill btn-primary btn-lg mt-2" href="{% url 'planning' %}" 
+      hx-get="{% url 'planning' %}" 
+      hx-target="#main-content" 
+      hx-swap="innerHTML" 
+      hx-push-url="true"
+    >
+      <i class="ph-fill ph-plus-circle"></i><span>Create New Goal</span>
+    </a>
+  </div>
+  {% endif %}
+
+  {% if category_limits_goals %}
+  <div class="flex justify-between items-center">
+    <h3>Monthly Category Limits</h3>
+    <a href="{% url 'planning' %}" class="text-primary text-14 no-underline font-medium"
+      hx-get="{% url 'planning' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
+    >
+      Manage
+    </a>
+  </div>
+
+  <div class="grid-2 gap-2 mb-2">
+    {% for limit in category_limits_goals %}
+    <div class="glass-panel category-limit-card">
+      <div class="flex items-center gap-1 mb-1">
+        <i class="icon-badge ph ph-{{ limit.category.icon }}" style="color: {{ limit.category.icon_color }};"></i>
+        <p class="font-medium">{{ limit.category.name }}</p>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" style="width: {{ limit.percent }}%;"></div>
+      </div>
+
+      <div class="flex justify-between text-12 text-light mt-1">
+        <span>
+          {{ user.userprofile.currency_symbol }}{{ limit.spent|floatformat:2 }} spent
+        </span>
+        <span>
+          {% if limit.over_limit %}
+            <span class="text-danger font-medium">
+              {{ user.userprofile.currency_symbol }}{{ limit.remaining|floatformat:2|slice:"1:" }} over limit
+            </span>
+          {% else %}
+            {{ user.userprofile.currency_symbol }}{{ limit.remaining|floatformat:2 }} remaining
+          {% endif %}
+          &nbsp;/&nbsp;{{ user.userprofile.currency_symbol }}{{ limit.limit_amount|floatformat:2 }}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
   {% if chart_data %}
   <div class="card glass-panel gap-1">
@@ -277,24 +337,6 @@
   </script>
   {% endif %}
 
-  {% else %}
-  <div class="glass-panel dashboard-empty">
-    <i class="ph-fill ph-compass"></i>
-
-    <h2>Let's set a course.</h2>
-    <p>You don't have an active savings plan. Tell us your goal, and we'll calculate your daily safe-to-spend limit automatically.</p>
-
-    <a title="Create New Goal" class="btn btn-fill btn-primary btn-lg mt-2" href="{% url 'planning' %}" 
-      hx-get="{% url 'planning' %}" 
-      hx-target="#main-content" 
-      hx-swap="innerHTML" 
-      hx-push-url="true"
-    >
-      <i class="ph-fill ph-plus-circle"></i><span>Create New Goal</span>
-    </a>
-  </div>
-  {% endif %}
-
   <div class="pd-1">
     <div class="flex justify-between items-center flex-wrap gap-1 mb-1">
       <h3>Recent Transactions</h3>
@@ -310,13 +352,12 @@
       {% for t in recent_transactions %}
       <div class="txn-item">
         <div class="flex items-center gap-1">
-          <div class="txn-icon">
-            {% if t.category %}
-              <i class="ph ph-{{ t.category.icon }}" style="color: {{ t.category.icon_color }};"></i>
-            {% else %}
-              <i class="ph-bold ph-minus"></i>
-            {% endif %}
-          </div>
+          {% if t.category %}
+            <i class="icon-badge ph ph-{{ t.category.icon }}" style="color: {{ t.category.icon_color }};"></i>
+          {% else %}
+            <i class="icon-badge ph-bold ph-minus"></i>
+          {% endif %}
+
           <div>
             <p class="font-medium">{{ t.description|default:"-" }}</p>
             <small class="text-light">

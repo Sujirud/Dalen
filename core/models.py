@@ -30,24 +30,6 @@ class RecurringItem(models.Model):
     def __str__(self):
         return f"{self.name} ({self.get_frequency_type_display()})"
 
-class BaseObjective(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        abstract = True
-
-class SavingGoal(BaseObjective):
-    name = models.CharField(max_length=100)
-    icon = models.CharField(max_length=50)
-    icon_color = models.CharField(max_length=7)
-    target_amount = models.DecimalField(max_digits=19, decimal_places=2)
-    deadline = models.DateField()
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
-
 class Category(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -70,6 +52,34 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.description} : {self.amount}"
+
+class BaseObjective(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
+class SavingGoal(BaseObjective):
+    name = models.CharField(max_length=100)
+    icon = models.CharField(max_length=50)
+    icon_color = models.CharField(max_length=7)
+    target_amount = models.DecimalField(max_digits=19, decimal_places=2)
+    deadline = models.DateField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+class CategoryLimit(BaseObjective):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category_limits',)
+    limit_amount = models.DecimalField(max_digits=19, decimal_places=2)
+
+    class Meta:
+        unique_together = ('user', 'category')
+
+    def __str__(self):
+        return f"{self.category.name} limit: {self.limit_amount}"
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
