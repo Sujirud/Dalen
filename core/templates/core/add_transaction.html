@@ -66,7 +66,7 @@
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-fill btn-primary btn-full">Record Transaction</button>
+      <button type="submit" class="btn btn-fill btn-primary w-full">Record Transaction</button>
     </div>
   </form>
 
@@ -87,11 +87,11 @@
     <div id="previewContainer" class="preview-grid mt-2 hidden"></div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-fill btn-primary btn-full">Analyze & Save</button>
+      <button type="submit" class="btn btn-fill btn-primary w-full">Analyze & Save</button>
     </div>
   </form>
 
-  <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm btn-full"
+  <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm"
     hx-get="{% url 'dashboard' %}" hx-target="#main-content" hx-swap="innerHTML" hx-push-url="true"
   >
     Cancel
@@ -118,7 +118,7 @@
         <form method="post" action="{% url 'delete_category' %}" hx-post="{% url 'delete_category' %}" hx-target="#main-content" hx-confirm="Are you sure? Existing transactions will become Uncategorized.">
           {% csrf_token %}
           <input type="hidden" name="category_id" value="{{ cat.id }}">
-          <button type="submit" class="icon-btn danger" title="Delete Category">
+          <button type="submit" class="btn-icon btn-danger" title="Delete Category">
             <i class="ph-bold ph-trash-simple"></i>
           </button>
         </form>

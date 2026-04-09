@@ -30,6 +30,7 @@ urlpatterns = [
     path('goal/add/<str:type>/', views.add_goal, name='add_goal_by_type'),
     path('goal/edit/', views.edit_goal, name='edit_goal'),
     path('goal/delete/', views.delete_goal, name='delete_goal'),
+    path('goal/complete/', views.complete_goal, name='complete_goal'),
 
     # Recurring Items
     path('recurring/add/', views.add_recurring, name='add_recurring'),

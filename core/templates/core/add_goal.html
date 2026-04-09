@@ -23,7 +23,7 @@
 
 {% elif type == "saving" %}
 <div class="flex items-center gap-2 mb-3">
-  <button class="icon-btn text-20" hx-get="{% url 'add_goal' %}" hx-target="#main-content" hx-push-url="true" title="Back to Goal Types">
+  <button class="btn-icon text-20" hx-get="{% url 'add_goal' %}" hx-target="#main-content" hx-push-url="true" title="Back to Goal Types">
     <i class="ph-bold ph-arrow-left"></i>
   </button>
   <h1>New Saving Goal</h1>
@@ -99,7 +99,7 @@
 
 {% elif type == "limit" %}
 <div class="flex items-center gap-2 mb-3">
-  <button class="icon-btn text-20" hx-get="{% url 'add_goal' %}" hx-target="#main-content" hx-push-url="true" title="Back to Goal Types">
+  <button class="btn-icon text-20" hx-get="{% url 'add_goal' %}" hx-target="#main-content" hx-push-url="true" title="Back to Goal Types">
     <i class="ph-bold ph-arrow-left"></i>
   </button>
   <h1>New Category Limit</h1>

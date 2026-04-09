@@ -547,6 +547,26 @@ def delete_goal(request):
 
 @login_required
 @require_POST
+def complete_goal(request):
+    goal_id = request.POST.get('goal_id')
+
+    if not goal_id:
+        messages.error(request, "No goal selected.")
+        return redirect('planning')
+
+    try:
+        goal = get_object_or_404(SavingGoal, id=goal_id, user=request.user)
+        goal.is_active = False
+        goal.save(update_fields=['is_active'])
+        messages.success(request, f"Saving goal '{goal.name}' marked as completed!")
+    except Exception:
+        messages.error(request, "An error occurred while trying to complete the goal.")
+
+    return redirect('planning')
+
+
+@login_required
+@require_POST
 def add_recurring(request):
     try:
         rec_name = request.POST.get('rec_name')

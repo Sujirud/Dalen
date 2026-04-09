@@ -36,20 +36,26 @@
               </div>
             </div>
 
-            <button id="goalActionsBtn-{{ goal.id }}" class="icon-btn">
+            <button id="goalActionsBtn-{{ goal.id }}" class="btn-icon">
               <i class="ph-fill ph-dots-three-outline-vertical"></i>
             </button>
 
             <dl-popover anchor-id="goalActionsBtn-{{ goal.id }}" placement="bottom-end" class="actions-popover">
-              <button class="btn" onclick="openModal('editGoalModal-{{ goal.id }}')" title="Edit Goal">
+              <form method="post" action="{% url 'complete_goal' %}" hx-post="{% url 'complete_goal' %}" hx-target="#main-content" hx-confirm="Mark {{ goal.name }} as completed?">
+                {% csrf_token %}
+                <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                <button type="submit" class="w-full btn btn-success" title="Mark as Completed">
+                  <i class="ph-bold ph-check-circle"></i><span>Complete</span>
+                </button>
+              </form>
+              <button class="w-full btn" onclick="openModal('editGoalModal-{{ goal.id }}')" title="Edit Goal">
                 <i class="ph-bold ph-pen"></i><span>Edit</span>
               </button>
-
               <form method="post" action="{% url 'delete_goal' %}" hx-post="{% url 'delete_goal' %}" hx-target="#main-content" hx-confirm="Delete {{ goal.name }}?">
                 {% csrf_token %}
                 <input type="hidden" name="goal_type" value="saving_goal">
                 <input type="hidden" name="goal_id" value="{{ goal.id }}">
-                <button type="submit" class="btn btn-danger" title="Delete Goal">
+                <button type="submit" class="w-full btn btn-danger" title="Delete Goal">
                   <i class="ph-bold ph-trash-simple"></i><span>Delete</span>
                 </button>
               </form>
@@ -87,7 +93,7 @@
               <h3>{{ limit.category.name }}</h3>
             </div>
 
-            <button id="limitActionsBtn-{{ limit.id }}" class="icon-btn">
+            <button id="limitActionsBtn-{{ limit.id }}" class="btn-icon">
               <i class="ph-fill ph-dots-three-outline-vertical"></i>
             </button>
 
@@ -167,7 +173,7 @@
             <form method="post" action="{% url 'delete_recurring' %}" hx-post="{% url 'delete_recurring' %}" hx-target="#main-content" hx-confirm="Delete {{ item.name }}? This will affect future budget calculations.">
               {% csrf_token %}
               <input type="hidden" name="item_id" value="{{ item.id }}">
-              <button type="submit" class="icon-btn danger" title="Delete Item">
+              <button type="submit" class="btn-icon btn-danger" title="Delete Item">
                 <i class="ph-bold ph-trash-simple"></i>
               </button>
             </form>
