@@ -177,42 +177,25 @@
   </script>
 
   <script>
-    // Initialize SlimSelect on Load
-    document.body.addEventListener('htmx:load', function(evt) {
-      const container = evt.detail.elt || evt.target;
-      if (!container || typeof container.querySelectorAll !== 'function') return;
+    const mainContent = document.getElementById("main-content");
 
-      const selects = Array.from(container.querySelectorAll('select'));
-      selects.forEach(select => {
+    // Initialize SlimSelect on Load
+    document.body.addEventListener('htmx:load', () => {
+      document.querySelectorAll('select').forEach(select => {
         if (select.slim) return;
 
         const enableSearch = select.dataset.search === 'true';
+        const contentLocation = select.closest('dialog') ? select.parentElement : mainContent;
         const placeholder = select.dataset.placeholder;
-
-        const isInDialog = select.closest('dialog') !== null;
 
         select.slim = new SlimSelect({
           select: select,
           settings: {
             showSearch: enableSearch,
-            ...(placeholder && { placeholderText: placeholder }),
-            ...(isInDialog && { contentLocation: select.parentElement })
+            contentLocation: contentLocation,
+            ...(placeholder && { placeholderText: placeholder })
           }
         });
-      });
-    });
-
-    // Cleanup SlimSelect before HTMX removes elements
-    document.body.addEventListener('htmx:beforeCleanupElement', function(evt) {
-      const container = evt.target;
-      if (!container || typeof container.querySelectorAll !== 'function') return;
-
-      const selects = Array.from(container.querySelectorAll('select'));
-      selects.forEach(select => {
-        if (select.slim) {
-          select.slim.destroy();
-          select.slim = null;
-        }
       });
     });
 
