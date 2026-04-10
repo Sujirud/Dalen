@@ -68,15 +68,32 @@
 
       {% for goal in completed_saving_goals %}
         <div class="completed-goal-card glass-panel">
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-start gap-1">
             <div class="flex items-center gap-1">
               <i class="icon-badge ph ph-{{ goal.icon }}" style="color: {{ goal.icon_color }};"></i>
               <div>
-                <h3>{{ goal.name }}</h3>
+                <div class="flex items-center gap-1">
+                  <h3>{{ goal.name }}</h3>
+                  <i class="ph-fill ph-check-circle text-success text-20"></i>
+                </div>
                 <p class="text-12 text-light">Ended: {{ goal.deadline|date:'M d, Y' }}</p>
               </div>
             </div>
-            <i class="ph-fill ph-check-circle text-success text-20"></i>
+
+            <button id="goalActionsBtn-{{ goal.id }}" class="btn-icon">
+              <i class="ph-fill ph-dots-three-outline-vertical"></i>
+            </button>
+
+            <dl-popover anchor-id="goalActionsBtn-{{ goal.id }}" placement="bottom-end" append-to="#main-content" class="actions-popover">
+              <form method="post" action="{% url 'delete_goal' %}" hx-post="{% url 'delete_goal' %}" hx-target="#main-content" hx-confirm="Delete {{ goal.name }}?">
+                {% csrf_token %}
+                <input type="hidden" name="goal_type" value="saving_goal">
+                <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                <button type="submit" class="w-full btn btn-danger" title="Delete Goal">
+                  <i class="ph-bold ph-trash-simple"></i><span>Delete</span>
+                </button>
+              </form>
+            </dl-popover>
           </div>
         </div>
       {% endfor %}
