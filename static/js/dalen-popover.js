@@ -10,17 +10,17 @@ class DlPopover extends HTMLElement {
           display: contents;
         }
         .popover-container {
+          box-sizing: border-box;
           position: absolute;
           top: 0;
           left: 0;
-          z-index: 9999;
-          box-sizing: border-box;
+          z-index: 99999;
           padding: 1rem;
           background: #ffffff;
           box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
           border: 1px solid #eeeeee;
           border-radius: 8px;
-          overflow: auto; 
+          overflow: auto;
           overscroll-behavior: none;
           opacity: 0;
           transform: scale(0.95);
@@ -58,6 +58,22 @@ class DlPopover extends HTMLElement {
   connectedCallback() {
     const anchorId = this.getAttribute('anchor-id');
     if (!anchorId) return;
+
+    const appendTo = this.getAttribute('append-to');
+    let contentLocation = null;
+
+    if (appendTo === 'none') contentLocation = null;
+    else if (appendTo) contentLocation = document.querySelector(appendTo);
+    else contentLocation = document.body;
+
+    if (contentLocation && this.parentNode !== contentLocation) {
+      setTimeout(() => {
+        contentLocation.appendChild(this);
+      }, 0);
+      return;
+    } else if (!contentLocation && appendTo && appendTo !== 'none') {
+      console.warn(`Append target "${appendTo}" not found. Popover will be rendered in place.`);
+    }
 
     requestAnimationFrame(() => {
       this._anchor = document.getElementById(anchorId);
@@ -133,6 +149,14 @@ class DlPopover extends HTMLElement {
 
     document.removeEventListener('mousedown', this._handleOutsideClick);
     document.removeEventListener('keydown', this._handleKeyDown);
+  }
+
+  destroy() {
+    this.close();
+    if (this._anchor) {
+      this._anchor.removeEventListener('click', this.toggle);
+    }
+    this.remove();
   }
 
   async updatePosition() {

@@ -40,7 +40,7 @@
               <i class="ph-fill ph-dots-three-outline-vertical"></i>
             </button>
 
-            <dl-popover anchor-id="goalActionsBtn-{{ goal.id }}" placement="bottom-end" class="actions-popover">
+            <dl-popover anchor-id="goalActionsBtn-{{ goal.id }}" placement="bottom-end" append-to="#main-content" class="actions-popover">
               <form method="post" action="{% url 'complete_goal' %}" hx-post="{% url 'complete_goal' %}" hx-target="#main-content" hx-confirm="Mark {{ goal.name }} as completed?">
                 {% csrf_token %}
                 <input type="hidden" name="goal_id" value="{{ goal.id }}">
@@ -97,7 +97,7 @@
               <i class="ph-fill ph-dots-three-outline-vertical"></i>
             </button>
 
-            <dl-popover anchor-id="limitActionsBtn-{{ limit.id }}" placement="bottom-end" class="actions-popover">
+            <dl-popover anchor-id="limitActionsBtn-{{ limit.id }}" placement="bottom-end" append-to="#main-content" class="actions-popover">
               <button class="btn" onclick="openModal('editLimitModal-{{ limit.id }}')" title="Edit Limit">
                 <i class="ph-bold ph-pen"></i><span>Edit</span>
               </button>
@@ -215,7 +215,7 @@
             </button>
           </label>
 
-          <dl-popover anchor-id="editGoalIconBtn-{{ goal.id }}" placement="bottom-start" class="icon-popover">
+          <dl-popover anchor-id="editGoalIconBtn-{{ goal.id }}" placement="bottom-start" append-to="none" class="icon-popover">
             <div class="mb-1">
               <span class="label">Icon Color</span>
               <hex-color-picker
