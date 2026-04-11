@@ -9,6 +9,7 @@
 
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
+  <script src="{% static 'js/snack-bar.js' %}"></script>
   <script type="module" src="{% static 'js/dalen-popover.js' %}"></script>
   <script src="{% static 'js/hex-color-picker.js' %}"></script>
 
@@ -133,7 +134,7 @@
       <main id="main-content">
         {% if messages %}
           {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
+            <snack-bar type="{{ message.tags }}">{{ message }}</snack-bar>
           {% endfor %}
         {% endif %}
 

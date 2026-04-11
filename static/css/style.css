@@ -282,15 +282,14 @@ body {
   padding: 1rem 1.6rem; margin: 0 1rem; border-radius: var(--radius-md);
   font-weight: 600; font-size: 1.6rem;
 }
-
-.alert-success { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
-.alert-error, .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
 .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.alert-success { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+.alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
 
-:where(.alert-success, .alert-error, .alert-danger, .alert-info)::before { font-family: "Phosphor-Fill"; font-size: 2rem; }
-.alert-success::before { content: "\e184"; }
-.alert-error::before , .alert-danger::before { content: "\e4e2"; }
+:where(.alert-info, .alert-success, .alert-error)::before { font-family: "Phosphor-Fill"; font-size: 2rem; }
 .alert-info::before { content: "\e2ce"; }
+.alert-success::before { content: "\e184"; }
+.alert-error::before { content: "\e4e2"; }
 
 .brand-wrapper {
   display: flex; align-items: center; gap: 1.2rem;
