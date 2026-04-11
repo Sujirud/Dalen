@@ -35,6 +35,7 @@
     document.addEventListener('htmx:afterSwap', function(evt) {
       if (evt.detail.target.id === 'main-content') {
         document.querySelector('.app-wrapper').scrollTo({ top: 0, behavior: 'instant' });
+        htmx.process(document.getElementById('main-content'));
       }
     });
   </script>
