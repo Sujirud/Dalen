@@ -941,47 +941,9 @@ dl-popover::part(container) {
 /* --------------------------------------------------------------------------
   ADD TRANSACTION
 -------------------------------------------------------------------------- */
-.tabs-container {
-  display: flex; gap: 0.5rem;
-  padding: 0.5rem;
-  background: var(--input-bg); box-shadow: var(--shadow-inner);
-  border-radius: 1.2rem;
-}
-
-.tab-label {
-  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.6rem; flex: 1;
-  padding: 1rem; border-radius: 0.8rem;
-  font-size: 1.6rem; font-weight: 600; color: var(--text-light); text-align: center;
-  cursor: pointer; transition: color 0.4s, background 0.4s;
-
-  &:hover { background: var(--hover-light); color: var(--text-main); }
-}
-@media (min-width: 55rem) {
-  .tab-label { flex-direction: row; }
-}
-
-.tab-content { display: none; animation: slideUp 0.3s ease-out; }
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-#tab_manual:checked ~ .content-manual { display: flex; }
-#tab_scan:checked ~ .content-scan { display: flex; }
-
-#tab_manual:checked ~ .tabs-container label[for="tab_manual"],
-#tab_scan:checked ~ .tabs-container label[for="tab_scan"] {
-  background: var(--glass-surface); color: var(--primary); box-shadow: var(--shadow-sm);
-}
-#tab_manual:focus-visible ~ .tabs-container label[for="tab_manual"],
-#tab_scan:focus-visible ~ .tabs-container label[for="tab_scan"] {
-  box-shadow: 0 0 0 1px var(--primary), 0 0 3px 4px rgba(var(--primary-rgb), 0.2);
-}
-
-/* ---- Manual tab ---- */
 .txn-amount-wrapper {
   display: flex; align-items: center; justify-content: center; gap: 1rem;
-  margin: 2rem;
+  margin: 2rem 2rem 3rem;
 
   input[type="number"] {
     min-width: 0; max-width: 30rem;
@@ -1027,50 +989,7 @@ dl-popover::part(container) {
   color: var(--success);
 }
 
-/* ---- Scan tab ---- */
-#upload-zone {
-  position: relative; border: 2px dashed var(--border-color);
-  border-radius: var(--radius-md); padding: 4rem 2rem;
-  text-align: center; background: rgba(255,255,255,0.05);
-  transition: all 0.3s; overflow: hidden; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; min-height: 20rem;
-}
-.file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-.zone-content { pointer-events: none; position: relative; z-index: 1; transition: transform 0.3s ease; }
-.upload-icon { display: block; margin-bottom: 1rem; font-size: 5rem; color: var(--text-light); transition: all 0.3s ease; }
-
-#upload-zone:hover, #upload-zone:focus-within {
-  border-color: var(--primary); background: rgba(var(--primary-rgb), 0.05);
-  transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(var(--primary-rgb), 0.15);
-}
-#upload-zone:hover .upload-icon { color: var(--primary); transform: scale(1.1); }
-#upload-zone.highlight {
-  border-color: var(--primary); background: rgba(var(--primary-rgb), 0.1); transform: scale(1.02);
-}
-
-.preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1.2rem; width: 100%; }
-.preview-item {
-  position: relative; background: var(--input-bg); border-radius: 1.2rem;
-  overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
-  aspect-ratio: 1; display: flex; flex-direction: column;
-}
-.preview-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.preview-info {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-  padding: 0.4rem 0.8rem; font-size: 1rem; color: white;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.deleteimg-btn {
-  position: absolute; top: 0.4rem; right: 0.4rem;
-  width: 2.4rem; height: 2.4rem; border-radius: 50%;
-  background: var(--danger); color: white; border: none;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s;
-}
-.deleteimg-btn:hover { transform: scale(1.1); }
-
-/* ---- Categories Management ---- */
+/* Categories Management */
 .categories-list {
   display: flex; flex-direction: column; gap: 0.5rem;
   max-height: 25rem;

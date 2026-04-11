@@ -1,21 +1,9 @@
 {% extends base_template %}
 {% block content %}
 <div class="glass-panel card pd-4">
-  <h2><i class="ph-bold ph-receipt"></i><span>Add Transaction</span></h2>
+  <h2 class="mb-2"><i class="ph-bold ph-receipt"></i><span>Add Transaction</span></h2>
 
-  <input type="radio" name="tab_control" class="visually-hidden" id="tab_manual" checked>
-  <input type="radio" name="tab_control" class="visually-hidden" id="tab_scan">
-
-  <div class="tabs-container mb-1">
-    <label for="tab_manual" class="tab-label">
-      <i class="ph-fill ph-keyboard"></i><span>Manual Entry</span>
-    </label>
-    <label for="tab_scan" class="tab-label">
-      <i class="ph-fill ph-camera"></i><span>Upload Receipt</span>
-    </label>
-  </div>
-
-  <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form tab-content flex-col gap-2 content-manual">
+  <form method="post" action="." hx-post="." hx-target="#main-content" class="styled-form">
     {% csrf_token %}
 
     <div class="txn-amount-wrapper">
@@ -67,27 +55,6 @@
 
     <div class="form-actions">
       <button type="submit" class="btn btn-fill btn-primary w-full">Record Transaction</button>
-    </div>
-  </form>
-
-  <form method="post" action="." hx-post="." hx-target="#main-content" hx-encoding="multipart/form-data" class="tab-content flex-col gap-2 content-scan" id="uploadForm">
-    {% csrf_token %}
-
-    <div id="upload-zone">
-      <input type="file" name="receipt_images" id="fileInput" class="file-input" accept="image/*" required multiple>
-
-      <div class="zone-content">
-        <i class="ph ph-upload-simple upload-icon"></i>
-        <h3>Upload Receipt Images</h3>
-        <p>Tap to select or drag files here.</p>
-        <small class="text-light">We'll extract the date and total automatically.</small>
-      </div>
-    </div>
-
-    <div id="previewContainer" class="preview-grid mt-2 hidden"></div>
-
-    <div class="form-actions">
-      <button type="submit" class="btn btn-fill btn-primary w-full">Analyze & Save</button>
     </div>
   </form>
 
@@ -202,97 +169,6 @@
     colorPicker.addEventListener("color-changed", (e) => {
       currentIcon.style.color = e.target.value;
     });
-  })();
-</script>
-
-<script>
-  (function() {
-    const fileInput = document.getElementById('fileInput');
-    const uploadZone = document.getElementById('upload-zone');
-    const previewContainer = document.getElementById('previewContainer');
-    const dt = new DataTransfer();
-
-    fileInput.addEventListener('change', function(e) {
-      for (let i = 0; i < this.files.length; i++) {
-        dt.items.add(this.files[i]);
-      }
-      this.files = dt.files; 
-      updateGallery();
-    });
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      uploadZone.addEventListener(eventName, preventDefaults, false);
-    });
-
-    function preventDefaults(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-      uploadZone.addEventListener(eventName, () => uploadZone.classList.add('highlight'), false);
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-      uploadZone.addEventListener(eventName, () => uploadZone.classList.remove('highlight'), false);
-    });
-
-    uploadZone.addEventListener('drop', handleDrop, false);
-
-    function handleDrop(e) {
-      const droppedFiles = e.dataTransfer.files;
-      for (let i = 0; i < droppedFiles.length; i++) {
-        dt.items.add(droppedFiles[i]);
-      }
-      fileInput.files = dt.files;
-      updateGallery();
-    }
-
-    function updateGallery() {
-      previewContainer.innerHTML = '';
-      
-      if (dt.files.length > 0) {
-        previewContainer.classList.remove('hidden');
-      } else {
-        previewContainer.classList.add('hidden');
-      }
-
-      Array.from(dt.files).forEach((file, index) => {
-        const item = document.createElement('div');
-        item.className = 'preview-item';
-
-        const img = document.createElement('img');
-        img.file = file;
-        img.className = 'preview-img';
-
-        const info = document.createElement('div');
-        info.className = 'preview-info';
-
-        const name = document.createElement('span');
-        name.textContent = file.name;
-
-        const delBtn = document.createElement('button');
-        delBtn.className = 'deleteimg-btn';
-        delBtn.innerHTML = '<i class="ph-bold ph-x"></i>';
-        delBtn.type = 'button';
-        delBtn.onclick = () => removeFile(index);
-
-        info.appendChild(name);
-        item.appendChild(img);
-        item.appendChild(info);
-        item.appendChild(delBtn);
-        previewContainer.appendChild(item);
-
-        const reader = new FileReader();
-        reader.onload = (e) => { img.src = e.target.result; };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    window.removeFile = function(index) {
-      dt.items.remove(index);
-      fileInput.files = dt.files;
-      updateGallery();
-    }
   })();
 </script>
 {% endblock %}

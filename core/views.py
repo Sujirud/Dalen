@@ -224,21 +224,6 @@ def add_transaction(request):
     today = _get_today(request.user)
 
     if request.method == 'POST':
-        # Handles receipt upload
-        images = request.FILES.getlist('receipt_images')
-        if images:
-            count = len(images)
-            total_cost = Decimal('100.00') * count * Decimal(-1)
-            Transaction.objects.create(
-                user=request.user,
-                amount=total_cost,
-                description=f"Scanned Receipt ({count} items)",
-                date=today
-            )
-            messages.success(request, f"Processed {count} receipts!")
-            return redirect('dashboard')
-
-        # Handles manual entry
         try:
             amount_val = request.POST.get('amount')
             trans_type = request.POST.get('type')
@@ -261,10 +246,11 @@ def add_transaction(request):
                     category=category
                 )
                 messages.success(request, "Transaction added.")
-                return redirect('add_transaction')
-        except Exception as e:
-            print(e)
+
+        except Exception:
             messages.error(request, "Error adding transaction.")
+
+        return redirect('add_transaction')
 
     categories = Category.objects.filter(user=request.user)
 
