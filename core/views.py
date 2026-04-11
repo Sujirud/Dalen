@@ -1,3 +1,4 @@
+import csv
 import json
 import zoneinfo
 from datetime import datetime, timedelta
@@ -11,6 +12,7 @@ from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone as django_timezone
@@ -329,6 +331,23 @@ def delete_transactions(request):
             messages.warning(request, "No transactions selected to delete.")
 
     return redirect('transactions')
+
+
+@login_required
+def export_transactions(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="transactions_{_get_today(request.user)}.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Date', 'Description', 'Category', 'Amount'])
+
+    txns = Transaction.objects.filter(user=request.user).select_related('category').order_by('-date', '-created_at')
+
+    for txn in txns:
+        category_name = txn.category.name if txn.category else 'Uncategorized'
+        writer.writerow([txn.date, txn.description, category_name, txn.amount])
+
+    return response
 
 
 @login_required
