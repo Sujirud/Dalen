@@ -64,7 +64,7 @@ ROOT_URLCONF = "Dalen.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'core' / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -114,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Bangkok"
 
 USE_I18N = True
 
@@ -125,6 +125,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # --- GPS APP CONFIGURATION ---
 # Auth Redirects
@@ -133,5 +134,4 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'landing'
 
 # Static & Templates config
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'core/templates')]
+STATICFILES_DIRS = [BASE_DIR / 'static']
