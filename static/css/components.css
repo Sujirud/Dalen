@@ -1,0 +1,274 @@
+/* --------------------------------------------------------------------------
+  CARDS & CONTAINERS
+-------------------------------------------------------------------------- */
+.surface-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--modal-border);
+  box-shadow: var(--shadow-md);
+}
+
+.glass-panel {
+  background: var(--glass-surface);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-md);
+}
+
+.card {
+  display: flex; flex-direction: column; gap: 2rem;
+  border-radius: var(--radius-md);
+  padding: 2.4rem;
+  overflow: hidden;
+}
+
+.auth-card {
+  display: flex; flex-direction: column; gap: 2rem;
+  width: 100%; max-width: 60rem;
+  border-radius: var(--radius-md);
+  padding: 4rem;
+  overflow: hidden;
+}
+
+.empty-card {
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  padding: 3rem 2rem;
+  background: var(--hover-light);
+  border-radius: var(--radius-md);
+  color: var(--text-light); text-align: center;
+
+  p { font-size: 1.9rem; font-weight: 600; }
+  small { font-size: 1.5rem; max-width: 50rem; }
+}
+
+/* --------------------------------------------------------------------------
+  FORMS & INPUTS                  
+-------------------------------------------------------------------------- */
+.styled-form { display: flex; flex-direction: column; gap: 2rem; }
+
+.form-row { display: flex; gap: 2rem;}
+@media (max-width: 45rem) { .form-row { flex-direction: column; } }
+
+.form-field { flex: 1; }
+
+/*
+1. label using for attribute
+2. label by wrapping the input
+3. not linking to any input, just a section label (e.g. for checkbox/radio groups)
+*/
+.form-field label:not(:has(*)),
+.form-field label > span:first-child,
+.label {
+  display: block;
+  width: fit-content; margin-bottom: 0.8rem;
+  font-weight: 600; font-size: 1.3rem; color: var(--text-light);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+.form-field input {
+  width: 100%; height: 5rem;
+  padding: 0 1.6rem;
+  background: var(--input-bg);
+  box-shadow: var(--shadow-inner);
+  border: 1px solid var(--border-color);
+  border-radius: 1.2rem;
+  font-size: 1.6rem; color: var(--text-main);
+  outline: none;
+  transition: all 0.2s;
+}
+.form-field input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 3px 3px rgba(var(--primary-rgb), 0.2);
+}
+
+.input-wrapper {
+  position: relative;
+
+  input { padding-left: 4.2rem; }
+  .input-icon {
+    position: absolute; left: 1.6rem; top: 50%; transform: translateY(-50%);
+    color: var(--text-light); font-weight: 600;
+    pointer-events: none;
+  }
+}
+
+.form-actions { display: flex; justify-content: end; gap: 1.6rem; margin-top: 1rem; }
+
+.help-text { display: block; margin: 1.4rem; color: var(--text-light); }
+.error-text { display: block; margin: 1.4rem; color: var(--danger); font-weight: 600; }
+.error-text::before {
+  content: "\e4e2";
+  font-family: "Phosphor-Fill";
+  margin-right: 0.4em;
+}
+
+/* --------------------------------------------------------------------------
+  BUTTONS
+-------------------------------------------------------------------------- */
+.btn {
+  padding: 1rem 2.4rem;
+  border-radius: 1.2rem;
+  font-size: 1.6rem; font-weight: 600;
+  text-align: center; text-decoration: none;
+  transition: all 0.2s ease-in-out;
+
+  &.btn-sm { padding: 0.8rem 1.6rem; font-size: 1.4rem; border-radius: 0.8rem; }
+  &.btn-lg { padding: 1.4rem 2.6rem; font-size: 1.8rem; }
+}
+
+.btn:not(.btn-fill, .btn-outline) {
+  &.btn-success {
+    color: var(--success);
+    &:hover { background: rgba(var(--success-rgb), 0.1); }
+  }
+  &.btn-danger {
+    color: var(--danger);
+    &:hover { background: rgba(var(--danger-rgb), 0.1); }
+  }
+}
+
+.btn-fill {
+  color: white;
+  &:hover { transform: translateY(-2px); }
+  &:active { transform: translateY(0); }
+
+  &.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb), 0.4);
+  }
+  &.btn-danger {
+    background: linear-gradient(135deg, var(--danger), rgb(var(--danger-rgb), 0.8));
+    border-top: 1px solid rgba(var(--danger-rgb), 0.2);
+    box-shadow: 0 4px 6px -1px rgba(var(--danger-rgb), 0.4);
+  }
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border-dark);
+  color: var(--text-main);
+  &:hover { border-color: var(--text-main); color: var(--text-main); }
+
+  &.btn-primary {
+    border-color: rgba(var(--primary-rgb), 0.4);
+    color: var(--primary);
+    &:hover { border-color: var(--primary); }
+  }
+
+  &.btn-danger {
+    border-color: rgba(var(--danger-rgb), 0.4);
+    color: var(--danger);
+    &:hover { border-color: var(--danger); }
+  }
+}
+
+.btn-icon {
+  flex: none;
+  padding: 0.8rem;
+  font-size: 1.6rem; color: var(--text-light);
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
+  i { display: block; }
+  &:hover { background: var(--hover-dark); color: var(--text-main); }
+
+  &.btn-danger {
+    color: rgba(var(--danger-rgb), 0.6);
+    &:hover { background: rgba(var(--danger-rgb), 0.2); color: var(--danger); }
+  }
+}
+
+/* --------------------------------------------------------------------------
+  ICON PICKER WIDGET
+-------------------------------------------------------------------------- */
+.icon-picker-trigger {
+  display: flex; justify-content: center; align-items: center;
+  width: 5rem; height: 5rem;
+  background: var(--input-bg);
+  box-shadow: var(--shadow-inner);
+  border: 1px solid var(--border-color);
+  border-radius: 1.2rem;
+  outline: none;
+  font-size: 2.2rem;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-picker-trigger:hover, 
+.icon-picker-trigger:focus-visible {
+  border-color: var(--primary);
+  box-shadow: 0 0 3px 3px rgba(var(--primary-rgb), 0.2);
+}
+
+.icon-popover::part(container) { width: 50rem; }
+
+.icon-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.4rem, 1fr));
+  gap: 0.6rem;
+
+  .icon-picker-label {
+    display: flex; align-items: center; justify-content: center;
+    width: 3.4rem; height: 3.4rem; margin: 0 auto;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 1.8rem; color: var(--text-light);
+    cursor: pointer; transition: all 0.3s;
+  }
+
+  .icon-picker-label:hover {
+    background: var(--hover-light);
+    color: var(--text-main);
+  }
+
+  .icon-picker-radio:checked + .icon-picker-label {
+    background: rgba(var(--primary-rgb), 0.05);
+    border-color: rgba(var(--primary-rgb), 0.8);
+    color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+  }
+
+  .icon-picker-radio:focus-visible + .icon-picker-label {
+    color: var(--text-main);
+  }
+}
+
+/* --------------------------------------------------------------------------
+  MISC
+-------------------------------------------------------------------------- */
+.alert {
+  display: flex; align-items: center; gap: 1.2rem;
+  padding: 1rem 1.6rem; margin: 0 1rem; border-radius: var(--radius-md);
+  font-weight: 600; font-size: 1.6rem;
+}
+.alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.alert-success { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+.alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+
+:where(.alert-info, .alert-success, .alert-error)::before { font-family: "Phosphor-Fill"; font-size: 2rem; }
+.alert-info::before { content: "\e2ce"; }
+.alert-success::before { content: "\e184"; }
+.alert-error::before { content: "\e4e2"; }
+
+.brand-wrapper {
+  display: flex; align-items: center; gap: 1.2rem;
+  font-weight: 800; font-size: 2.4rem;
+  color: var(--text-main);
+  letter-spacing: 0.04em;
+
+  img { width: 4.2rem; height: 4.2rem; }
+}
+
+.throbber {
+  display: inline-block; position: relative;
+  width: 1em; height: 1em;
+  border-radius: 50%;
+  background: linear-gradient(45deg, transparent, transparent 40%, #e5f403);
+  -webkit-mask: radial-gradient(farthest-side, transparent 80%, #000 81%);
+  mask: radial-gradient(farthest-side, transparent 80%, #000 81%);
+  animation: loading 1s linear infinite;
+}
+@keyframes loading {
+  0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
+  100% { transform: rotate(360deg); filter: hue-rotate(360deg); }
+}
