@@ -254,7 +254,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; }
 select { display: none; }
 
 .ss-main {
-  display: flex !important; align-items: center; gap: 1.4rem;
+  align-items: center; gap: 1.4rem;
   min-height: 5rem; padding: 1rem 1.6rem;
   background: var(--input-bg);
   box-shadow: var(--shadow-inner);
@@ -283,7 +283,6 @@ select { display: none; }
 
 /* Dropdown Menu */
 .ss-content {
-  display: flex !important;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-lg);

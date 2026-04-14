@@ -179,22 +179,36 @@
   </script>
 
   <script>
-    const mainContent = document.getElementById("main-content");
+    // Clean up SlimSelect instances to ensure proper re-initialization
+    document.body.addEventListener('htmx:beforeSwap', (e) => {
+      const container = e.detail.target;
+      if (!container || typeof container.querySelectorAll !== 'function') return;
+
+      container.querySelectorAll('select').forEach(select => {
+        if (select.slim) {
+          select.slim.destroy();
+          delete select.slim;
+        }
+      });
+    });
 
     // Initialize SlimSelect on Load
-    document.body.addEventListener('htmx:load', () => {
-      document.querySelectorAll('select').forEach(select => {
+    document.body.addEventListener('htmx:load', (e) => {
+      const container = e.detail.elt;
+      if (!container || typeof container.querySelectorAll !== 'function') return;
+
+      container.querySelectorAll('select').forEach(select => {
         if (select.slim) return;
 
         const enableSearch = select.dataset.search === 'true';
-        const contentLocation = select.closest('dialog') ? select.parentElement : mainContent;
+        const isInDialog = select.closest('dialog') !== null;
         const placeholder = select.dataset.placeholder;
 
         select.slim = new SlimSelect({
           select: select,
           settings: {
             showSearch: enableSearch,
-            contentLocation: contentLocation,
+            ...(isInDialog && { contentLocation: select.parentElement }),
             ...(placeholder && { placeholderText: placeholder })
           }
         });
@@ -202,7 +216,7 @@
     });
 
     // Make label clicks open SlimSelect dropdowns
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', (e) => {
       const label = e.target.closest('label');
       if (label) {
         let selectEl = null;
