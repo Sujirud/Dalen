@@ -215,7 +215,7 @@ class SnackBarNotification extends HTMLElement {
           align-items: start;
 
           padding: 1.6rem 1.4rem 1.4rem;
-          border-radius: 1.6rem;
+          border-radius: 1rem;
           overflow: hidden;
           cursor: default;
 

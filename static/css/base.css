@@ -285,12 +285,16 @@ select { display: none; }
 
 /* Dropdown Menu */
 .ss-content {
+  visibility: hidden;
   gap: 1rem;
   background: var(--bg-surface);
   box-shadow: var(--shadow-lg);
   padding: 1rem;
 
   & * { line-height: 1.5; }
+}
+.ss-content:is(.ss-dir-above, .ss-dir-below) {
+  visibility: visible;
 }
 
 /* Search */
@@ -336,6 +340,7 @@ select { display: none; }
       justify-content: center;
       width: 2.8rem; height: 2.8rem;
       border: none;
+      outline-offset: -2px;
 
       svg { width: 0.8rem; height: 0.8rem; }
 

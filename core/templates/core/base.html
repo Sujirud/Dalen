@@ -181,10 +181,7 @@
   <script>
     // Clean up SlimSelect instances to ensure proper re-initialization
     document.body.addEventListener('htmx:beforeSwap', (e) => {
-      const container = e.detail.target;
-      if (!container || typeof container.querySelectorAll !== 'function') return;
-
-      container.querySelectorAll('select').forEach(select => {
+      e.detail.target.querySelectorAll('select').forEach(select => {
         if (select.slim) {
           select.slim.destroy();
           delete select.slim;
@@ -194,10 +191,7 @@
 
     // Initialize SlimSelect on Load
     document.body.addEventListener('htmx:load', (e) => {
-      const container = e.detail.elt;
-      if (!container || typeof container.querySelectorAll !== 'function') return;
-
-      container.querySelectorAll('select').forEach(select => {
+      e.detail.elt.querySelectorAll('select').forEach(select => {
         if (select.slim) return;
 
         const enableSearch = select.dataset.search === 'true';

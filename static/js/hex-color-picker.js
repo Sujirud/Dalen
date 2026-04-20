@@ -84,10 +84,10 @@ class HexColorPicker extends HTMLElement {
         fieldset { border: none; padding: 0; margin: 0; }
         #shade-palette { margin-top: 0.2rem; }
         .palette-row { display: flex; justify-content: center; margin-bottom: -0.65rem; }
-        .base-swatch, .shade-swatch { display: block; position: relative; cursor: pointer; transition: transform 0.2s ease; }
+        .base-swatch, .shade-swatch { display: block; position: relative; cursor: pointer; }
         .base-swatch { width: 2.2rem; height: 2.6rem; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); scale: 1.05; }
         .shade-swatch { width: 2rem; height: 2rem; }
-        .base-swatch:hover, .shade-swatch:hover { transform: scale(1.15); }
+        .base-swatch:hover, .shade-swatch:hover { transform: scale(1.15); z-index: 1; }
         .base-swatch:has(input:focus-visible)::after, .shade-swatch:has(input:focus-visible)::after {
           content: "";
           position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);

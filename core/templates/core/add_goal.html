@@ -1,6 +1,5 @@
 {% extends base_template %}
 {% block content %}
-
 {% if not type %}
 <div class="mb-3">
   <h1>Create New Goal</h1>
@@ -117,8 +116,8 @@
       <div class="form-field">
         <label>
           <span>Category</span>
-          <select name="limit_category" required>
-            <option value="" disabled selected>Select a category…</option>
+          <select name="limit_category" required data-placeholder="Select a category...">
+            <option value="" data-placeholder="true"></option>
             {% for cat in available_categories %}
               <option value="{{ cat.id }}">{{ cat.name }}</option>
             {% endfor %}
@@ -173,5 +172,4 @@
     }
   })();
 </script>
-
 {% endblock %}
