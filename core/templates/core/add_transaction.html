@@ -84,6 +84,7 @@
 
         <form method="post" action="{% url 'delete_category' %}" hx-post="{% url 'delete_category' %}" hx-target="#main-content" hx-confirm="Are you sure? Existing transactions will become Uncategorized.">
           {% csrf_token %}
+          <input type="hidden" name="next" value="add_transaction">
           <input type="hidden" name="category_id" value="{{ cat.id }}">
           <button type="submit" class="btn-icon btn-danger" title="Delete Category">
             <i class="ph-bold ph-trash-simple"></i>
@@ -97,6 +98,7 @@
 
     <form method="post" action="{% url 'add_category' %}" hx-post="{% url 'add_category' %}" hx-target="#main-content" class="styled-form">
       {% csrf_token %}
+      <input type="hidden" name="next" value="add_transaction">
 
       <h4>Add New Category</h4>
       <div class="flex items-end gap-2">
@@ -152,8 +154,8 @@
 </dialog>
 
 <script>
-  (function() {
-    const currentIcon = document.getElementById("catIconBtn").querySelector("i");
+  (() => {
+    const currentIcon = document.getElementById("catIconBtn")?.querySelector("i");
     const colorPicker = document.getElementById("catColorPicker");
     const radios = document.querySelectorAll(".icon-picker-radio");
 

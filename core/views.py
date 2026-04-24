@@ -33,7 +33,6 @@ def _get_today(user):
     user_tz = zoneinfo.ZoneInfo(user.userprofile.timezone)
     return django_timezone.now().astimezone(user_tz).date()
 
-
 def _get_category_limits_data(user, today):
     """
     Returns a list of dicts, one per CategoryLimit, with monthly spend totals calculated for the current calendar month.
@@ -207,6 +206,7 @@ def transactions(request):
         'transactions': transactions_page,
         'last_date': last_date,
         'categories': categories,
+        'icon_choices': ICON_CHOICES,
         'load_more_url': load_more_url,
         'filters_applied': filters_applied
     }
@@ -356,19 +356,26 @@ def add_category(request):
     cat_name = request.POST.get('category_name')
     cat_icon = request.POST.get('category_icon')
     cat_icon_color = request.POST.get('category_icon_color')
-    if cat_name and cat_icon:
+
+    if cat_name and cat_icon and cat_icon_color:
         Category.objects.create(user=request.user, name=cat_name, icon=cat_icon, icon_color=cat_icon_color)
         messages.success(request, f"Category '{cat_name}' added.")
-    return redirect('add_transaction')
+
+    next_url = request.POST.get('next', 'transaction')
+    return redirect(next_url)
 
 
 @login_required
 @require_POST
 def delete_category(request):
     cat_id = request.POST.get('category_id')
-    Category.objects.filter(user=request.user, id=cat_id).delete()
-    messages.success(request, "Category deleted.")
-    return redirect('add_transaction')
+
+    if cat_id:
+        Category.objects.filter(user=request.user, id=cat_id).delete()
+        messages.success(request, "Category deleted.")
+
+    next_url = request.POST.get('next', 'transaction')
+    return redirect(next_url)
 
 # ==========================================
 # PLANNING VIEWS (GOALS & RECURRING)

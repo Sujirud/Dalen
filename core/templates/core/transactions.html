@@ -60,10 +60,12 @@
   </form>
 
   <div class="flex flex-wrap justify-end items-baseline gap-2 pd-2">
+    <button class="text-primary font-medium" onclick="openModal('manageCategoriesModal')">
+      <i class="ph-bold ph-list-plus"></i><span>Manage Categories</span>
+    </button>
     <button id="editModeToggle" class="text-primary font-medium">
       <i class="ph-bold ph-pencil-simple text-14"></i><span>Edit mode</span>
     </button>
-
     <a class="text-primary font-medium no-underline" href="{% url 'export_transactions' %}" title="Export CSV">
       <i class="ph-bold ph-download-simple"></i><span>Export CSV</span>
     </a>
@@ -178,6 +180,94 @@
   </div>
 </dialog>
 
+<dialog id="manageCategoriesModal">
+  <div class="modal-card surface-panel">
+    <div class="modal-header">
+      <h3>Manage Categories</h3>
+      <button type="button" class="modal-close" onclick="closeModal('manageCategoriesModal')">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    </div>
+
+    <div class="categories-list no-scrollbar">
+      {% for cat in categories %}
+      <div class="categories-card glass-panel">
+        <div class="flex items-center gap-1">
+          <i class="icon-badge ph ph-{{ cat.icon }}" style="color: {{ cat.icon_color }};"></i>
+          <span class="font-medium">{{ cat.name }}</span>
+        </div>
+
+        <form method="post" action="{% url 'delete_category' %}" hx-post="{% url 'delete_category' %}" hx-target="#main-content" hx-confirm="Are you sure? Existing transactions will become Uncategorized.">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="transactions">
+          <input type="hidden" name="category_id" value="{{ cat.id }}">
+          <button type="submit" class="btn-icon btn-danger" title="Delete Category">
+            <i class="ph-bold ph-trash-simple"></i>
+          </button>
+        </form>
+      </div>
+      {% empty %}
+      <p class="text-light text-center pd-2">No categories yet. Add one below!</p>
+      {% endfor %}
+    </div>
+
+    <form method="post" action="{% url 'add_category' %}" hx-post="{% url 'add_category' %}" hx-target="#main-content" class="styled-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="transactions">
+
+      <h4>Add New Category</h4>
+      <div class="flex items-end gap-2">
+        <div class="form-field flex-none">
+          <label>
+            <span>Icon</span>
+            <button type="button" id="catIconBtn" class="icon-picker-trigger">
+              <i class="ph ph-{{ icon_choices.0.0 }}" style="color: #206BFF;"></i>
+            </button>
+          </label>
+
+          <dl-popover anchor-id="catIconBtn" placement="bottom-start" append-to="none" class="icon-popover">
+            <div class="mb-1">
+              <span class="label">Icon Color</span>
+              <hex-color-picker
+                id="catColorPicker"
+                name="category_icon_color"
+                value="#206BFF">
+              </hex-color-picker>
+            </div>
+
+            <div>
+              <span class="label">Icon</span>
+              <div class="icon-picker-grid">
+                {% for icon_val, icon_label in icon_choices %}
+                  <input type="radio" name="category_icon" id="cat_icon_{{ icon_val }}" value="{{ icon_val }}" class="visually-hidden icon-picker-radio" 
+                    {% if forloop.first %}checked{% endif %}>
+                  <label for="cat_icon_{{ icon_val }}" class="icon-picker-label" title="{{ icon_label }}">
+                    <i class="ph ph-{{ icon_val }}"></i>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          </dl-popover>
+        </div>
+
+        <div class="form-field">
+          <label>
+            <span>Category Name</span>
+            <div class="input-wrapper">
+              <i class="ph ph-tag input-icon"></i>
+              <input type="text" name="category_name" placeholder="e.g. Groceries" maxlength="50" autocomplete="off" required>
+            </div>
+          </label>
+        </div>
+
+        <button type="submit" class="new-categories-btn btn btn-fill btn-primary">
+          <i class="ph-bold ph-plus"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
 <script>
   (() => {
     const container = document.getElementById("transactionsContainer");
@@ -232,6 +322,27 @@
     });
 
     updateToolbar();
+  })();
+</script>
+
+<script>
+  (() => {
+    const currentIcon = document.getElementById("catIconBtn")?.querySelector("i");
+    const colorPicker = document.getElementById("catColorPicker");
+    const radios = document.querySelectorAll(".icon-picker-radio");
+
+    if (!currentIcon || !colorPicker) return;
+
+    radios.forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        currentIcon.className = `ph ph-${e.target.value}`;
+        currentIcon.style.color = colorPicker.value;
+      });
+    });
+
+    colorPicker.addEventListener("color-changed", (e) => {
+      currentIcon.style.color = e.target.value;
+    });
   })();
 </script>
 {% endblock %}
